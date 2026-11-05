@@ -262,7 +262,6 @@ def init_db():
         ("Video Editing & Hiring BD #109", "https://www.facebook.com/groups/1096533198753530/", 5),
         ("Video Editor Job Bangladesh", "https://www.facebook.com/groups/VideoditorJobBangladesh/", 5),
         ("Video Editors YES", "https://www.facebook.com/groups/videoeditorsyes/", 5),
-        ("Professional Editors BD #229", "https://www.facebook.com/groups/2292891657639248/", 5),
         ("Video Editing Freelance BD #117", "https://www.facebook.com/groups/1173532240001355/", 5),
         ("BD Video Editing Network #294", "https://www.facebook.com/groups/294830932856749/", 5),
         ("Video Editor in Bangladesh", "https://www.facebook.com/groups/videoeditorinbangladesh/", 5),
@@ -335,11 +334,17 @@ def init_db():
         clean = g_url.strip()
         if not clean.endswith('/'):
             clean += '/'
+        clean_no_slash = clean.rstrip('/')
         c.execute("""
             INSERT INTO fb_monitored_groups (name, url, active, check_interval_min, priority)
             VALUES (?, ?, 1, 1, ?)
             ON CONFLICT(url) DO UPDATE SET priority=excluded.priority, name=excluded.name
         """, (g_name, clean, prio))
+        c.execute("""
+            UPDATE fb_monitored_groups 
+            SET priority = MAX(priority, ?), name = ?
+            WHERE url = ? OR url = ?
+        """, (prio, g_name, clean, clean_no_slash))
 
     conn.commit()
     conn.close()
@@ -665,9 +670,6 @@ def insert_fb_group(name: str, url: str, interval: int = 2, priority: int = 0) -
         ON CONFLICT(url) DO UPDATE SET priority=excluded.priority, name=excluded.name
     """, (name, url, interval, priority))
     gid = c.lastrowid
-    conn.commit()
-    conn.close()
-    return gid
     conn.commit()
     conn.close()
     return gid

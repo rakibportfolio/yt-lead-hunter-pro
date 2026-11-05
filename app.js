@@ -262,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load saved state
   loadStoredKeys();
   loadLeadsFromDatabase();
+  loadFbAlerts();
   initNichePanel();
   initExportColumns();
   setupFilterEventListeners();
@@ -1838,13 +1839,16 @@ function renderFbGroupsList() {
   const groupItems = FB_GROUPS_STATE.map(g => {
     const isActive = g.active === 1;
     const isSelected = SELECTED_FB_GROUP_ID === g.id;
+    const isVip = (g.priority && g.priority >= 10);
     const safeName = (g.name || 'Facebook Group').replace(/'/g, "\\'");
+    const vipBadge = isVip ? '<span style="background:#fef3c7;color:#b45309;font-size:9.5px;font-weight:900;padding:2px 6px;border-radius:4px;margin-left:5px;border:1px solid #fde68a;">⭐ VIP (Top Priority)</span>' : '';
     return `
-      <div onclick="selectFbGroup(${g.id}, '${safeName}')" style="padding:11px 12px;border-radius:8px;cursor:pointer;display:flex;flex-direction:column;gap:5px;transition:all 0.15s ease;${isSelected ? 'background:#eff6ff;border:2px solid #1877F2;box-shadow:0 0 0 2px rgba(24,119,242,0.2);' : 'background:var(--bg-subtle);border:1px solid var(--border-color);'}">
+      <div onclick="selectFbGroup(${g.id}, '${safeName}')" style="padding:11px 12px;border-radius:8px;cursor:pointer;display:flex;flex-direction:column;gap:5px;transition:all 0.15s ease;${isSelected ? 'background:#eff6ff;border:2px solid #1877F2;box-shadow:0 0 0 2px rgba(24,119,242,0.2);' : (isVip ? 'background:#fffbeb;border:1px solid #fde68a;' : 'background:var(--bg-subtle);border:1px solid var(--border-color);')}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div style="flex:1;overflow:hidden;padding-right:6px;">
-            <div style="font-weight:800;font-size:12.5px;color:${isSelected ? '#1d4ed8' : 'var(--text-main)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-              ${isSelected ? '👉 ' : ''}${escapeHtml(g.name)}
+            <div style="font-weight:800;font-size:12.5px;color:${isSelected ? '#1d4ed8' : (isVip ? '#92400e' : 'var(--text-main)')};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;">
+              <span style="overflow:hidden;text-overflow:ellipsis;">${isSelected ? '👉 ' : ''}${escapeHtml(g.name)}</span>
+              ${vipBadge}
             </div>
             <a href="${escapeHtml(g.url)}" target="_blank" onclick="event.stopPropagation()" style="font-size:10.5px;color:#1877F2;text-decoration:none;">🔗 Open Group</a>
           </div>
@@ -2109,3 +2113,11 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+// Auto-refresh FB Radar alerts every 20 seconds so fresh posts appear live
+setInterval(() => {
+  if (APP_STATE.currentPage === 'fb-radar') {
+    loadFbAlerts();
+  }
+}, 20000);
+
