@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Ensure backend directory is in sys.path for direct imports
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+if BACKEND_DIR not in sys.path:
+    sys.path.insert(0, BACKEND_DIR)
+
 from fb_group_monitor import (
     start_fb_monitor, stop_fb_monitor, process_single_fb_group, send_test_fb_hiring_alert
 )
