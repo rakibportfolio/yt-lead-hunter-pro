@@ -348,16 +348,21 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                 except Exception as ce:
                     print(f"[FB Cookies] Note adding cookies: {ce}")
 
-            page = context.new_page()
-            page.goto(clean_url, timeout=25000, wait_until="domcontentloaded")
-            page.wait_for_timeout(3000)
+            # First priority: target the group's hiring search feed to bypass noise/chatter
+            search_url = f"{clean_url}/search/?q=hiring"
+            try:
+                page.goto(search_url, timeout=20000, wait_until="domcontentloaded")
+                page.wait_for_timeout(3000)
+            except Exception:
+                page.goto(clean_url, timeout=20000, wait_until="domcontentloaded")
+                page.wait_for_timeout(3000)
 
             # Incremental scrolls: grab posts as they appear in the DOM
-            for _ in range(4):
+            for scroll_round in range(4):
                 if len(posts) >= limit:
                     break
 
-                feed_posts = page.query_selector_all('div[role="feed"] div[role="article"], div[role="article"], div[data-ad-preview="message"]')
+                feed_posts = page.query_selector_all('div[role="feed"] > div, div[role="article"], div[data-ad-preview="message"]')
                 for f_post in feed_posts:
                     if len(posts) >= limit:
                         break
@@ -389,8 +394,41 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                         })
 
                 # Scroll down
-                page.evaluate("window.scrollBy(0, 1000)")
-                page.wait_for_timeout(1500)
+                page.evaluate("window.scrollBy(0, 1200)")
+                page.wait_for_timeout(1200)
+
+            # If search feed returned fewer than 2 posts, also check main group feed
+            if len(posts) < 2:
+                try:
+                    page.goto(clean_url, timeout=20000, wait_until="domcontentloaded")
+                    page.wait_for_timeout(2500)
+                    for _ in range(2):
+                        feed_posts = page.query_selector_all('div[role="feed"] div[role="article"], div[role="article"]')
+                        for f_post in feed_posts:
+                            if len(posts) >= limit:
+                                break
+                            try:
+                                txt = f_post.inner_text().strip()
+                            except Exception:
+                                continue
+                            if len(txt) > 30 and txt not in seen_texts:
+                                seen_texts.add(txt)
+                                img_tag = f_post.query_selector('img[src*="scontent"], img')
+                                img_src = img_tag.get_attribute("src") if img_tag else ""
+                                link_tag = f_post.query_selector('a[href*="/posts/"], a[href*="/permalink/"]')
+                                p_href = link_tag.get_attribute("href") if link_tag else clean_url
+                                pid = f"fb_{abs(hash(txt[:80]))}"
+                                posts.append({
+                                    "post_id": pid,
+                                    "author_name": "Facebook User",
+                                    "post_url": p_href if p_href.startswith("http") else f"https://facebook.com{p_href}",
+                                    "content": txt,
+                                    "image_url": img_src or ""
+                                })
+                        page.evaluate("window.scrollBy(0, 1000)")
+                        page.wait_for_timeout(1000)
+                except Exception:
+                    pass
 
             browser.close()
     except Exception as pe:
