@@ -48,6 +48,9 @@ class Config:
     # ── Gemini AI ─────────────────────────────────────────────
     GEMINI_API_KEY = _clean_val(os.getenv("GEMINI_API_KEY", ""))
 
+    # ── Facebook Session Cookies ─────────────────────────────
+    FB_COOKIES = os.getenv("FB_COOKIES", "")
+
     # ── Telegram Bot ──────────────────────────────────────────
     TELEGRAM_BOT_TOKEN = _clean_val(os.getenv("TELEGRAM_BOT_TOKEN", "8874694866:AAEmdXxd3DP3B8J4L2sHS0pIxVR98HV9vqI"))
     TELEGRAM_CHAT_ID   = _clean_val(os.getenv("TELEGRAM_CHAT_ID", "8279465535"))

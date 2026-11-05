@@ -24,35 +24,34 @@ from telegram_bot import alert_fb_hiring_post
 # ── Strict Freshness Filter (Max 3 Hours) ───────────────────
 def is_post_fresh(content: str, max_hours: int = 3) -> bool:
     """
-    STRICT FILTER: Accurately accepts ONLY fresh leads posted within the last 3 hours
-    (e.g. 'just now', '12 minutes ago', 'about an hour ago', '2 hours ago', '3h').
-    Strictly rejects older posts (>= 4 hours, 'yesterday', '2 days ago', past dates/years).
+    SMART FILTER: Accepts fresh leads posted within the last 3 hours.
+    If NO timestamp is found in the post, we ALLOW it (assume it could be recent).
+    Only EXPLICITLY OLD posts (yesterday, 4h+, past dates) are rejected.
     """
     t = content.lower()
 
-    # 1. Immediate Fresh Signals (< 1 hour)
+    # 1. Immediate Fresh Signals (< 1 hour) → ACCEPT immediately
     if 'just now' in t or 'এইমাত্র' in t:
         return True
     if re.search(r'\b\d+\s*(?:m|min|mins|minutes?|মিনিট)\b', t):
         return True
 
-    # 2. Fresh Hours Check (<= max_hours)
-    if 'about an hour' in t or 'an hour ago' in t or '১ ঘণ্টা' in t:
+    # 2. Fresh Hours Check (<= max_hours) → ACCEPT
+    if 'about an hour' in t or 'an hour ago' in t or '১ ঘণ্টা' in t or '1 hour' in t:
         return True
 
     hr_matches = re.findall(r'\b(\d+)\s*(?:h|hr|hrs|hours?|ঘণ্টা|ঘন্টা)\b', t)
     if hr_matches:
         try:
-            # Check smallest hour tag in post header
             min_hr = min(int(h) for h in hr_matches)
             if min_hr <= max_hours:
                 return True
             else:
-                return False
+                return False  # explicitly 4h+ → reject
         except ValueError:
             pass
 
-    # 3. Explicit old indicators in English and Bengali
+    # 3. Explicit OLD indicators → REJECT
     old_keywords = [
         'yesterday', 'গতকাল', 'days ago', 'দিন আগে', 'day ago',
         'weeks ago', 'সপ্তাহ আগে', 'week ago',
@@ -66,26 +65,28 @@ def is_post_fresh(content: str, max_hours: int = 3) -> bool:
         if old in t:
             return False
 
-    if re.search(r'\b\d+\s*(?:d|days?|দিন)\b', t):
+    if re.search(r'\b\d+\s*(?:d|days?)\b', t):  # e.g. "2d", "3 days"
         return False
 
-    # 4. Past years (2020-2025)
+    # 4. Past years (2020-2025) → REJECT
     if re.search(r'\b(201\d|202[0-5])\b', t):
         return False
 
-    # 5. Other months (not current month 'november')
-    other_months = [
-        'january', 'february', 'march', 'april', 'may', 'june',
+    # 5. Specific OLD calendar months → REJECT only if paired with a day number
+    old_months = [
+        'january', 'february', 'march', 'april', 'june',
         'july', 'august', 'september', 'october', 'december',
         'jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'oct', 'dec',
         'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
         'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'ডিসেম্বর'
     ]
-    for m in other_months:
+    for m in old_months:
         if re.search(r'\b\d{1,2}\s+' + m + r'\b|\b' + m + r'\s+\d{1,2}\b', t):
             return False
 
-    return False
+    # 6. No timestamp found at all → ALLOW (assume could be recent)
+    # This is the KEY fix: when FB hides timestamps (login wall), we still scan the content
+    return True
 
 # ── AI / Intent Classification using Gemini LLM ──────────────
 def classify_fb_post_with_ai(content: str, author_name: str = "", group_name: str = "") -> Dict[str, Any]:
@@ -311,7 +312,24 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
             from playwright.sync_api import sync_playwright
             with sync_playwright() as p:
                 browser = p.chromium.launch(headless=True)
-                page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+                context = browser.new_context(
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                )
+
+                # Inject logged-in Facebook cookies if available (100% bypasses login popup)
+                if cfg.FB_COOKIES:
+                    cookie_list = []
+                    for part in cfg.FB_COOKIES.split(';'):
+                        if '=' in part:
+                            k, v = part.strip().split('=', 1)
+                            cookie_list.append({'name': k.strip(), 'value': v.strip(), 'domain': '.facebook.com', 'path': '/'})
+                    if cookie_list:
+                        try:
+                            context.add_cookies(cookie_list)
+                        except Exception as ce:
+                            print(f"[FB Cookies] Note adding cookies: {ce}")
+
+                page = context.new_page()
                 page.goto(clean_url, timeout=20000, wait_until="domcontentloaded")
                 time.sleep(2)
 
