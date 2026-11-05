@@ -1,0 +1,69 @@
+# ============================================================
+# ZENTIC MEDIA — CLIENT HUNTING AUTOMATION
+# config.py — All settings in one place
+# ============================================================
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def _clean_val(val: str) -> str:
+    if not val:
+        return ""
+    v = val.strip()
+    if v.startswith("your_") or "your_app_password" in v or v == "your@gmail.com":
+        return ""
+    return v
+
+class Config:
+    # ── App ──────────────────────────────────────────────────
+    APP_NAME    = "Zentic Media Client Hunter"
+    VERSION     = "1.0.0"
+    DEBUG       = os.getenv("DEBUG", "true").lower() == "true"
+
+    # ── Database ─────────────────────────────────────────────
+    DB_PATH     = os.getenv("DB_PATH", "zentic_data.db")
+
+    # ── Gmail / Email ─────────────────────────────────────────
+    GMAIL_ADDRESS   = _clean_val(os.getenv("GMAIL_ADDRESS", ""))
+    GMAIL_PASSWORD  = _clean_val(os.getenv("GMAIL_PASSWORD", ""))   # App Password
+    SMTP_HOST       = "smtp.gmail.com"
+    SMTP_PORT       = 587
+    DAILY_SEND_LIMIT = int(os.getenv("DAILY_SEND_LIMIT", "200"))
+
+    # Email tracking — your server URL (where pixel lives)
+    TRACKING_BASE_URL = os.getenv("TRACKING_BASE_URL", "http://localhost:8000")
+
+    # ── YouTube API ───────────────────────────────────────────
+    YOUTUBE_API_KEY = _clean_val(os.getenv("YOUTUBE_API_KEY", ""))
+    YOUTUBE_QUOTA_LIMIT = 10000   # daily
+
+    # ── Bright Data YouTube Datasets ──────────────────────────
+    BRIGHT_DATA_API_KEY = _clean_val(os.getenv("BRIGHT_DATA_API_KEY", ""))
+    BRIGHT_DATA_VIDEOS_DATASET = "gd_lk56epmy2i5g7lzu0k"
+    BRIGHT_DATA_CHANNELS_DATASET = "gd_lk538t2k2p1k3oos71"
+    BRIGHT_DATA_BASE_URL = "https://api.brightdata.com/datasets/v3"
+
+    # ── Gemini AI ─────────────────────────────────────────────
+    GEMINI_API_KEY = _clean_val(os.getenv("GEMINI_API_KEY", ""))
+
+    # ── Telegram Bot ──────────────────────────────────────────
+    TELEGRAM_BOT_TOKEN = _clean_val(os.getenv("TELEGRAM_BOT_TOKEN", ""))
+    TELEGRAM_CHAT_ID   = _clean_val(os.getenv("TELEGRAM_CHAT_ID", ""))
+    DAILY_REPORT_TIME  = os.getenv("DAILY_REPORT_TIME", "23:00")
+
+    # ── WhatsApp ──────────────────────────────────────────────
+    WHATSAPP_TOKEN       = _clean_val(os.getenv("WHATSAPP_TOKEN", ""))
+    WHATSAPP_PHONE_ID    = _clean_val(os.getenv("WHATSAPP_PHONE_ID", ""))
+
+    # ── Links ─────────────────────────────────────────────────
+    PORTFOLIO_LINK       = os.getenv("PORTFOLIO_LINK", "https://zentic.media/portfolio")
+    CALENDLY_LINK        = os.getenv("CALENDLY_LINK", "https://calendly.com/zenticmedia")
+
+    # ── Social APIs ───────────────────────────────────────────
+    TWITTER_BEARER_TOKEN = _clean_val(os.getenv("TWITTER_BEARER_TOKEN", ""))
+    LINKEDIN_CLIENT_ID   = _clean_val(os.getenv("LINKEDIN_CLIENT_ID", ""))
+    LINKEDIN_CLIENT_SECRET = _clean_val(os.getenv("LINKEDIN_CLIENT_SECRET", ""))
+
+cfg = Config()

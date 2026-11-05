@@ -1,0 +1,39 @@
+# Environment and Secrets (CRITICAL)
+.env
+*.env
+backend/.env
+
+# SQLite Databases (Keep your collected leads private)
+*.db
+*.sqlite
+*.sqlite3
+zentic_data.db
+backend/zentic_data.db
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# Playwright & Browser artifacts
+.playwright/
+test-results/
+
+# Temporary patch and test scripts
+patch_*.py
+clean_*.py
+fix_*.py
+test_http.py
+db_fb_patch.py
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+

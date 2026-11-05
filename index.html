@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YT Lead Hunter PRO + AI Outreach & CRM</title>
+  <link rel="stylesheet" href="styles.css?v=3.1" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238b1524'><path d='M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z'/></svg>" />
+</head>
+<body>
+
+  <!-- ── Top Navigation Bar ── -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <div class="brand-section">
+        <div class="brand-logo-icon">▶</div>
+        <div class="brand-text">
+          <h1>YT Lead Hunter <span class="brand-badge">PRO</span></h1>
+          <div class="brand-sub">POWERED BY AK TECHNOLOGY &amp; ZENTIC MEDIA</div>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-page="dashboard" onclick="navigatePage('dashboard')">
+          <span>⊞</span> Dashboard
+        </button>
+        <button class="nav-tab-btn" data-page="find-leads" onclick="navigatePage('find-leads')">
+          <span>🔍</span> Find Leads
+        </button>
+        <button class="nav-tab-btn" data-page="results" onclick="navigatePage('results')">
+          <span>☑</span> Results <span class="nav-badge" id="resultsBadge">0</span>
+        </button>
+        <button class="nav-tab-btn" data-page="ai-workspace" onclick="navigatePage('ai-workspace')">
+          <span>✻</span> AI Workspace
+        </button>
+        <button class="nav-tab-btn" data-page="exports" onclick="navigatePage('exports')">
+          <span>↓</span> Exports
+        </button>
+        <button class="nav-tab-btn" data-page="pipeline" onclick="navigatePage('pipeline')">
+          <span>🏆</span> CRM Pipeline <span class="nav-badge" id="pipelineBadge" style="background:#166534;">0</span>
+        </button>
+        <button class="nav-tab-btn" data-page="fb-radar" onclick="navigatePage('fb-radar')">
+          <span>🎯</span> FB Radar <span class="nav-badge" id="fbRadarBadge" style="background:#1877F2;">0</span>
+        </button>
+        <button class="nav-tab-btn" data-page="settings" onclick="navigatePage('settings')">
+          <span>⚙</span> Settings
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="quota-pill" id="navQuotaPill" title="Daily Magic Quota Limit">
+          <span class="pulse-dot"></span>
+          <span id="navQuotaUnits">30,000 units</span>
+        </div>
+        <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+          🌙
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Main Content Area ── -->
+  <main class="main-wrapper">
+
+    <!-- ============================================================
+         PAGE 1: DASHBOARD
+         ============================================================ -->
+    <section class="page-view active" id="view-dashboard">
+      <div class="page-header">
+        <h2 class="page-title">Dashboard</h2>
+        <p class="page-subtitle">Your lead discovery command center</p>
+      </div>
+
+      <!-- Top 4 Metric Cards -->
+      <div class="metrics-row">
+        <div class="metric-card red">
+          <div class="metric-icon-wrap">👤</div>
+          <div class="metric-info">
+            <h3 id="statTotalLeads">0</h3>
+            <p>Total Leads</p>
+            <span class="sub-text" id="statQualifiedSub">0 qualified</span>
+          </div>
+        </div>
+        <div class="metric-card green">
+          <div class="metric-icon-wrap">⭐</div>
+          <div class="metric-info">
+            <h3 id="statHighPotential">0</h3>
+            <p>High Potential</p>
+            <span class="sub-text">Score ≥ 70</span>
+          </div>
+        </div>
+        <div class="metric-card blue">
+          <div class="metric-icon-wrap">📊</div>
+          <div class="metric-info">
+            <h3 id="statAvgScore">--</h3>
+            <p>Avg Lead Score</p>
+            <span class="sub-text">Across all leads</span>
+          </div>
+        </div>
+        <div class="metric-card gray">
+          <div class="metric-icon-wrap">⏱</div>
+          <div class="metric-info">
+            <h3 id="statQuotaRemaining">30,000</h3>
+            <p>Quota Remaining</p>
+            <span class="sub-text" id="statQuotaPct">100% of 30k daily limit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard 2-Column Grid -->
+      <div class="dash-grid">
+        <!-- Left Main Column -->
+        <div class="dash-left-col">
+          <!-- Top Leads Card -->
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>Top Leads</span>
+              <a href="javascript:void(0)" onclick="navigatePage('results')">View All →</a>
+            </div>
+            <div class="card-body" id="topLeadsList">
+              <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
+                <div style="font-size:32px;margin-bottom:8px;">🔍</div>
+                <p style="font-weight:600;">No leads yet</p>
+                <p style="font-size:12px;color:var(--text-light);margin-bottom:14px;">Run your first discovery to see results here</p>
+                <button class="btn-primary-red" onclick="navigatePage('find-leads')">🔍 Find Leads</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Score Distribution Card -->
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>Score Distribution</span>
+              <span id="scoreDistTotalLeads">0 LEADS</span>
+            </div>
+            <div class="card-body">
+              <div class="score-dist-grid" id="scoreDistGrid">
+                <div class="dist-col">
+                  <div class="dist-val" id="distVal0">0</div>
+                  <div class="dist-bar-wrap"><div class="dist-bar" id="distBar0" style="height:2px;"></div></div>
+                  <div class="dist-label">0–19</div>
+                </div>
+                <div class="dist-col">
+                  <div class="dist-val" id="distVal1">0</div>
+                  <div class="dist-bar-wrap"><div class="dist-bar" id="distBar1" style="height:2px;"></div></div>
+                  <div class="dist-label">20–39</div>
+                </div>
+                <div class="dist-col">
+                  <div class="dist-val" id="distVal2">0</div>
+                  <div class="dist-bar-wrap"><div class="dist-bar" id="distBar2" style="height:2px;"></div></div>
+                  <div class="dist-label">40–59</div>
+                </div>
+                <div class="dist-col">
+                  <div class="dist-val" id="distVal3">0</div>
+                  <div class="dist-bar-wrap"><div class="dist-bar" id="distBar3" style="height:2px;"></div></div>
+                  <div class="dist-label">60–79</div>
+                </div>
+                <div class="dist-col">
+                  <div class="dist-val" id="distVal4">0</div>
+                  <div class="dist-bar-wrap"><div class="dist-bar" id="distBar4" style="height:2px;"></div></div>
+                  <div class="dist-label">80–100★</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Magic Usage Card -->
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>Magic Usage</span>
+              <span id="magicUsagePct">100%</span>
+            </div>
+            <div class="card-body">
+              <div style="height:8px;background:var(--border-color);border-radius:4px;overflow:hidden;margin-bottom:10px;">
+                <div id="magicUsageBar" style="height:100%;background:var(--primary-red);width:100%;"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);font-weight:600;">
+                <span id="magicUsedText">0 / 30,000 Magic Units</span>
+                <span>Resets Midnight Pacific</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Searches Card -->
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>Recent Searches</span>
+            </div>
+            <div class="card-body" id="recentSearchesList">
+              <p style="color:var(--text-light);font-size:13px;text-align:center;padding:15px 0;">No searches yet</p>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>Quick Actions</span>
+            </div>
+            <div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button class="btn-primary-red" onclick="navigatePage('find-leads')">🔍 Find New Leads</button>
+              <button class="btn-secondary" onclick="navigatePage('results')">📈 View Results</button>
+              <button class="btn-secondary" onclick="navigatePage('exports')">↓ Export Leads</button>
+              <button class="btn-secondary" onclick="exportGoogleSheetsCSV()">📊 Google Sheets CSV (Apps Script)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Sidebar Column -->
+        <div class="dash-right-col">
+          <!-- Growth Analytics -->
+          <div class="card-box">
+            <div class="card-header-crimson" style="display:flex;align-items:center;justify-content:space-between;">
+              <span>Growth Analytics</span>
+              <span style="font-size:10px;background:#10b981;color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;">● LIVE</span>
+            </div>
+            <div class="card-body">
+              <div style="display:flex;background:var(--bg-subtle);border-radius:6px;padding:3px;margin-bottom:14px;">
+                <button class="switch-pill-btn active" style="flex:1;">Today</button>
+                <button class="switch-pill-btn" style="flex:1;">This Week</button>
+                <button class="switch-pill-btn" style="flex:1;">Month</button>
+              </div>
+              <div class="stats-tri-row">
+                <div class="tri-stat"><h4 id="rightWeekLeads">0</h4><span>Leads This Week</span></div>
+                <div class="tri-stat"><h4 id="rightHighPotential">0</h4><span>High Potential</span></div>
+                <div class="tri-stat"><h4 id="rightAvgScore">--</h4><span>Avg Score</span></div>
+              </div>
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin:12px 0 6px;">7-Day Lead Activity</div>
+              <div style="display:flex;justify-content:space-between;align-items:flex-end;height:45px;border-bottom:1px solid var(--border-color);padding-bottom:4px;" id="activityBars">
+                <span style="font-size:10px;color:var(--text-light);">S</span>
+                <span style="font-size:10px;color:var(--text-light);">M</span>
+                <span style="font-size:10px;color:var(--text-light);">T</span>
+                <span style="font-size:10px;color:var(--text-light);">W</span>
+                <span style="font-size:10px;color:var(--text-light);">T</span>
+                <span style="font-size:10px;color:var(--text-light);">F</span>
+                <span style="font-size:10px;color:var(--text-light);">S</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Magic Unit Intelligence -->
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>Magic Unit Intelligence</span>
+              <span style="font-size:10px;background:#166534;color:#dcfce7;padding:2px 6px;border-radius:4px;font-weight:700;">Healthy</span>
+            </div>
+            <div class="card-body">
+              <div class="gauge-box">
+                <svg class="gauge-svg" viewBox="0 0 100 100">
+                  <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
+                  <circle class="gauge-val-circle" id="gaugeCircle" cx="50" cy="50" r="45"></circle>
+                </svg>
+                <div class="gauge-center-text">
+                  <div class="gauge-pct" id="gaugeCenterPct">100%</div>
+                  <div class="gauge-sub">REMAINING</div>
+                </div>
+              </div>
+              <div style="text-align:center;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">
+                <span id="gaugeOfUnits">30,000 of 30,000 Magic Units</span>
+              </div>
+              <div class="stats-tri-row">
+                <div class="tri-stat"><h4 id="gaugeUsedToday">0</h4><span>Used Today</span></div>
+                <div class="tri-stat"><h4 id="gaugeSearchesLeft">300</h4><span>Searches Left</span></div>
+                <div class="tri-stat"><h4 id="gaugeEstLeads">~900</h4><span>Est. Leads</span></div>
+              </div>
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin:12px 0 6px;">Per-Key Usage — 3 Keys Active</div>
+              <div class="key-usage-item">
+                <span class="key-name">Primary Key</span>
+                <span class="key-val" id="keyValPrimary">10,000 left</span>
+              </div>
+              <div class="key-usage-item">
+                <span class="key-name">Secondary Key</span>
+                <span class="key-val" id="keyValSecondary">10,000 left</span>
+              </div>
+              <div class="key-usage-item">
+                <span class="key-name">Third Key</span>
+                <span class="key-val" id="keyValThird">10,000 left</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PAGE 2: FIND LEADS
+         ============================================================ -->
+    <section class="page-view" id="view-find-leads">
+      <div class="page-header">
+        <h2 class="page-title">Find Leads</h2>
+        <p class="page-subtitle">Discover underperforming YouTube channels — your next consulting clients</p>
+      </div>
+
+      <div class="find-leads-grid">
+        <!-- Main Form Column -->
+        <div class="find-leads-form-col">
+          <div class="card-box">
+            <div class="card-body">
+              <!-- Mode Switcher -->
+              <div class="discovery-mode-wrap">
+                <div>
+                  <h3 style="font-size:15px;font-weight:800;color:var(--text-main);">Discovery Mode</h3>
+                  <p style="font-size:12px;color:var(--text-muted);">Search one keyword or bulk-run across many topics at once</p>
+                </div>
+                <div class="toggle-switch-pills">
+                  <button class="switch-pill-btn active" id="btnModeSingle" onclick="setDiscoveryMode('single')">Single Keyword</button>
+                  <button class="switch-pill-btn" id="btnModeBulk" onclick="setDiscoveryMode('bulk')">Bulk Keywords</button>
+                </div>
+              </div>
+
+              <!-- Single Keyword Input -->
+              <div id="singleKeywordSection">
+                <div style="position:relative;margin-bottom:8px;">
+                  <input type="text" class="search-input-field" id="inputKeyword" placeholder="e.g. personal finance, learn guitar, backyard chickens, how to lose weight..." />
+                </div>
+                <p style="font-size:12px;color:var(--text-light);margin-bottom:14px;">The engine auto-classifies your input and expands into targeted queries. Works with seed keywords, topics, pain-points.</p>
+              </div>
+
+              <!-- Bulk Keywords Input -->
+              <div id="bulkKeywordSection" style="display:none;margin-bottom:16px;">
+                <textarea class="search-input-field" id="inputBulkKeywords" rows="6" placeholder="Enter one keyword per line (1000+ supported):&#10;fitness coach&#10;real estate agent&#10;career coach&#10;nutrition coach&#10;how to save money"></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);font-weight:600;margin-top:6px;">
+                  <span id="bulkKeywordsStats">Lines: 0 | Keywords: 0 | Est. queries: 0 | Est. API units: 0</span>
+                  <div style="display:flex;gap:8px;">
+                    <button class="btn-secondary" style="padding:4px 10px;font-size:11px;" onclick="pasteClipboardKeywords()">📋 Paste</button>
+                    <button class="btn-secondary" style="padding:4px 10px;font-size:11px;" onclick="clearBulkKeywords()">Clear all</button>
+                  </div>
+                </div>
+                <div style="margin-top:14px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;display:block;">⚡ Leads Per Keyword (Per-keyword output cap)</label>
+                  <div class="pills-select-group" id="bulkCapPills">
+                    <button class="select-pill" data-val="20">20</button>
+                    <button class="select-pill" data-val="50">50</button>
+                    <button class="select-pill active" data-val="100">100</button>
+                    <button class="select-pill" data-val="150">150</button>
+                    <button class="select-pill" data-val="250">250</button>
+                    <button class="select-pill" data-val="500">500</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Discovery Strategy -->
+              <div style="margin-bottom:20px;">
+                <div class="filter-section-title">Discovery Strategy</div>
+                <div class="strategy-pills-row">
+                  <button class="strategy-btn active" data-strategy="auto">Auto</button>
+                  <button class="strategy-btn" data-strategy="conservative">Conservative</button>
+                  <button class="strategy-btn" data-strategy="balanced">Balanced</button>
+                  <button class="strategy-btn" data-strategy="aggressive">Aggressive</button>
+                </div>
+                <p style="font-size:11.5px;color:var(--text-light);margin-top:6px;" id="strategyDesc">Smart — adapts query depth to keyword type (recommended)</p>
+              </div>
+
+              <hr style="border:none;border-top:1px solid var(--border-color);margin:20px 0;" />
+
+              <!-- Core Filters -->
+              <div class="filter-section-title">⚙ Core Filters</div>
+
+              <!-- Engine Selection -->
+              <div style="margin-bottom:16px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;display:block;">Scraping Engine</label>
+                <select id="selectEngine" class="search-input-field" style="padding:10px 14px;font-size:13.5px;">
+                  <option value="auto">⚡ Auto (Bright Data verified emails if key set, else YouTube API / Public)</option>
+                  <option value="bright_data">💎 Bright Data (100% Real Verified Creator Emails &amp; Anti-Block)</option>
+                  <option value="youtube_standard">📺 YouTube Standard / Public Scraper</option>
+                </select>
+              </div>
+
+              <!-- Max Results -->
+              <div style="margin-bottom:16px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;display:block;">Max Results</label>
+                <div class="pills-select-group" id="maxResultsPills">
+                  <button class="select-pill active" data-val="50">50</button>
+                  <button class="select-pill" data-val="100">100</button>
+                  <button class="select-pill" data-val="250">250</button>
+                  <button class="select-pill" data-val="500">500</button>
+                  <button class="select-pill" data-val="1000">1000</button>
+                </div>
+                <p style="font-size:11.5px;color:var(--text-light);margin-top:6px;">More results = more quota used. Recommended: 50–250.</p>
+              </div>
+
+              <!-- Subscriber Range -->
+              <div style="margin-bottom:16px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;display:block;">Subscriber Range</label>
+                <div class="two-col-inputs">
+                  <div class="field-box">
+                    <label>MIN</label>
+                    <input type="number" id="filterMinSubs" placeholder="e.g. 1000" />
+                  </div>
+                  <div class="field-box">
+                    <label>MAX</label>
+                    <input type="number" id="filterMaxSubs" placeholder="Blank = unlimited" />
+                  </div>
+                </div>
+                <p style="font-size:11.5px;color:var(--text-light);margin-top:6px;">Hard constraints — channels outside this range will not appear.</p>
+              </div>
+
+              <!-- Country / Market -->
+              <div style="margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Country / Market</label>
+                  <a href="javascript:void(0)" onclick="clearCountryFilter()" style="font-size:11px;color:var(--primary-red);font-weight:600;">Clear all</a>
+                </div>
+                <select id="filterCountry" class="search-input-field" style="padding:10px 14px;font-size:13.5px;">
+                  <option value="">🌐 Global (No country filter)</option>
+                  <option value="US">🇺🇸 United States</option>
+                  <option value="GB">🇬🇧 United Kingdom</option>
+                  <option value="CA">🇨🇦 Canada</option>
+                  <option value="AU">🇦🇺 Australia</option>
+                  <option value="BD">🇧🇩 Bangladesh</option>
+                  <option value="IN">🇮🇳 India</option>
+                  <option value="DE">🇩🇪 Germany</option>
+                  <option value="FR">🇫🇷 France</option>
+                </select>
+              </div>
+
+              <!-- Advanced Filters Collapsible -->
+              <div class="collapsible-header" onclick="toggleAdvancedFilters()">
+                <span>⚡ Advanced Filters</span>
+                <span id="advToggleIcon">▼</span>
+              </div>
+              <div id="advFiltersContent" style="display:none;padding-top:14px;">
+                <!-- Last Upload Activity -->
+                <div style="margin-bottom:14px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;display:block;">Last Upload (Activity)</label>
+                  <div class="pills-select-group" id="activityPills">
+                    <button class="select-pill" data-val="any">Any time</button>
+                    <button class="select-pill" data-val="7">7 days</button>
+                    <button class="select-pill" data-val="14">14 days</button>
+                    <button class="select-pill active" data-val="30">30 days</button>
+                    <button class="select-pill" data-val="60">60 days</button>
+                    <button class="select-pill" data-val="90">90 days</button>
+                  </div>
+                  <p style="font-size:11.5px;color:var(--text-light);margin-top:6px;">Channels that have not uploaded within this window are excluded.</p>
+                </div>
+
+                <!-- Minimum Videos Published -->
+                <div style="margin-bottom:14px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;display:block;">Minimum Videos Published</label>
+                  <div class="pills-select-group" id="minVideosPills">
+                    <button class="select-pill active" data-val="0">No min</button>
+                    <button class="select-pill" data-val="10">10+</button>
+                    <button class="select-pill" data-val="25">25+</button>
+                    <button class="select-pill" data-val="50">50+</button>
+                    <button class="select-pill" data-val="100">100+</button>
+                    <button class="select-pill" data-val="250">250+</button>
+                  </div>
+                </div>
+
+                <!-- Discovery Quality -->
+                <div style="margin-bottom:14px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;display:block;">Discovery Quality</label>
+                  <div class="pills-select-group" id="qualityPills">
+                    <button class="select-pill active" data-val="all">All Channels</button>
+                    <button class="select-pill" data-val="med">Medium+ Opportunity</button>
+                    <button class="select-pill" data-val="high">High Opportunity Only</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pre-search Estimate Card -->
+              <div class="estimate-bar-card">
+                <div class="est-stats-grid">
+                  <div class="est-stat">
+                    <h4 id="estQualifiedLeads">~88</h4>
+                    <span>Est. Qualified Leads</span>
+                  </div>
+                  <div class="est-stat">
+                    <h4 id="estQuotaUnits">3,583</h4>
+                    <span>Quota Units</span>
+                  </div>
+                  <div class="est-stat">
+                    <h4 id="estQuotaPct">12%</h4>
+                    <span>% of Daily Quota</span>
+                  </div>
+                  <div class="est-stat">
+                    <h4 id="estSearchTime">~42s</h4>
+                    <span>Est. Time</span>
+                  </div>
+                </div>
+                <div class="est-progress">
+                  <div class="est-progress-bar" id="estProgressBar"></div>
+                </div>
+              </div>
+
+              <!-- Search Button & Scan Bar -->
+              <div style="margin-top:20px;">
+                <button class="btn-primary-red" id="btnStartDiscovery" style="width:100%;justify-content:center;padding:14px;font-size:15px;" onclick="startDiscoveryScan()">
+                  🚀 Start Lead Discovery
+                </button>
+              </div>
+
+              <!-- Live Progress Box (When scanning) -->
+              <div id="liveScanProgressBox" style="display:none;margin-top:16px;background:var(--bg-subtle);border:1px solid var(--border-color);border-radius:8px;padding:14px;">
+                <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:8px;">
+                  <span id="scanStatusMsg">Connecting to YouTube...</span>
+                  <span id="scanProgressPct">0%</span>
+                </div>
+                <div style="height:8px;background:var(--border-color);border-radius:4px;overflow:hidden;">
+                  <div id="scanProgressBarFill" style="height:100%;background:var(--primary-red);width:0%;transition:width 0.3s ease;"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Niche Intelligence Column -->
+        <div class="find-leads-niche-col">
+          <div class="card-box">
+            <div class="niche-header-box">
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;opacity:0.8;margin-bottom:4px;">● KNOWLEDGE BASE ACTIVE</div>
+              <div style="display:flex;align-items:center;">
+                <div class="niche-score-badge" id="nicheScoreDisplay">81.5</div>
+                <div>
+                  <h3 style="font-size:18px;font-weight:800;" id="nicheTitleDisplay">Motivation</h3>
+                  <span style="font-size:11px;opacity:0.85;">C — Opportunistic</span>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);text-align:center;margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.15);">
+                <div><div style="font-weight:800;font-size:14px;">85</div><span style="font-size:9px;opacity:0.8;">BUSINESS</span></div>
+                <div><div style="font-weight:800;font-size:14px;">78</div><span style="font-size:9px;opacity:0.8;">QUAL.</span></div>
+                <div><div style="font-weight:800;font-size:14px;">80</div><span style="font-size:9px;opacity:0.8;">PURCHASE</span></div>
+                <div><div style="font-weight:800;font-size:14px;">84</div><span style="font-size:9px;opacity:0.8;">YT SEO</span></div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;">● SUB-NICHES (5)</div>
+              <div id="nicheSubList"></div>
+
+              <div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin:16px 0 8px;">● MICRO-NICHES (5)</div>
+              <div id="nicheMicroList"></div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px;">
+                <div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;">● OPPORTUNITIES</div>
+                <button class="btn-secondary" style="padding:3px 8px;font-size:11px;" onclick="copyAllOpportunities()">📋 Copy All</button>
+              </div>
+              <div id="nicheOpportunitiesList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PAGE 3: RESULTS
+         ============================================================ -->
+    <section class="page-view" id="view-results">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h2 class="page-title">Results</h2>
+          <p class="page-subtitle" id="resultsSubHeader">All collected YouTube creator leads and contact profiles</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-secondary" onclick="clearAllResults()">Clear All</button>
+          <button class="btn-secondary" onclick="exportFilteredLeads()">Export Filtered</button>
+          <button class="btn-secondary" onclick="exportSelectedLeads()" id="btnExportSelected">Export Selected (0)</button>
+          <button class="btn-primary-red" onclick="navigatePage('find-leads')">+ Find More Leads</button>
+        </div>
+      </div>
+
+      <!-- Results Tabs -->
+      <div class="results-tabs">
+        <button class="results-tab-btn active" id="tabQualifiedLeads" onclick="switchResultsTab('qualified')">Qualified Leads</button>
+        <button class="results-tab-btn" id="tabDiscoveryVault" onclick="switchResultsTab('vault')">🏛 Discovery Vault</button>
+      </div>
+
+      <!-- Results Metric Summary -->
+      <div class="stats-tri-row" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);margin-bottom:18px;">
+        <div class="tri-stat"><h4 id="resTotalCount">0</h4><span>TOTAL</span></div>
+        <div class="tri-stat"><h4 style="color:#166534;" id="resHighCount">0</h4><span>HIGH</span></div>
+        <div class="tri-stat"><h4 style="color:#854d0e;" id="resMedCount">0</h4><span>MEDIUM</span></div>
+        <div class="tri-stat"><h4 style="color:#991b1b;" id="resLowCount">0</h4><span>LOW</span></div>
+        <div class="tri-stat"><h4 id="resAvgScore">--</h4><span>AVG SCORE</span></div>
+      </div>
+
+      <!-- Search & Score Chips Filter -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="text" id="tableSearchInput" placeholder="Search channels..." class="search-input-field" style="width:260px;padding:8px 12px;font-size:13px;" oninput="filterResultsTable()" />
+          <div class="pills-select-group">
+            <button class="select-pill active" data-filter="all" onclick="setScoreFilter('all', this)">All</button>
+            <button class="select-pill" data-filter="high" onclick="setScoreFilter('high', this)">High</button>
+            <button class="select-pill" data-filter="med" onclick="setScoreFilter('med', this)">Med</button>
+            <button class="select-pill" data-filter="low" onclick="setScoreFilter('low', this)">Low</button>
+          </div>
+        </div>
+        <div style="font-size:12.5px;color:var(--text-muted);font-weight:600;">
+          <span id="visibleChannelsCount">0 channels</span> • <a href="javascript:void(0)" onclick="clearTableSelection()" style="color:var(--primary-red);">Clear Selection</a>
+        </div>
+      </div>
+
+      <!-- Leads Table -->
+      <div class="table-responsive">
+        <table class="leads-data-table" id="mainLeadsTable">
+          <thead>
+            <tr>
+              <th style="width:36px;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" /></th>
+              <th>CHANNEL</th>
+              <th>SUBSCRIBERS</th>
+              <th>TOTAL VIEWS</th>
+              <th>VIDEOS</th>
+              <th>AVG VIEWS</th>
+              <th>LAST UPLOAD</th>
+              <th>FREQUENCY</th>
+              <th>WEBSITE</th>
+              <th>SOCIAL MEDIA</th>
+              <th>EMAIL</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="leadsTableBody">
+            <!-- Dynamic rows populated by app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PAGE 4: AI WORKSPACE
+         ============================================================ -->
+    <section class="page-view" id="view-ai-workspace">
+      <div class="page-header">
+        <h2 class="page-title">AI Workspace</h2>
+        <p class="page-subtitle">Prompt generation and cold outreach pitch writing engine</p>
+      </div>
+
+      <div class="dash-grid">
+        <div class="dash-left-col">
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>Niche Research &amp; Query Expansion Prompt</span>
+              <button class="btn-secondary" style="background:#fff;color:var(--primary-red);padding:2px 8px;font-size:11px;" onclick="copyPromptText()">📋 Copy Prompt</button>
+            </div>
+            <div class="card-body">
+              <pre class="ai-prompt-box" id="aiPromptText">
+No duplicate Search Queries.
+No repeated wording.
+No repeated ideas.
+If duplicates are found, replace them with unique and relevant alternatives before displaying the final output.
+
+HUMAN SEARCHES:
+Generate realistic YouTube search queries based on real user behavior.
+Include:
+• How To • Questions • Tutorials • Reviews • Comparisons • Tips • Mistakes • Best • Tools • AI • Career • Business • Trends
+Use natural search language only.
+
+LOCATION RULE:
+If a Target Country is provided, create one final section:
+Location Based YouTube Searches
+Only this section may contain cities or regions.
+
+OUTPUT RULES:
+Always follow this order:
+Main Niche
+↓
+Category
+↓
+Sub-Niche
+↓
+Micro-Niche
+              </pre>
+
+              <h4 style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin:16px 0 10px;">Replace These Variables:</h4>
+              <div class="two-col-inputs">
+                <div class="field-box">
+                  <label>{{PRIMARY_NICHE}}</label>
+                  <input type="text" id="varNiche" value="Video Editing Agency" />
+                </div>
+                <div class="field-box">
+                  <label>{{COUNTRY}} (OPTIONAL)</label>
+                  <input type="text" id="varCountry" value="United States" />
+                </div>
+                <div class="field-box">
+                  <label>{{LANGUAGE}}</label>
+                  <input type="text" id="varLang" value="English" />
+                </div>
+                <div class="field-box">
+                  <label>{{TARGET_AUDIENCE}} (OPTIONAL)</label>
+                  <input type="text" id="varAudience" value="YouTubers with 5k–100k subscribers" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-right-col">
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>🤖 AI Video Pitch Generator</span>
+            </div>
+            <div class="card-body">
+              <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px;">Generate a retention-engineered pitch targeting viewer drop-off and pacing.</p>
+              <div class="field-box" style="margin-bottom:10px;">
+                <label>Target Channel Name</label>
+                <input type="text" id="pitchChannelName" placeholder="e.g. Snehil Real Estate" />
+              </div>
+              <div class="field-box" style="margin-bottom:12px;">
+                <label>Channel Handle</label>
+                <input type="text" id="pitchHandle" placeholder="@SnehilRealEstate" />
+              </div>
+              <button class="btn-primary-red" style="width:100%;justify-content:center;" onclick="generateAIPitch()">⚡ Generate Pitch</button>
+
+              <div id="pitchResultBox" style="display:none;margin-top:16px;background:var(--bg-subtle);border:1px solid var(--border-color);border-radius:8px;padding:12px;">
+                <div style="font-weight:700;font-size:13px;color:var(--primary-red);margin-bottom:6px;" id="pitchSubjectLine">Subject: ...</div>
+                <div style="font-size:12px;line-height:1.5;white-space:pre-wrap;max-height:220px;overflow-y:auto;" id="pitchBodyText"></div>
+                <button class="btn-secondary" style="width:100%;margin-top:10px;justify-content:center;" onclick="copyPitch()">📋 Copy Pitch</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PAGE 5: EXPORTS
+         ============================================================ -->
+    <section class="page-view" id="view-exports">
+      <div class="page-header">
+        <h2 class="page-title">Export Leads</h2>
+        <p class="page-subtitle">Configure and download your leads in CSV or Excel format</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:300px 1fr 280px;gap:20px;">
+        <!-- Left: Presets & Format -->
+        <div>
+          <div class="card-box">
+            <div class="card-header-crimson"><span>Export Preset</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+              <button class="btn-secondary active" style="text-align:left;padding:10px;" onclick="setExportPreset('leadgen')">
+                <strong>🎯 Lead Generation</strong><br /><span style="font-size:11px;color:var(--text-light);">Name, URL, Email, Website, Social</span>
+              </button>
+              <button class="btn-secondary" style="text-align:left;padding:10px;" onclick="setExportPreset('seo')">
+                <strong>📈 SEO Outreach</strong><br /><span style="font-size:11px;color:var(--text-light);">Name, Subs, Views, Score, Website</span>
+              </button>
+              <button class="btn-secondary" style="text-align:left;padding:10px;" onclick="setExportPreset('sheets')">
+                <strong>📊 Google Sheets (Apps Script)</strong><br /><span style="font-size:11px;color:var(--text-light);">Formatted for apps_script.gs</span>
+              </button>
+              <button class="btn-secondary" style="text-align:left;padding:10px;" onclick="setExportPreset('all')">
+                <strong>⚙ Custom (All Columns)</strong><br /><span style="font-size:11px;color:var(--text-light);">All 24 fields exported</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-header-crimson"><span>File Format</span></div>
+            <div class="card-body">
+              <div class="toggle-switch-pills" style="width:100%;">
+                <button class="switch-pill-btn active" style="flex:1;" id="fmtCsv" onclick="setExportFormat('csv')">CSV (.csv)</button>
+                <button class="switch-pill-btn" style="flex:1;" id="fmtExcel" onclick="setExportFormat('xlsx')">Excel (.xlsx)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle: Column Selection & Export Preview -->
+        <div>
+          <div class="card-box">
+            <div class="card-header-crimson" style="display:flex;justify-content:space-between;">
+              <span>Columns</span>
+              <div>
+                <a href="javascript:void(0)" onclick="selectAllExportCols(true)" style="color:#fecaca;margin-right:8px;">All</a> /
+                <a href="javascript:void(0)" onclick="selectAllExportCols(false)" style="color:#fecaca;">None</a>
+              </div>
+            </div>
+            <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="exportColumnsGrid">
+              <!-- Dynamically rendered column checkboxes -->
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <h4 style="font-size:18px;font-weight:800;" id="exportPreviewRows">0 Rows</h4>
+                <span style="font-size:12px;color:var(--text-muted);" id="exportPreviewCols">0 Columns selected</span>
+              </div>
+              <button class="btn-primary-red" style="padding:12px 24px;font-size:15px;" onclick="triggerExportDownload()">
+                ↓ Export Leads
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Recent Sessions -->
+        <div>
+          <div class="card-box">
+            <div class="card-header-crimson"><span>Recent Sessions</span></div>
+            <div class="card-body" id="exportRecentSessionsList">
+              <p style="font-size:12px;color:var(--text-light);text-align:center;">No recent export sessions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PAGE 6: SETTINGS
+         ============================================================ -->
+    <section class="page-view" id="view-settings">
+      <div class="page-header">
+        <h2 class="page-title">Settings &amp; API Configuration</h2>
+        <p class="page-subtitle">Manage multi-key rotation, Bright Data datasets, and AI integrations</p>
+      </div>
+
+      <div class="find-leads-grid">
+        <!-- Main Settings Column -->
+        <div class="find-leads-form-col">
+          <!-- Primary Magic Key -->
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>Primary Magic Key (YouTube Data API v3)</span>
+              <span class="score-badge med" id="badgeKeyPrimary">NOT LOCKED</span>
+            </div>
+            <div class="card-body">
+              <div class="field-box" style="margin-bottom:12px;">
+                <label>PRIMARY MAGIC KEY *</label>
+                <input type="password" id="inputKeyPrimary" placeholder="AIzaSy..." />
+                <span style="font-size:11.5px;color:var(--text-light);margin-top:4px;display:block;">Stored locally — never sent to third parties. Grants 10,000 units/day.</span>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-secondary" onclick="validateKey('primary')">✓ Validate &amp; Lock</button>
+                <button class="btn-primary-red" onclick="saveKey('primary')">💾 Save Draft</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary Magic Key -->
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>Secondary Magic Key (Failover)</span>
+              <span class="score-badge med" id="badgeKeySecondary">NOT LOCKED</span>
+            </div>
+            <div class="card-body">
+              <div class="field-box" style="margin-bottom:12px;">
+                <label>SECONDARY MAGIC KEY</label>
+                <input type="password" id="inputKeySecondary" placeholder="AIzaSy..." />
+                <span style="font-size:11.5px;color:var(--text-light);margin-top:4px;display:block;">Adds +10,000 units/day (Total 20,000). Failover is automatic.</span>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-secondary" onclick="validateKey('secondary')">✓ Validate &amp; Lock</button>
+                <button class="btn-primary-red" onclick="saveKey('secondary')">💾 Save Draft</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Third Magic Key -->
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>Third Magic Key (Heavy Scaling)</span>
+              <span class="score-badge med" id="badgeKeyThird">NOT LOCKED</span>
+            </div>
+            <div class="card-body">
+              <div class="field-box" style="margin-bottom:12px;">
+                <label>THIRD MAGIC KEY</label>
+                <input type="password" id="inputKeyThird" placeholder="AIzaSy..." />
+                <span style="font-size:11.5px;color:var(--text-light);margin-top:4px;display:block;">Adds +10,000 units/day (Total 30,000). Ideal for 5,000+ leads discovery.</span>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-secondary" onclick="validateKey('third')">✓ Validate &amp; Lock</button>
+                <button class="btn-primary-red" onclick="saveKey('third')">💾 Save Draft</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bright Data API Key -->
+          <div class="card-box">
+            <div class="card-header-crimson">
+              <span>💎 Bright Data YouTube Datasets (Verified Real Emails)</span>
+            </div>
+            <div class="card-body">
+              <div class="field-box" style="margin-bottom:12px;">
+                <label>BRIGHT DATA API KEY</label>
+                <input type="password" id="inputBrightDataKey" placeholder="Paste Bright Data API Key..." />
+                <span style="font-size:11.5px;color:var(--text-light);margin-top:4px;display:block;">Scrapes 100% real verified emails via YouTube Datasets (<code>gd_lk56epmy2i5g7lzu0k</code> &amp; <code>gd_lk538t2k2p1k3oos71</code>) without IP block.</span>
+              </div>
+              <button class="btn-primary-red" onclick="saveBrightDataSettings()">💾 Save Bright Data Config</button>
+            </div>
+          </div>
+
+          <!-- Usage & Limits Card -->
+          <div class="card-box">
+            <div class="card-header-crimson" style="display:flex;justify-content:space-between;">
+              <span>Daily API Quota Management</span>
+              <button class="btn-secondary" style="background:#fff;color:var(--primary-red);padding:2px 8px;font-size:11px;" onclick="resetQuotaCounter()">Reset Counter</button>
+            </div>
+            <div class="card-body">
+              <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:8px;">Combined daily limit resets at Midnight Pacific Time. Reset counter manually if your Google Cloud project quota has renewed.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Setup Guide Column -->
+        <div class="find-leads-niche-col">
+          <div class="card-box">
+            <div class="card-header-crimson"><span>📋 Setup Guide</span></div>
+            <div class="card-body" style="font-size:13px;line-height:1.6;">
+              <ol style="padding-left:18px;margin-bottom:14px;color:var(--text-muted);">
+                <li style="margin-bottom:10px;"><strong style="color:var(--text-main);">Get Your Magic Key:</strong> Go to Google Cloud Console, enable YouTube Data API v3, and create an API Key.</li>
+                <li style="margin-bottom:10px;"><strong style="color:var(--text-main);">Validate &amp; Lock:</strong> Enter Primary Key and click Validate &amp; Lock.</li>
+                <li style="margin-bottom:10px;"><strong style="color:var(--text-main);">Add Secondary &amp; Third Key:</strong> Optional — gives up to 30,000 units/day.</li>
+                <li style="margin-bottom:10px;"><strong style="color:var(--text-main);">Bright Data:</strong> Add Bright Data token if you need bulk verified emails at scale.</li>
+              </ol>
+
+              <div style="background:var(--primary-red-light);border:1px solid var(--primary-red-border);border-radius:8px;padding:12px;">
+                <h5 style="color:var(--primary-red);font-size:12px;font-weight:800;margin-bottom:4px;">💡 PRO TIPS</h5>
+                <p style="font-size:11.5px;color:var(--text-muted);">Keys are saved locally in your browser and backend SQLite database. You can also run the extension version directly in your browser without local server.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       EXECUTIVE STATISTICS & LEAD PROFILE MODAL (Frame 15 & 16)
+       ============================================================ -->
+  <div class="modal-overlay" id="leadModalOverlay" onclick="closeModalOnOverlay(event)">
+    <div class="lead-modal-card">
+      <div class="modal-crimson-header">
+        <div class="modal-channel-brand">
+          <img class="modal-avatar-lg" id="modalAvatar" src="" alt="Avatar" />
+          <div>
+            <h2 id="modalChannelName">Channel Name</h2>
+            <span id="modalHandle">@handle</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="score-badge high" id="modalScoreBadge">85 — High</span>
+          <button class="modal-close-btn" onclick="closeLeadModal()">✕</button>
+        </div>
+      </div>
+
+      <div class="modal-content-grid">
+        <!-- Left Side -->
+        <div>
+          <div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;">● EXECUTIVE STATISTICS</div>
+          <div class="exec-stats-grid">
+            <div class="exec-stat-box"><h4 id="mStatSubs">0</h4><span>SUBSCRIBERS</span></div>
+            <div class="exec-stat-box"><h4 id="mStatViews">0</h4><span>TOTAL VIEWS</span></div>
+            <div class="exec-stat-box"><h4 id="mStatVideos">0</h4><span>VIDEOS</span></div>
+            <div class="exec-stat-box"><h4 id="mStatAvgViews">0</h4><span>AVG VIEWS</span></div>
+            <div class="exec-stat-box"><h4 id="mStatRate">--</h4><span>VIDEOS / MONTH</span></div>
+            <div class="exec-stat-box"><h4 id="mStatLastUpload">--</h4><span>LAST UPLOAD</span></div>
+            <div class="exec-stat-box"><h4 id="mStatCountry">US</h4><span>COUNTRY</span></div>
+            <div class="exec-stat-box"><h4 id="mStatCreated">--</h4><span>CREATED</span></div>
+          </div>
+
+          <div class="pace-banner" id="mPaceBanner">
+            <span>●</span> <span id="mPaceText">4.3 / month recent pace • last 5 uploads over 28 days • active</span>
+          </div>
+
+          <!-- Contact & Business -->
+          <div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;">● CONTACT &amp; BUSINESS</div>
+          <div style="background:var(--bg-subtle);border:1px solid var(--border-color);border-radius:8px;padding:12px;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:13.5px;font-weight:700;color:var(--primary-red);" id="mContactEmail">email@example.com</span>
+              <button class="btn-secondary" style="padding:3px 8px;font-size:11px;" onclick="copyModalEmail()">📋 Copy</button>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;" id="mSocialPills"></div>
+          </div>
+
+          <!-- Channel Description -->
+          <div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">● CHANNEL DESCRIPTION</div>
+          <p style="font-size:12.5px;color:var(--text-muted);line-height:1.5;background:var(--bg-card);border:1px solid var(--border-color);padding:10px;border-radius:6px;margin-bottom:14px;max-height:90px;overflow-y:auto;" id="mDescription">
+            Channel bio description goes here...
+          </p>
+
+          <!-- Personal Outreach Notes -->
+          <div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">● PERSONAL OUTREACH NOTES</div>
+          <textarea class="search-input-field" id="mNotesInput" rows="3" style="font-size:12.5px;padding:10px;margin-bottom:8px;" placeholder="First contact sent, needs follow-up, meeting booked, pricing discussed, VIP prospect..."></textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <button class="btn-primary-red" style="padding:6px 14px;font-size:12px;" onclick="saveLeadNotes()">Save Notes</button>
+            <span style="font-size:11px;color:var(--text-light);">Notes stored locally &amp; in database</span>
+          </div>
+        </div>
+
+        <!-- Right Side: Lead Intelligence Gauge & Actions -->
+        <div>
+          <div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;">● LEAD INTELLIGENCE</div>
+          <div class="gauge-box" style="padding:10px 0;">
+            <svg class="gauge-svg" viewBox="0 0 100 100">
+              <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
+              <circle class="gauge-val-circle" id="mGaugeCircle" cx="50" cy="50" r="45"></circle>
+            </svg>
+            <div class="gauge-center-text">
+              <div class="gauge-pct" id="mGaugePct">85</div>
+              <div class="gauge-sub">/ 100</div>
+            </div>
+          </div>
+
+          <!-- 5 Opportunity Progress Bars -->
+          <div class="opp-progress-item">
+            <div class="opp-progress-header"><span>SEO Opportunity</span><span id="mOppSeo">68</span></div>
+            <div class="opp-bar-bg"><div class="opp-bar-fill" id="mBarSeo" style="width:68%;"></div></div>
+          </div>
+          <div class="opp-progress-item">
+            <div class="opp-progress-header"><span>Growth Potential</span><span id="mOppGrowth">100</span></div>
+            <div class="opp-bar-bg"><div class="opp-bar-fill green" id="mBarGrowth" style="width:100%;"></div></div>
+          </div>
+          <div class="opp-progress-item">
+            <div class="opp-progress-header"><span>Activity</span><span id="mOppActivity">100</span></div>
+            <div class="opp-bar-bg"><div class="opp-bar-fill green" id="mBarActivity" style="width:100%;"></div></div>
+          </div>
+          <div class="opp-progress-item">
+            <div class="opp-progress-header"><span>Client Probability</span><span id="mOppClient">75</span></div>
+            <div class="opp-bar-bg"><div class="opp-bar-fill" id="mBarClient" style="width:75%;"></div></div>
+          </div>
+          <div class="opp-progress-item">
+            <div class="opp-progress-header"><span>Business Readiness</span><span id="mOppBusiness">79</span></div>
+            <div class="opp-bar-bg"><div class="opp-bar-fill" id="mBarBusiness" style="width:79%;"></div></div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="modal-quick-actions">
+            <button class="modal-action-btn primary" onclick="visitModalChannel()">▶ Visit Channel</button>
+            <button class="modal-action-btn secondary" onclick="composeModalEmail()">✉ Compose Email</button>
+            <button class="modal-action-btn secondary" onclick="copyModalEmail()">📋 Copy Email</button>
+            <button class="modal-action-btn secondary" onclick="copyModalChannelUrl()">📋 Copy Channel URL</button>
+            <button class="modal-action-btn secondary" onclick="copyModalName()">📋 Copy Name</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastBox"></div>
+
+  <!-- ============================================================
+       PAGE 7: CRM PIPELINE (Kanban Board)
+       ============================================================ -->
+  <section class="page-view" id="view-pipeline">
+    <div class="page-header">
+      <h2 class="page-title">🏆 CRM Pipeline</h2>
+      <p class="page-subtitle">Drag & drop leads through your sales funnel — inspired by DjangoCRM</p>
+    </div>
+
+    <!-- Revenue Stats Bar -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
+      <div class="card-box" style="text-align:center;padding:14px 10px;">
+        <div style="font-size:22px;font-weight:800;color:var(--primary-red);" id="pipeTotal">0</div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Total Leads</div>
+      </div>
+      <div class="card-box" style="text-align:center;padding:14px 10px;">
+        <div style="font-size:22px;font-weight:800;color:#1877F2;" id="pipeContacted">0</div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Contacted</div>
+      </div>
+      <div class="card-box" style="text-align:center;padding:14px 10px;">
+        <div style="font-size:22px;font-weight:800;color:#E1306C;" id="pipeReplied">0</div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Replied</div>
+      </div>
+      <div class="card-box" style="text-align:center;padding:14px 10px;">
+        <div style="font-size:22px;font-weight:800;color:#166534;" id="pipeClosed">0</div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Deals Closed</div>
+      </div>
+      <div class="card-box" style="text-align:center;padding:14px 10px;">
+        <div style="font-size:22px;font-weight:800;color:#166534;" id="pipeRevenue">$0</div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Revenue Closed</div>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <button class="btn-primary" style="padding:8px 16px;font-size:12px;" onclick="loadPipelineBoard()">🔄 Refresh Board</button>
+      <button class="btn-secondary" style="padding:8px 16px;font-size:12px;" onclick="pushAllLeadsToPipeline()">➕ Push All Leads to Pipeline</button>
+      <div style="margin-left:auto;font-size:12px;color:var(--text-muted);" id="pipeLastUpdated">Last updated: —</div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div id="kanbanBoard" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:16px;min-height:420px;">
+      <!-- Columns rendered by JS -->
+    </div>
+  </section>
+
+  <!-- CRM Lead Detail Side Panel -->
+  
+  <!-- ============================================================
+       PAGE 8: FACEBOOK GROUP HIRING RADAR
+       ============================================================ -->
+  <section class="page-view" id="view-fb-radar">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:15px;">
+      <div>
+        <h2 class="page-title">🎯 Facebook Group Hiring Radar</h2>
+        <p class="page-subtitle">Real-time AI monitoring for video editor hiring posts with instant Telegram alerts</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-primary" style="background:#1877F2;border-color:#1877F2;" onclick="openAddGroupModal()">➕ Add Facebook Group</button>
+        <button class="btn-secondary" onclick="testFbAlert()">⚡ Test Telegram Alert</button>
+        <button class="btn-secondary" onclick="scanFbNow()">🔍 Scan Active Groups</button>
+      </div>
+    </div>
+
+    <!-- Radar Stats Bar -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+      <div class="card-box" style="text-align:center;padding:14px 10px;">
+        <div style="font-size:22px;font-weight:800;color:#1877F2;" id="fbGroupCount">0</div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Monitored Groups</div>
+      </div>
+      <div class="card-box" style="text-align:center;padding:14px 10px;">
+        <div style="font-size:22px;font-weight:800;color:#166534;" id="fbRadarStatus">🟢 ACTIVE</div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Radar Status (Every 60s)</div>
+      </div>
+      <div class="card-box" style="text-align:center;padding:14px 10px;">
+        <div style="font-size:22px;font-weight:800;color:var(--primary-red);" id="fbJobsFound">0</div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Hiring Posts Detected</div>
+      </div>
+      <div class="card-box" style="text-align:center;padding:14px 10px;">
+        <div style="font-size:22px;font-weight:800;color:#0A66C2;" id="fbTelegramSent">0</div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Telegram Alerts Dispatched</div>
+      </div>
+    </div>
+
+    <!-- Telegram Quick Connect Card -->
+    <div class="card-box" style="margin-bottom:20px;padding:16px 20px;border-left:4px solid #229ED9;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:20px;">✈️</span>
+          <div>
+            <h4 style="margin:0;font-size:14px;color:var(--text-main);">Telegram Instant Alert Delivery</h4>
+            <span style="font-size:11.5px;color:var(--text-muted);">Hiring alerts with contact numbers, client name, and budget will be sent directly to your phone.</span>
+          </div>
+        </div>
+        <button class="btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="toggleTelegramConfig()">⚙ Configure Token</button>
+      </div>
+      <div id="telegramConfigBox" style="display:none;padding-top:12px;border-top:1px solid var(--border-color);margin-top:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:flex-end;">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);">BOT TOKEN</label>
+            <input type="text" id="tgBotTokenInput" placeholder="e.g. 123456789:ABCdefGhI..." style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--border-color);font-size:12px;" />
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);">CHAT ID</label>
+            <input type="text" id="tgChatIdInput" placeholder="e.g. 987654321" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--border-color);font-size:12px;" />
+          </div>
+          <button class="btn-primary" style="background:#229ED9;border-color:#229ED9;padding:8px 16px;font-size:12px;" onclick="saveTelegramSettings()">Save & Activate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content: Groups on Left, Live Hiring Feed on Right -->
+    <div style="display:grid;grid-template-columns:360px 1fr;gap:18px;">
+      
+      <!-- Left Column: Monitored Groups -->
+      <div class="card-box" style="padding:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <h3 style="font-size:14px;font-weight:800;color:var(--text-main);margin:0;">Monitored Groups</h3>
+          <span style="font-size:11px;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-weight:700;" id="fbGroupsBadge">0 Groups</span>
+        </div>
+        <div id="fbGroupsList" style="display:flex;flex-direction:column;gap:10px;max-height:480px;overflow-y:auto;">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Right Column: Live Hiring Job Alerts Feed -->
+      <div class="card-box" style="padding:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div>
+            <h3 style="font-size:14px;font-weight:800;color:var(--text-main);margin:0;">🚨 Detected Hiring Posts</h3>
+            <span style="font-size:11px;color:var(--text-muted);">AI filtered — only clients recruiting video editors</span>
+          </div>
+          <button class="btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="loadFbAlerts()">🔄 Refresh Feed</button>
+        </div>
+        <div id="fbAlertsList" style="display:flex;flex-direction:column;gap:12px;max-height:600px;overflow-y:auto;">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Modal: Add Facebook Group -->
+  <div id="modalAddFbGroup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+    <div class="card-box" style="width:460px;max-width:92%;background:#fff;padding:24px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="margin:0;font-size:16px;font-weight:800;">Add Facebook Group to Radar</h3>
+        <button onclick="closeAddGroupModal()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px;font-weight:700;display:block;margin-bottom:6px;">Group Name</label>
+        <input type="text" id="newFbGroupName" placeholder="e.g. Video Editors Bangladesh" style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;" />
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px;font-weight:700;display:block;margin-bottom:6px;">Group URL</label>
+        <input type="url" id="newFbGroupUrl" placeholder="https://www.facebook.com/groups/yourgroup" style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;" />
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:12px;font-weight:700;display:block;margin-bottom:6px;">Check Interval</label>
+        <select id="newFbGroupInterval" style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;">
+          <option value="1">Every 1 minute (Fastest)</option>
+          <option value="2" selected>Every 2 minutes (Recommended)</option>
+          <option value="5">Every 5 minutes</option>
+          <option value="10">Every 10 minutes</option>
+        </select>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;">
+        <button class="btn-secondary" onclick="closeAddGroupModal()">Cancel</button>
+        <button class="btn-primary" style="background:#1877F2;border-color:#1877F2;" onclick="submitAddFbGroup()">Add & Start Monitoring</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="crmPanel" style="display:none;position:fixed;top:0;right:0;width:380px;height:100vh;background:#fff;border-left:2px solid var(--border-color);z-index:1000;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,0.12);">
+    <div style="padding:20px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="font-size:15px;font-weight:800;color:var(--text-main);" id="crmPanelTitle">Lead Detail</h3>
+      <button onclick="closeCrmPanel()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">✕</button>
+    </div>
+    <div style="padding:20px;" id="crmPanelBody">
+      <!-- Dynamic content -->
+    </div>
+  </div>
+
+  <script src="app.js?v=3.3" charset="UTF-8"></script>
+</body>
+</html>
