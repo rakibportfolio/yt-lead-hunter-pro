@@ -24,28 +24,33 @@ from telegram_bot import alert_fb_hiring_post
 # ── Strict Freshness Filter (Max 3 Hours) ───────────────────
 def is_post_fresh(content: str, max_hours: int = 3) -> bool:
     """
-    STRICT FILTER: Rejects old posts so ONLY fresh hiring leads (<= 3 hours)
-    are sent to Telegram.
-    Rejects posts with past dates (e.g. '6 February 2025', '17 August'),
-    'yesterday', 'days ago', 'weeks ago', or hours > max_hours.
+    STRICT FILTER: Accurately accepts ONLY fresh leads posted within the last 3 hours
+    (e.g. 'just now', '12 minutes ago', 'about an hour ago', '2 hours ago', '3h').
+    Strictly rejects older posts (>= 4 hours, 'yesterday', '2 days ago', past dates/years).
     """
     t = content.lower()
 
-    # 1. Any calendar date (e.g. 'February 6', '6 February', '17 August') means days/months/years old!
-    months = [
-        'january', 'february', 'march', 'april', 'may', 'june',
-        'july', 'august', 'september', 'october', 'november', 'december',
-        'jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
-        'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
-        'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
-    ]
-    for m in months:
-        if re.search(r'\b\d{1,2}\s+' + m + r'\b|\b' + m + r'\s+\d{1,2}\b', t):
-            return False
+    # 1. Immediate Fresh Signals (< 1 hour)
+    if 'just now' in t or 'এইমাত্র' in t:
+        return True
+    if re.search(r'\b\d+\s*(?:m|min|mins|minutes?|মিনিট)\b', t):
+        return True
 
-    # 2. Any past year (e.g. 2020-2025)
-    if re.search(r'\b(201\d|202[0-5])\b', t):
-        return False
+    # 2. Fresh Hours Check (<= max_hours)
+    if 'about an hour' in t or 'an hour ago' in t or '১ ঘণ্টা' in t:
+        return True
+
+    hr_matches = re.findall(r'\b(\d+)\s*(?:h|hr|hrs|hours?|ঘণ্টা|ঘন্টা)\b', t)
+    if hr_matches:
+        try:
+            # Check smallest hour tag in post header
+            min_hr = min(int(h) for h in hr_matches)
+            if min_hr <= max_hours:
+                return True
+            else:
+                return False
+        except ValueError:
+            pass
 
     # 3. Explicit old indicators in English and Bengali
     old_keywords = [
@@ -61,20 +66,26 @@ def is_post_fresh(content: str, max_hours: int = 3) -> bool:
         if old in t:
             return False
 
-    # 4. Check for days: e.g. "1d", "2d", "5 days"
     if re.search(r'\b\d+\s*(?:d|days?|দিন)\b', t):
         return False
 
-    # 5. Check for hours: e.g. "4h", "5 hrs", "6 hours ago", "৪ ঘণ্টা"
-    hr_matches = re.findall(r'(\d+)\s*(?:h|hr|hrs|hours?|ঘণ্টা|ঘন্টা)\b', t)
-    for hr_str in hr_matches:
-        try:
-            if int(hr_str) > max_hours:
-                return False
-        except ValueError:
-            pass
+    # 4. Past years (2020-2025)
+    if re.search(r'\b(201\d|202[0-5])\b', t):
+        return False
 
-    return True
+    # 5. Other months (not current month 'november')
+    other_months = [
+        'january', 'february', 'march', 'april', 'may', 'june',
+        'july', 'august', 'september', 'october', 'december',
+        'jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'oct', 'dec',
+        'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+        'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'ডিসেম্বর'
+    ]
+    for m in other_months:
+        if re.search(r'\b\d{1,2}\s+' + m + r'\b|\b' + m + r'\s+\d{1,2}\b', t):
+            return False
+
+    return False
 
 # ── AI / Intent Classification using Gemini LLM ──────────────
 def classify_fb_post_with_ai(content: str, author_name: str = "", group_name: str = "") -> Dict[str, Any]:
@@ -267,7 +278,7 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
     # 1. Direct Web Request with Mobile User-Agent / mbasic fallback
     try:
         # Check mbasic endpoint for public groups
-        m_url = clean_url.replace("www.facebook.com", "mbasic.facebook.com").replace("facebook.com", "mbasic.facebook.com")
+        m_url = re.sub(r'https?://(?:www\.)?facebook\.com', 'https://mbasic.facebook.com', clean_url)
         r = requests.get(m_url, headers=headers, timeout=12)
         if r.status_code == 200 and len(r.text) > 1000:
             soup = BeautifulSoup(r.text, "html.parser")
@@ -301,11 +312,13 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
             with sync_playwright() as p:
                 browser = p.chromium.launch(headless=True)
                 page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
-                page.goto(clean_url, timeout=25000, wait_until="domcontentloaded")
+                page.goto(clean_url, timeout=20000, wait_until="domcontentloaded")
                 time.sleep(2)
 
-                # Scroll once to trigger render
-                page.evaluate("window.scrollBy(0, 800)")
+                # Scroll to load recent posts
+                page.evaluate("window.scrollBy(0, 1000)")
+                time.sleep(1.5)
+                page.evaluate("window.scrollBy(0, 1000)")
                 time.sleep(1.5)
 
                 feed_posts = page.query_selector_all('div[role="feed"] div[role="article"], div[role="article"]')
