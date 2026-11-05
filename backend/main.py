@@ -707,6 +707,22 @@ def api_scan_fb_groups(background_tasks: BackgroundTasks):
     background_tasks.add_task(run_all)
     return {"ok": True, "message": f"Scanning {len(groups)} active groups in background"}
 
+@app.post("/api/fb/scan-group/{group_id}")
+def api_scan_single_fb_group(group_id: int):
+    all_groups = get_all_fb_groups()
+    matched = [g for g in all_groups if g.get("id") == group_id]
+    if not matched:
+        raise HTTPException(status_code=404, detail="Group not found")
+    g = matched[0]
+    new_jobs = process_single_fb_group(g)
+    alerts = get_fb_alerts(50)
+    return {
+        "ok": True,
+        "jobs_found": new_jobs,
+        "message": f"Scanned {g['name']}! Found {new_jobs} new hiring leads.",
+        "alerts": alerts
+    }
+
 
 class IngestPostItem(BaseModel):
     content: str

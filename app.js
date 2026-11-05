@@ -1,4 +1,4 @@
-﻿/**
+/**
  * YT Lead Hunter PRO & CRM
  * Full Client Engine & State Management
  * AK Technology & Zentic Media Architecture
@@ -1653,6 +1653,108 @@ async function savePipelineNotes(leadId) {
 
 let FB_GROUPS_STATE = [];
 let FB_ALERTS_STATE = [];
+let SELECTED_FB_GROUP_ID = null;
+let SELECTED_FB_GROUP_NAME = '';
+let FB_TIME_FILTER = 'all';  // 'all', '15m', '1h', '3h', '24h'
+let FB_SORT_ORDER = 'newest'; // 'newest' (1m -> 2m -> 1h), 'oldest'
+
+// Helper to extract post freshness / age in minutes
+function getPostAgeInMinutes(alert) {
+  const t = (alert.content || alert.ai_summary || '').toLowerCase();
+  
+  if (t.includes('just now') || t.includes('এইমাত্র')) return 0;
+
+  // Match relative minutes (e.g. "4m", "4 minutes ago", "4m ·")
+  const m = t.match(/\b(\d+)\s*(?:m|min|mins|minutes?|মিনিট)\b/);
+  if (m) return parseInt(m[1], 10);
+
+  // Match relative hours (e.g. "1h", "2 hours ago")
+  const h = t.match(/\b(\d+)\s*(?:h|hr|hrs|hours?|ঘণ্টা|ঘন্টা)\b/);
+  if (h) return parseInt(h[1], 10) * 60;
+
+  if (t.includes('about an hour') || t.includes('an hour ago') || t.includes('১ ঘণ্টা')) return 60;
+
+  // Match relative days (e.g. "2d", "2 days ago")
+  const d = t.match(/\b(\d+)\s*(?:d|days?|দিন)\b/);
+  if (d) return parseInt(d[1], 10) * 1440;
+
+  // Fallback: calculate from created_at timestamp
+  if (alert.created_at) {
+    try {
+      const dt = new Date(alert.created_at.replace(' ', 'T'));
+      const diffMs = Date.now() - dt.getTime();
+      if (!isNaN(diffMs) && diffMs >= 0) {
+        return Math.floor(diffMs / 60000);
+      }
+    } catch (e) {}
+  }
+  return 999999;
+}
+
+function formatPostAgeLabel(mins) {
+  if (mins === 0) return '⚡ Just now';
+  if (mins < 60) return `⏱️ ${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  const remM = mins % 60;
+  if (hrs < 24) return remM > 0 ? `🕒 ${hrs}h ${remM}m ago` : `🕒 ${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `📅 ${days}d ago`;
+}
+
+function selectFbGroup(gid, gname) {
+  SELECTED_FB_GROUP_ID = gid;
+  SELECTED_FB_GROUP_NAME = gname;
+  renderFbGroupsList();
+  renderFbAlertsList();
+}
+
+function clearSelectedFbGroup() {
+  SELECTED_FB_GROUP_ID = null;
+  SELECTED_FB_GROUP_NAME = '';
+  renderFbGroupsList();
+  renderFbAlertsList();
+}
+
+function onFbFilterChange() {
+  const timeSelect = document.getElementById('fbTimeFilterSelect');
+  const sortSelect = document.getElementById('fbSortSelect');
+  if (timeSelect) FB_TIME_FILTER = timeSelect.value;
+  if (sortSelect) FB_SORT_ORDER = sortSelect.value;
+  renderFbAlertsList();
+}
+
+async function scanSelectedGroupNow() {
+  if (!SELECTED_FB_GROUP_ID) return;
+  const btn = document.getElementById('fbScanSelectedGroupBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Scanning...';
+  }
+  try {
+    const res = await fetch(`/api/fb/scan-group/${SELECTED_FB_GROUP_ID}`, { method: 'POST' });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(data.message || `Found ${data.jobs_found} hiring leads!`, 'success');
+      if (data.alerts) {
+        FB_ALERTS_STATE = data.alerts;
+      } else {
+        await loadFbAlerts();
+      }
+      renderFbAlertsList();
+      updateFbStats();
+    } else {
+      showToast(data.message || 'Scan completed', 'info');
+    }
+  } catch (err) {
+    console.error('Scan group error:', err);
+    showToast('Scan initiated in background', 'info');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '⚡ Scan This Group Now';
+    }
+  }
+}
 
 async function loadFbRadarPage() {
   await Promise.all([loadFbGroups(), loadFbAlerts()]);
@@ -1722,48 +1824,115 @@ function renderFbGroupsList() {
     return;
   }
 
-  list.innerHTML = FB_GROUPS_STATE.map(g => {
+  const allActive = SELECTED_FB_GROUP_ID === null;
+  const allGroupsPill = `
+    <div onclick="clearSelectedFbGroup()" style="padding:10px 12px;border-radius:8px;cursor:pointer;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;transition:all 0.15s ease;${allActive ? 'background:#1877F2;color:#fff;font-weight:800;box-shadow:0 2px 6px rgba(24,119,242,0.3);' : 'background:var(--bg-subtle);color:var(--text-main);border:1px solid var(--border-color);'}">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span>🌐</span>
+        <span style="font-size:12px;">All Monitored Groups</span>
+      </div>
+      <span style="font-size:10.5px;padding:2px 7px;border-radius:10px;${allActive ? 'background:rgba(255,255,255,0.25);color:#fff;' : 'background:#e2e8f0;color:#334155;'}">${FB_GROUPS_STATE.length}</span>
+    </div>
+  `;
+
+  const groupItems = FB_GROUPS_STATE.map(g => {
     const isActive = g.active === 1;
+    const isSelected = SELECTED_FB_GROUP_ID === g.id;
+    const safeName = (g.name || 'Facebook Group').replace(/'/g, "\\'");
     return `
-      <div style="padding:12px;background:var(--bg-subtle);border-radius:8px;border:1px solid var(--border-color);display:flex;flex-direction:column;gap:6px;">
+      <div onclick="selectFbGroup(${g.id}, '${safeName}')" style="padding:11px 12px;border-radius:8px;cursor:pointer;display:flex;flex-direction:column;gap:5px;transition:all 0.15s ease;${isSelected ? 'background:#eff6ff;border:2px solid #1877F2;box-shadow:0 0 0 2px rgba(24,119,242,0.2);' : 'background:var(--bg-subtle);border:1px solid var(--border-color);'}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div>
-            <div style="font-weight:800;font-size:12.5px;color:var(--text-main);">${escapeHtml(g.name)}</div>
-            <a href="${escapeHtml(g.url)}" target="_blank" style="font-size:11px;color:#1877F2;text-decoration:none;">🔗 Open Group</a>
+          <div style="flex:1;overflow:hidden;padding-right:6px;">
+            <div style="font-weight:800;font-size:12.5px;color:${isSelected ? '#1d4ed8' : 'var(--text-main)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              ${isSelected ? '👉 ' : ''}${escapeHtml(g.name)}
+            </div>
+            <a href="${escapeHtml(g.url)}" target="_blank" onclick="event.stopPropagation()" style="font-size:10.5px;color:#1877F2;text-decoration:none;">🔗 Open Group</a>
           </div>
-          <button onclick="toggleFbGroupActive(${g.id})" style="padding:3px 8px;border-radius:12px;border:none;font-size:10px;font-weight:800;cursor:pointer;${isActive ? 'background:#dcfce7;color:#166534;' : 'background:#f3f4f6;color:#6b7280;'}">
+          <button onclick="event.stopPropagation();toggleFbGroupActive(${g.id})" style="padding:3px 8px;border-radius:12px;border:none;font-size:9.5px;font-weight:800;cursor:pointer;white-space:nowrap;${isActive ? 'background:#dcfce7;color:#166534;' : 'background:#f3f4f6;color:#6b7280;'}">
             ${isActive ? 'ACTIVE' : 'PAUSED'}
           </button>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:var(--text-muted);padding-top:4px;border-top:1px dashed var(--border-color);margin-top:2px;">
-          <span>Checks: every ${g.check_interval_min || 2}m</span>
+          <span>Checks: every ${g.check_interval_min || 1}m</span>
           <span>Jobs: <b>${g.total_jobs_found || 0}</b></span>
-          <button onclick="deleteFbGroupItem(${g.id})" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:12px;" title="Delete group">🗑</button>
+          <button onclick="event.stopPropagation();deleteFbGroupItem(${g.id})" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:11px;" title="Delete group">🗑</button>
         </div>
       </div>
     `;
   }).join('');
+
+  list.innerHTML = allGroupsPill + groupItems;
 }
 
 function renderFbAlertsList() {
   const list = document.getElementById('fbAlertsList');
   if (!list) return;
 
-  if (FB_ALERTS_STATE.length === 0) {
+  const banner = document.getElementById('fbActiveGroupBanner');
+  const bannerName = document.getElementById('fbActiveGroupName');
+  const subtitle = document.getElementById('fbFilterSubtitle');
+
+  let filtered = [...FB_ALERTS_STATE];
+
+  // 1. Filter by Selected Group
+  if (SELECTED_FB_GROUP_ID !== null) {
+    const selGroup = FB_GROUPS_STATE.find(g => g.id === SELECTED_FB_GROUP_ID);
+    if (banner && bannerName) {
+      banner.style.display = 'flex';
+      bannerName.textContent = `Showing posts for: ${SELECTED_FB_GROUP_NAME || selGroup?.name || 'Selected Group'}`;
+    }
+    filtered = filtered.filter(a => {
+      if (a.group_id && a.group_id === SELECTED_FB_GROUP_ID) return true;
+      if (selGroup && a.group_name) {
+        const agn = a.group_name.toLowerCase();
+        const sgn = selGroup.name.toLowerCase();
+        if (agn.includes(sgn) || sgn.includes(agn)) return true;
+      }
+      if (selGroup && selGroup.url && a.post_url) {
+        const slug = selGroup.url.split('/groups/')[1]?.split('/')[0]?.replace(/\/$/, '');
+        if (slug && a.post_url.includes(slug)) return true;
+      }
+      return false;
+    });
+  } else {
+    if (banner) banner.style.display = 'none';
+  }
+
+  // 2. Filter by Time Window
+  if (FB_TIME_FILTER !== 'all') {
+    const maxMins = FB_TIME_FILTER === '15m' ? 15 : (FB_TIME_FILTER === '1h' ? 60 : (FB_TIME_FILTER === '3h' ? 180 : 1440));
+    filtered = filtered.filter(a => getPostAgeInMinutes(a) <= maxMins);
+  }
+
+  // 3. Sort chronologically (Newest first: 1m -> 2m -> 5m -> 1h)
+  filtered.sort((a, b) => {
+    const ageA = getPostAgeInMinutes(a);
+    const ageB = getPostAgeInMinutes(b);
+    return FB_SORT_ORDER === 'newest' ? (ageA - ageB) : (ageB - ageA);
+  });
+
+  if (subtitle) {
+    subtitle.textContent = `Showing ${filtered.length} posts ${SELECTED_FB_GROUP_NAME ? `in "${SELECTED_FB_GROUP_NAME}"` : 'across all groups'} (Sorted by: ${FB_SORT_ORDER === 'newest' ? 'Newest first' : 'Oldest first'})`;
+  }
+
+  if (filtered.length === 0) {
     list.innerHTML = `
       <div style="text-align:center;padding:48px 20px;color:var(--text-muted);">
         <div style="font-size:32px;margin-bottom:8px;">🎯</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">No hiring posts detected yet</div>
-        <div style="font-size:12px;">Active monitoring will filter and surface hiring posts automatically, or click "Test Telegram Alert" to see it in action!</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">No hiring posts found for this selection</div>
+        <div style="font-size:12px;margin-bottom:12px;">Try changing the time filter above or click "Scan This Group Now" to scrape the freshest posts right now.</div>
+        ${SELECTED_FB_GROUP_ID ? `<button onclick="scanSelectedGroupNow()" class="btn-primary" style="background:#1877F2;border-color:#1877F2;padding:6px 14px;font-size:11px;">⚡ Scan This Group Now</button>` : ''}
       </div>
     `;
     return;
   }
 
-  list.innerHTML = FB_ALERTS_STATE.map(a => {
+  list.innerHTML = filtered.map(a => {
     const cleanWa = (a.contact_whatsapp || a.contact_phone || '').replace(/[^0-9]/g, '');
     const waLink = cleanWa ? (cleanWa.startsWith('01') && cleanWa.length === 11 ? `https://wa.me/88${cleanWa}` : `https://wa.me/${cleanWa}`) : '';
     const imgHtml = a.image_url ? `<img src="${escapeHtml(a.image_url)}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid var(--border-color);" />` : '';
+    const ageMins = getPostAgeInMinutes(a);
+    const ageLabel = formatPostAgeLabel(ageMins);
 
     return `
       <div style="padding:14px 16px;background:#fff;border-radius:8px;border:1px solid var(--border-color);box-shadow:0 1px 3px rgba(0,0,0,0.04);display:flex;gap:14px;align-items:flex-start;">
@@ -1774,7 +1943,8 @@ function renderFbAlertsList() {
               <span style="font-weight:800;font-size:13.5px;color:var(--text-main);">${escapeHtml(a.client_name || a.author_name || 'Client')}</span>
               <span style="font-size:11px;color:var(--text-muted);margin-left:6px;">in <b>${escapeHtml(a.group_name || 'Group')}</b></span>
             </div>
-            <div style="display:flex;gap:6px;align-items:center;">
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <span style="background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">${ageLabel}</span>
               <span style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">${escapeHtml(a.job_type || 'Video Editor')}</span>
               <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">${escapeHtml(a.budget || 'Negotiable')}</span>
               <span style="background:#f0fdf4;color:#15803d;padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;">${a.confidence_score || 95}% AI</span>

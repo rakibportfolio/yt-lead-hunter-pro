@@ -1202,13 +1202,39 @@ Micro-Niche
         <div id="fbGroupsList" style="display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;"></div>
       </div>
       <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
           <div>
             <h3 style="font-size:14px;font-weight:800;color:#0f172a;margin:0;">&#128680; Detected Hiring Posts</h3>
-            <span style="font-size:11px;color:#64748b;">AI filtered &mdash; only clients recruiting video editors</span>
+            <span style="font-size:11px;color:#64748b;" id="fbFilterSubtitle">AI filtered &mdash; only clients recruiting video editors</span>
           </div>
-          <button onclick="loadFbAlerts()" style="background:#f1f5f9;border:1px solid #e2e8f0;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;color:#334155;">&#128260; Refresh</button>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="fbTimeFilterSelect" onchange="onFbFilterChange()" style="padding:6px 10px;border-radius:7px;border:1px solid #cbd5e1;font-size:11px;font-weight:600;background:#fff;color:#1e293b;cursor:pointer;">
+              <option value="all">🕒 All Time</option>
+              <option value="15m">⚡ Last 15 Mins</option>
+              <option value="1h">⏱️ Last 1 Hour</option>
+              <option value="3h">🔥 Last 3 Hours</option>
+              <option value="24h">📅 Last 24 Hours</option>
+            </select>
+            <select id="fbSortSelect" onchange="onFbFilterChange()" style="padding:6px 10px;border-radius:7px;border:1px solid #cbd5e1;font-size:11px;font-weight:600;background:#fff;color:#1e293b;cursor:pointer;">
+              <option value="newest" selected>⬇️ Newest First (1m &rarr; 2m &rarr; 1h)</option>
+              <option value="oldest">⬆️ Oldest First</option>
+            </select>
+            <button onclick="loadFbAlerts()" style="background:#f1f5f9;border:1px solid #e2e8f0;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;color:#334155;">&#128260; Refresh</button>
+          </div>
         </div>
+
+        <!-- Filter banner when a group is selected -->
+        <div id="fbActiveGroupBanner" style="display:none;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 14px;margin-bottom:14px;justify-content:space-between;align-items:center;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:14px;">🎯</span>
+            <span id="fbActiveGroupName" style="font-size:12.5px;color:#1e40af;font-weight:800;">Showing posts for: ...</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button id="fbScanSelectedGroupBtn" onclick="scanSelectedGroupNow()" style="background:#1877F2;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">⚡ Scan This Group Now</button>
+            <button onclick="clearSelectedFbGroup()" style="background:#fff;color:#475569;border:1px solid #cbd5e1;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">✕ Show All</button>
+          </div>
+        </div>
+
         <div id="fbAlertsList" style="display:flex;flex-direction:column;gap:12px;max-height:560px;overflow-y:auto;"></div>
       </div>
     </div>
