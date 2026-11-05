@@ -1989,7 +1989,8 @@ ${escapeHtml(a.content || a.ai_summary || '')}
               ${a.contact_email ? `<span style="color:var(--text-muted);">✉ ${escapeHtml(a.contact_email)}</span>` : ''}
               <span style="color:var(--text-light);">${(a.created_at || '').substring(0, 16)}</span>
             </div>
-            <div style="display:flex;gap:6px;">
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              ${a.author_url ? `<a href="${escapeHtml(a.author_url)}" target="_blank" class="btn-primary" style="background:#1877F2;border-color:#1877F2;padding:4px 10px;font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">👤 Message FB ID</a>` : ''}
               ${waLink ? `<a href="${waLink}" target="_blank" class="btn-primary" style="background:#25D366;border-color:#25D366;padding:4px 10px;font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">💬 WhatsApp</a>` : ''}
               ${a.post_url ? `<a href="${escapeHtml(a.post_url)}" target="_blank" class="btn-secondary" style="padding:4px 10px;font-size:11px;text-decoration:none;">🔗 Open Post</a>` : ''}
             </div>

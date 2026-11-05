@@ -299,6 +299,7 @@ def alert_fb_hiring_post(job: dict) -> bool:
     """Send instant high-priority alert for a Facebook Video Editor hiring post."""
     group_name = job.get("group_name", "Facebook Group")
     author_name = job.get("author_name", "Client")
+    author_url = job.get("author_url", "")
     client_name = job.get("client_name") or author_name
     job_type = job.get("job_type", "Video Editor")
     budget = job.get("budget", "Negotiable / Not specified")
@@ -318,8 +319,14 @@ def alert_fb_hiring_post(job: dict) -> bool:
     caption = f"""🚨 <b>NEW VIDEO EDITOR HIRING POST!</b> 🎯
 ━━━━━━━━━━━━━━━━━━━━
 🏢 <b>Group:</b> {group_name}
-👤 <b>Client:</b> {client_name} ({author_name})
-💼 <b>Need:</b> {job_type}
+👤 <b>Client:</b> {client_name}
+"""
+    if author_url:
+        caption += f"🔗 <b>FB Profile / ID:</b> <a href='{author_url}'>{author_url}</a>\n"
+    elif post_url:
+        caption += f"🔗 <b>FB Post & ID:</b> <a href='{post_url}'>Click to View & Message Poster</a>\n"
+
+    caption += f"""💼 <b>Need:</b> {job_type}
 💰 <b>Budget:</b> {budget}
 
 📋 <b>Post Summary:</b>
@@ -336,15 +343,20 @@ def alert_fb_hiring_post(job: dict) -> bool:
 ━━━━━━━━━━━━━━━━━━━━
 ⚡ <b>React fast to secure this deal before other editors!</b>"""
 
-    # Build inline buttons
+    # Build inline buttons (WhatsApp + Direct FB Profile/Post)
     inline_keyboard = []
     btn_row = []
     if clean_wa:
         btn_row.append({"text": "💬 WhatsApp Chat", "url": f"https://wa.me/{clean_wa}"})
-    if post_url:
+    if author_url:
+        btn_row.append({"text": "👤 Message on FB", "url": author_url})
+    elif post_url:
         btn_row.append({"text": "🔗 Open FB Post", "url": post_url})
     if btn_row:
         inline_keyboard.append(btn_row)
+
+    if post_url and author_url:
+        inline_keyboard.append([{"text": "🔗 View Full FB Post", "url": post_url}])
 
     reply_markup = {"inline_keyboard": inline_keyboard} if inline_keyboard else None
 

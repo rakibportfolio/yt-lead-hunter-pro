@@ -239,12 +239,46 @@ def init_db():
         )
     """)
 
+    try:
+        c.execute("ALTER TABLE fb_job_alerts ADD COLUMN author_url TEXT")
+    except Exception:
+        pass
+
     # Seed curated Facebook video editing groups automatically
     DEFAULT_GROUPS = [
+        # ── USER REQUESTED VIP HIGH PRIORITY GROUPS (Priority 10) ─────
+        ("BD Freelancers Community", "https://www.facebook.com/groups/bdfreelancerscommunity/", 10),
+        ("Video Editor Jobs Worldwide", "https://www.facebook.com/groups/videoeditorjobs/", 10),
+        ("Video Editing BD Hub #563", "https://www.facebook.com/groups/563297302882280/", 10),
+        ("Freelance Editors BD #786", "https://www.facebook.com/groups/786509760938079/", 10),
+        ("Video Editors & Animators BD #131", "https://www.facebook.com/groups/1319176705676218/", 10),
+        ("Video Editors Community #470", "https://www.facebook.com/groups/470532055541674/", 10),
+        ("Creative Editors Network #497", "https://www.facebook.com/groups/497041285819747/", 10),
+        ("Video Editing Zone #337", "https://www.facebook.com/groups/337481355732194/", 10),
+        ("Video Creators Hub #838", "https://www.facebook.com/groups/838048813733900/", 10),
+        ("Video Editing Jobs #158", "https://www.facebook.com/groups/1585573421895994/", 10),
+        ("I Need a Video Editor", "https://www.facebook.com/groups/ineedavideoeditor/", 10),
+        ("EditVerse Freelance Hub", "https://www.facebook.com/groups/editverse.freelancehub/", 10),
+        ("Free Video Editor Group", "https://www.facebook.com/groups/freevideoeditorgroup/", 10),
+        ("Freelance Video Editors #153", "https://www.facebook.com/groups/1535727757545719/", 10),
+        ("Video Editor Hiring BD #132", "https://www.facebook.com/groups/1326223411530920/", 10),
+        ("Billi4You Video Editors", "https://www.facebook.com/groups/billi4you.video.editors/", 10),
+        ("VIP: Video Editors Bangladesh BD", "https://www.facebook.com/groups/VideoEditorsBangladesh.BD/", 10),
+        ("EvokeVerse Video Editors", "https://www.facebook.com/groups/evokeverse/", 10),
+        ("Video Editors Global #162", "https://www.facebook.com/groups/1624224204424600/", 10),
+        ("Video Editing Jobs Hub #241", "https://www.facebook.com/groups/2417162128540008/", 10),
+        ("Freelance Video Editor", "https://www.facebook.com/groups/freelancevideoeditor/", 10),
+        ("Video Creators & Editors #729", "https://www.facebook.com/groups/729888311361914/", 10),
+        ("Video Editors Community #632", "https://www.facebook.com/groups/6320719404694598/", 10),
+        ("Premiere & AE Editors #594", "https://www.facebook.com/groups/594778777333016/", 10),
+        ("Freelance Video Editors Worldwide", "https://www.facebook.com/groups/freelancevideoeditors/", 10),
+        ("Video Editing Hub BD #947", "https://www.facebook.com/groups/947928056999454/", 10),
+        ("Video Editors Network #386", "https://www.facebook.com/groups/386403410983677/", 10),
+        ("Professional Video Editors Global", "https://www.facebook.com/groups/ProfessionalVideoEditors/", 10),
+        ("Video Editing Masterclass BD #112", "https://www.facebook.com/groups/1126963997314568/", 10),
         # ── 4 VIP TOP PRIORITY GROUPS (Always Scanned First) ──────
         ("VIP: Video Editing Bangladesh", "https://www.facebook.com/groups/bangladeshyoututbeandfacebookcommunity/", 10),
         ("VIP: Video Editor - VFX Bangladesh", "https://www.facebook.com/groups/videoeditorhire/", 10),
-        ("VIP: Video Editors Bangladesh BD", "https://www.facebook.com/groups/VideoEditorsBangladesh.BD/", 10),
         ("VIP: Video Editors BD #229", "https://www.facebook.com/groups/2292891657639248/", 10),
 
         # ── USER VERIFIED GROUPS ──────────────────────────────────
@@ -709,14 +743,16 @@ def is_fb_post_seen(post_id: str) -> bool:
 def insert_fb_alert(data: dict) -> int:
     conn = get_db()
     c = conn.cursor()
+    if "author_url" not in data:
+        data["author_url"] = ""
     c.execute("""
         INSERT INTO fb_job_alerts (
-            group_id, group_name, post_id, author_name, post_url, content, image_url,
+            group_id, group_name, post_id, author_name, author_url, post_url, content, image_url,
             is_hiring, client_name, job_type, budget, contact_phone, contact_email,
             contact_whatsapp, contact_telegram, confidence_score, ai_summary,
             telegram_sent, telegram_sent_at
         ) VALUES (
-            :group_id, :group_name, :post_id, :author_name, :post_url, :content, :image_url,
+            :group_id, :group_name, :post_id, :author_name, :author_url, :post_url, :content, :image_url,
             :is_hiring, :client_name, :job_type, :budget, :contact_phone, :contact_email,
             :contact_whatsapp, :contact_telegram, :confidence_score, :ai_summary,
             :telegram_sent, :telegram_sent_at

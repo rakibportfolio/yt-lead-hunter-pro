@@ -214,18 +214,22 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
 
     # Positive hiring patterns (English + Banglish + Bengali)
     hiring_patterns = [
-        r'\b(?:need|looking\s+for|hiring|seeking|want|require)\b[^\.\n\?!]{0,40}\b(?:video\s+editor|editor|motion\s+designer|animator)\b',
-        r'\b(?:video\s+editor|editor)\s+(?:lagbe|dorkar|khujchi|chahida|need|hiring)\b',
-        r'\b(?:we\s+are\s+hiring|urgently\s+need|urgent\s+requirement|job\s+offer|job\s+circular)\b',
-        r'\b(?:pay|budget|salary|rate)\s*[:=–-]?\s*\$?\d+',
-        r'\b(?:send\s+portfolio|inbox\s+with\s+portfolio|inbox\s+your\s+rate|apply\s+at)\b',
-        r'\b(?:who\s+can\s+edit\s+my\s+videos|need\s+someone\s+to\s+edit)\b',
+        r'\b(?:need|looking\s+for|hiring|seeking|want|require|wanted)\b[^\.\n\?!]{0,40}\b(?:video\s+editor|editor|motion\s+designer|animator)\b',
+        r'\b(?:video\s+editor|editor|motion\s+designer)\s*(?:lagbe|dorkar|khujchi|chahida|need|hiring|chai|proyojon)\b',
+        r'\b(?:urgent|urgently|urgent\s+requirement|we\s+are\s+hiring|job\s+offer|job\s+circular|recruitment)\b',
+        r'\b(?:pay|budget|salary|rate|remuneration)\s*[:=–-]?\s*\$?\d+',
+        r'\b(?:send\s+portfolio|inbox\s+with\s+portfolio|inbox\s+your\s+rate|apply\s+at|drop\s+portfolio|send\s+cv|send\s+resume)\b',
+        r'\b(?:who\s+can\s+edit\s+my\s+videos|need\s+someone\s+to\s+edit|can\s+anyone\s+edit|anyone\s+available\s+to\s+edit)\b',
+        r'\b(?:video\s+edit\s+korate\s+chai|editing\s+er\s+lok\s+lagbe|editor\s+dorkar)\b',
         r'ভিডিও\s*এডিটর\s*লাগবে',
         r'ভিডিও\s*এডিটর\s*দরকার',
         r'এডিটর\s*লাগবে',
         r'এডিটর\s*আবশ্যক',
         r'ভিডিও\s*এডিটর\s*আবশ্যক',
-        r'ভিডিও\s*এডিটর\s*খুঁজছি'
+        r'ভিডিও\s*এডিটর\s*খুঁজছি',
+        r'ভিডিও\s*এডিট\s*করাতে\s*চাই',
+        r'জরুরী\s*ভিত্তিতে\s*এডিটর',
+        r'কাজের\s*জন্য\s*এডিটর'
     ]
 
     is_hiring = any(re.search(p, c_lower) for p in hiring_patterns)
@@ -378,16 +382,29 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                         link_tag = f_post.query_selector('a[href*="/posts/"], a[href*="/permalink/"]')
                         p_href = link_tag.get_attribute("href") if link_tag else clean_url
 
-                        # Author name extraction
-                        author_el = f_post.query_selector('h2, h3, strong, a[role="link"]')
-                        author = author_el.inner_text().strip() if author_el else "Facebook User"
-                        if '\n' in author:
-                            author = author.split('\n')[0].strip()
+                        # Author name & FB Profile URL extraction
+                        author_el = f_post.query_selector('h2 a, h3 a, a[role="link"][tabindex="0"], div[data-ad-rendering-role="profile_name"] a, h2, h3, strong, a[role="link"]')
+                        author = "Facebook User"
+                        author_url = ""
+                        if author_el:
+                            author = author_el.inner_text().strip()
+                            if '\n' in author:
+                                author = author.split('\n')[0].strip()
+                            href = author_el.get_attribute("href") or ""
+                            if href and not href.startswith("#") and "/groups/" not in href:
+                                if href.startswith("/"):
+                                    href = f"https://www.facebook.com{href}"
+                                if "profile.php?id=" in href:
+                                    pid_part = href.split("profile.php?id=")[1].split("&")[0]
+                                    author_url = f"https://www.facebook.com/profile.php?id={pid_part}"
+                                else:
+                                    author_url = href.split("?")[0]
 
                         pid = f"fb_{abs(hash(txt[:80]))}"
                         posts.append({
                             "post_id": pid,
                             "author_name": author or "Facebook User",
+                            "author_url": author_url or "",
                             "post_url": p_href if p_href.startswith("http") else f"https://facebook.com{p_href}",
                             "content": txt,
                             "image_url": img_src or ""
@@ -417,14 +434,28 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                             img_src = img_tag.get_attribute("src") if img_tag else ""
                             link_tag = f_post.query_selector('a[href*="/posts/"], a[href*="/permalink/"]')
                             p_href = link_tag.get_attribute("href") if link_tag else clean_url
-                            author_el = f_post.query_selector('h2, h3, strong, a[role="link"]')
-                            author = author_el.inner_text().strip() if author_el else "Facebook User"
-                            if '\n' in author:
-                                author = author.split('\n')[0].strip()
+                            author_el = f_post.query_selector('h2 a, h3 a, a[role="link"][tabindex="0"], div[data-ad-rendering-role="profile_name"] a, h2, h3, strong, a[role="link"]')
+                            author = "Facebook User"
+                            author_url = ""
+                            if author_el:
+                                author = author_el.inner_text().strip()
+                                if '\n' in author:
+                                    author = author.split('\n')[0].strip()
+                                href = author_el.get_attribute("href") or ""
+                                if href and not href.startswith("#") and "/groups/" not in href:
+                                    if href.startswith("/"):
+                                        href = f"https://www.facebook.com{href}"
+                                    if "profile.php?id=" in href:
+                                        pid_part = href.split("profile.php?id=")[1].split("&")[0]
+                                        author_url = f"https://www.facebook.com/profile.php?id={pid_part}"
+                                    else:
+                                        author_url = href.split("?")[0]
+
                             pid = f"fb_{abs(hash(txt[:80]))}"
                             posts.append({
                                 "post_id": pid,
                                 "author_name": author or "Facebook User",
+                                "author_url": author_url or "",
                                 "post_url": p_href if p_href.startswith("http") else f"https://facebook.com{p_href}",
                                 "content": txt,
                                 "image_url": img_src or ""
@@ -503,6 +534,7 @@ def process_single_fb_group(group: Dict[str, Any]) -> int:
             "group_name": gname,
             "post_id": pid,
             "author_name": p["author_name"],
+            "author_url": p.get("author_url", ""),
             "post_url": p["post_url"],
             "content": p["content"],
             "image_url": p.get("image_url", ""),
