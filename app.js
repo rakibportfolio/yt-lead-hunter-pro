@@ -1708,16 +1708,6 @@ function selectFbGroup(gid, gname) {
   SELECTED_FB_GROUP_NAME = gname;
   renderFbGroupsList();
   renderFbAlertsList();
-
-  // If this group has no posts loaded yet, auto-scan so the user immediately gets all posts!
-  const hasPosts = FB_ALERTS_STATE.some(a => {
-    if (a.group_id && a.group_id === gid) return true;
-    if (a.group_name && gname && (a.group_name.toLowerCase().includes(gname.toLowerCase()) || gname.toLowerCase().includes(a.group_name.toLowerCase()))) return true;
-    return false;
-  });
-  if (!hasPosts) {
-    scanSelectedGroupNow();
-  }
 }
 
 function clearSelectedFbGroup() {
@@ -1740,32 +1730,37 @@ function onFbFilterChange() {
 async function scanSelectedGroupNow() {
   if (!SELECTED_FB_GROUP_ID) return;
   const btn = document.getElementById('fbScanSelectedGroupBtn');
+  const btnEmpty = document.getElementById('fbScanEmptyGroupBtn');
   if (btn) {
     btn.disabled = true;
     btn.innerHTML = '⏳ Scanning...';
+  }
+  if (btnEmpty) {
+    btnEmpty.disabled = true;
+    btnEmpty.innerHTML = '⏳ Scanning Facebook Group...';
   }
   try {
     const res = await fetch(`/api/fb/scan-group/${SELECTED_FB_GROUP_ID}`, { method: 'POST' });
     const data = await res.json();
     if (data.ok) {
-      showToast(data.message || `Found ${data.jobs_found} hiring leads!`, 'success');
-      if (data.alerts) {
-        FB_ALERTS_STATE = data.alerts;
-      } else {
-        await loadFbAlerts();
-      }
-      renderFbAlertsList();
-      updateFbStats();
+      showToast(data.message || 'Scan completed!', 'success');
+      await loadFbAlerts();
     } else {
       showToast(data.message || 'Scan completed', 'info');
+      await loadFbAlerts();
     }
   } catch (err) {
     console.error('Scan group error:', err);
     showToast('Scan initiated in background', 'info');
+    await loadFbAlerts();
   } finally {
     if (btn) {
       btn.disabled = false;
       btn.innerHTML = '⚡ Scan This Group Now';
+    }
+    if (btnEmpty) {
+      btnEmpty.disabled = false;
+      btnEmpty.innerHTML = '⚡ Fetch All Posts From Group Now';
     }
   }
 }
@@ -1943,9 +1938,12 @@ function renderFbAlertsList() {
         <div style="font-size:36px;margin-bottom:8px;">👥</div>
         <div style="font-weight:800;font-size:15px;color:#1e293b;margin-bottom:6px;">No posts loaded yet for ${SELECTED_FB_GROUP_NAME ? `"${escapeHtml(SELECTED_FB_GROUP_NAME)}"` : 'this selection'}</div>
         <div style="font-size:12.5px;color:#64748b;margin-bottom:16px;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.5;">
-          Click the button below to fetch all live posts from this Facebook group right now in real time!
+          This group has no posts loaded in this session yet. Click the button below to fetch live posts, or click "Show All Groups" to see all posts from all other groups!
         </div>
-        ${SELECTED_FB_GROUP_ID ? `<button onclick="scanSelectedGroupNow()" class="btn-primary" style="background:#1877F2;border-color:#1877F2;padding:9px 20px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(24,119,242,0.3);cursor:pointer;">⚡ Fetch All Posts From Group Now</button>` : ''}
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          ${SELECTED_FB_GROUP_ID ? `<button id="fbScanEmptyGroupBtn" onclick="scanSelectedGroupNow()" class="btn-primary" style="background:#1877F2;border-color:#1877F2;padding:9px 18px;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(24,119,242,0.3);cursor:pointer;">⚡ Fetch All Posts From Group Now</button>` : ''}
+          <button onclick="clearSelectedFbGroup()" class="btn-secondary" style="padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;">🌐 Show All Groups (সব গ্রুপের পোস্ট দেখুন)</button>
+        </div>
       </div>
     `;
     return;
