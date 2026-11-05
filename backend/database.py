@@ -10,7 +10,9 @@ from config import cfg
 
 
 def get_db():
-    conn = sqlite3.connect(cfg.DB_PATH)
+    conn = sqlite3.connect(cfg.DB_PATH, timeout=30.0)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=30000;")
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -230,6 +232,56 @@ def init_db():
             created_at          TEXT DEFAULT (datetime('now'))
         )
     """)
+
+    # Seed curated Facebook video editing groups automatically
+    DEFAULT_GROUPS = [
+        ("MZ Studio BD", "https://www.facebook.com/groups/mzstudiobd/"),
+        ("Video Editors & Creators BD #291", "https://www.facebook.com/groups/291019220252715/"),
+        ("Video Editing Hub BD #359", "https://www.facebook.com/groups/359734483826735/"),
+        ("Video Editor Jobs BD #185", "https://www.facebook.com/groups/1851439782436285/"),
+        ("Video Editors Freelancer BD #147", "https://www.facebook.com/groups/147032671260514/"),
+        ("Creative Video Editors BD #384", "https://www.facebook.com/groups/3847335125558578/"),
+        ("Video Editing Community #752", "https://www.facebook.com/groups/752472806507912/"),
+        ("Editors & Animators BD #874", "https://www.facebook.com/groups/874914633509210/"),
+        ("Video Editors Bangladesh Official", "https://www.facebook.com/groups/videoeditorsbangladeshofficial/"),
+        ("BD Video Creators & Editors #100", "https://www.facebook.com/groups/1001939884944907/"),
+        ("Video Editing Zone BD #286", "https://www.facebook.com/groups/286521763690926/"),
+        ("Video Editing & Hiring BD #109", "https://www.facebook.com/groups/1096533198753530/"),
+        ("Video Editor Job Bangladesh", "https://www.facebook.com/groups/VideoditorJobBangladesh/"),
+        ("Video Editors YES", "https://www.facebook.com/groups/videoeditorsyes/"),
+        ("Professional Editors BD #229", "https://www.facebook.com/groups/2292891657639248/"),
+        ("Video Editing Freelance BD #117", "https://www.facebook.com/groups/1173532240001355/"),
+        ("BD Video Editing Network #294", "https://www.facebook.com/groups/294830932856749/"),
+        ("Video Editor in Bangladesh", "https://www.facebook.com/groups/videoeditorinbangladesh/"),
+        ("Bangladesh YouTube & Facebook Community", "https://www.facebook.com/groups/bangladeshyoututbeandfacebookcommunity/"),
+        ("Professional Video Editor", "https://www.facebook.com/groups/ProfessionalVideoEditor/"),
+        ("Video Editors Circle BD #151", "https://www.facebook.com/groups/1510297602711737/"),
+        ("Freelance Video Editors BD #310", "https://www.facebook.com/groups/310584494121197/"),
+        ("Video Editors Bangladesh PRO", "https://www.facebook.com/groups/videoeditorsbangladeshpro/"),
+        ("BD Content & Video Editors #449", "https://www.facebook.com/groups/449818040305896/"),
+        ("Digital Video Editors BD #185", "https://www.facebook.com/groups/185647597308414/"),
+        ("Video Editing BD Hub #343", "https://www.facebook.com/groups/343780916577699/"),
+        ("Creative Freelance Editors BD #656", "https://www.facebook.com/groups/6560510120739077/"),
+        ("AE Video Editors PH / Global", "https://www.facebook.com/groups/AEVideoEditorsPH/"),
+        ("Video Editing Masterclass BD #112", "https://www.facebook.com/groups/1126963997314568/"),
+        ("Video Editor Bangladesh", "https://www.facebook.com/groups/videoeditorbd/"),
+        ("Video Editing Jobs BD", "https://www.facebook.com/groups/videoeditingjobsbd/"),
+        ("Freelancer Bangladesh", "https://www.facebook.com/groups/freelancerbd/"),
+        ("Motion Graphics Bangladesh", "https://www.facebook.com/groups/motiondesignerbd/"),
+        ("Adobe Premiere Pro Bangladesh", "https://www.facebook.com/groups/premiererobd/"),
+        ("After Effects Bangladesh", "https://www.facebook.com/groups/aftereffectsbd/"),
+        ("Bangladesh Freelancers", "https://www.facebook.com/groups/bangladeshfreelancers/"),
+        ("Video Editor Jobs Worldwide", "https://www.facebook.com/groups/videoeditorjobs/"),
+        ("Video Editor Needed", "https://www.facebook.com/groups/videoeditorsneeded/")
+    ]
+    for g_name, g_url in DEFAULT_GROUPS:
+        clean = g_url.strip()
+        if not clean.endswith('/'):
+            clean += '/'
+        c.execute("""
+            INSERT OR IGNORE INTO fb_monitored_groups (name, url, active, check_interval_min)
+            VALUES (?, ?, 1, 2)
+        """, (g_name, clean))
 
     conn.commit()
     conn.close()
