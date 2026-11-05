@@ -350,16 +350,14 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
 
             page = context.new_page()
 
-            # First priority: target the group's hiring search feed to bypass noise/chatter
-            search_url = f"{clean_url}/search/?q=hiring"
+            # 1. Main group feed: grab newest posts directly in reverse chronological order
             try:
-                page.goto(search_url, timeout=20000, wait_until="domcontentloaded")
+                page.goto(clean_url, timeout=22000, wait_until="domcontentloaded")
                 page.wait_for_timeout(3000)
-            except Exception:
-                page.goto(clean_url, timeout=20000, wait_until="domcontentloaded")
-                page.wait_for_timeout(3000)
+            except Exception as ge:
+                print(f"[FB Playwright] Note loading {clean_url}: {ge}")
 
-            # Incremental scrolls: grab posts as they appear in the DOM
+            # Incremental scrolls: grab posts as they appear in the feed
             for scroll_round in range(4):
                 if len(posts) >= limit:
                     break
@@ -373,7 +371,7 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                     except Exception:
                         continue
 
-                    if len(txt) > 30 and txt not in seen_texts:
+                    if len(txt) > 25 and txt not in seen_texts:
                         seen_texts.add(txt)
                         img_tag = f_post.query_selector('img[src*="scontent"], img')
                         img_src = img_tag.get_attribute("src") if img_tag else ""
@@ -397,40 +395,44 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
 
                 # Scroll down
                 page.evaluate("window.scrollBy(0, 1200)")
-                page.wait_for_timeout(1200)
+                page.wait_for_timeout(1000)
 
-            # If search feed returned fewer than 2 posts, also check main group feed
-            if len(posts) < 2:
-                try:
-                    page.goto(clean_url, timeout=20000, wait_until="domcontentloaded")
-                    page.wait_for_timeout(2500)
-                    for _ in range(2):
-                        feed_posts = page.query_selector_all('div[role="feed"] div[role="article"], div[role="article"]')
-                        for f_post in feed_posts:
-                            if len(posts) >= limit:
-                                break
-                            try:
-                                txt = f_post.inner_text().strip()
-                            except Exception:
-                                continue
-                            if len(txt) > 30 and txt not in seen_texts:
-                                seen_texts.add(txt)
-                                img_tag = f_post.query_selector('img[src*="scontent"], img')
-                                img_src = img_tag.get_attribute("src") if img_tag else ""
-                                link_tag = f_post.query_selector('a[href*="/posts/"], a[href*="/permalink/"]')
-                                p_href = link_tag.get_attribute("href") if link_tag else clean_url
-                                pid = f"fb_{abs(hash(txt[:80]))}"
-                                posts.append({
-                                    "post_id": pid,
-                                    "author_name": "Facebook User",
-                                    "post_url": p_href if p_href.startswith("http") else f"https://facebook.com{p_href}",
-                                    "content": txt,
-                                    "image_url": img_src or ""
-                                })
-                        page.evaluate("window.scrollBy(0, 1000)")
-                        page.wait_for_timeout(1000)
-                except Exception:
-                    pass
+            # 2. Targeted search: also check the hiring query feed so no hiring post is missed
+            search_url = f"{clean_url}/search/?q=hiring"
+            try:
+                page.goto(search_url, timeout=18000, wait_until="domcontentloaded")
+                page.wait_for_timeout(2500)
+                for _ in range(2):
+                    feed_posts = page.query_selector_all('div[role="feed"] > div, div[role="article"]')
+                    for f_post in feed_posts:
+                        if len(posts) >= limit:
+                            break
+                        try:
+                            txt = f_post.inner_text().strip()
+                        except Exception:
+                            continue
+                        if len(txt) > 25 and txt not in seen_texts:
+                            seen_texts.add(txt)
+                            img_tag = f_post.query_selector('img[src*="scontent"], img')
+                            img_src = img_tag.get_attribute("src") if img_tag else ""
+                            link_tag = f_post.query_selector('a[href*="/posts/"], a[href*="/permalink/"]')
+                            p_href = link_tag.get_attribute("href") if link_tag else clean_url
+                            author_el = f_post.query_selector('h2, h3, strong, a[role="link"]')
+                            author = author_el.inner_text().strip() if author_el else "Facebook User"
+                            if '\n' in author:
+                                author = author.split('\n')[0].strip()
+                            pid = f"fb_{abs(hash(txt[:80]))}"
+                            posts.append({
+                                "post_id": pid,
+                                "author_name": author or "Facebook User",
+                                "post_url": p_href if p_href.startswith("http") else f"https://facebook.com{p_href}",
+                                "content": txt,
+                                "image_url": img_src or ""
+                            })
+                    page.evaluate("window.scrollBy(0, 1000)")
+                    page.wait_for_timeout(1000)
+            except Exception:
+                pass
 
             browser.close()
     except Exception as pe:
@@ -477,12 +479,12 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
 
 # ── Processing & Alert Pipeline ──────────────────────────────
 def process_single_fb_group(group: Dict[str, Any]) -> int:
-    """Scrapes, classifies, and sends alerts for one group."""
+    """Scrapes, classifies, and saves ALL posts for one group (sending Telegram alert for hiring ones)."""
     gid = group["id"]
     gname = group["name"]
     gurl = group["url"]
 
-    posts = scrape_facebook_group_posts(gurl, limit=12)
+    posts = scrape_facebook_group_posts(gurl, limit=20)
     update_fb_group_scan_stats(gid, len(posts))
 
     new_jobs_count = 0
@@ -492,41 +494,42 @@ def process_single_fb_group(group: Dict[str, Any]) -> int:
         if is_fb_post_seen(pid):
             continue
 
-        # Classify with AI
+        # Classify with AI / Heuristics
         ai_res = classify_fb_post_with_ai(p["content"], p["author_name"], gname)
+        is_hiring = 1 if ai_res.get("is_hiring") else 0
 
-        if ai_res.get("is_hiring"):
-            alert_data = {
-                "group_id": gid,
-                "group_name": gname,
-                "post_id": pid,
-                "author_name": p["author_name"],
-                "post_url": p["post_url"],
-                "content": p["content"],
-                "image_url": p.get("image_url", ""),
-                "is_hiring": 1,
-                "client_name": ai_res.get("client_name", p["author_name"]),
-                "job_type": ai_res.get("job_type", "Video Editor"),
-                "budget": ai_res.get("budget", "Negotiable"),
-                "contact_phone": ai_res.get("contact_phone", ""),
-                "contact_email": ai_res.get("contact_email", ""),
-                "contact_whatsapp": ai_res.get("contact_whatsapp", ""),
-                "contact_telegram": ai_res.get("contact_telegram", ""),
-                "confidence_score": ai_res.get("confidence_score", 95),
-                "ai_summary": ai_res.get("ai_summary", p["content"][:200]),
-                "telegram_sent": 0,
-                "telegram_sent_at": None
-            }
+        alert_data = {
+            "group_id": gid,
+            "group_name": gname,
+            "post_id": pid,
+            "author_name": p["author_name"],
+            "post_url": p["post_url"],
+            "content": p["content"],
+            "image_url": p.get("image_url", ""),
+            "is_hiring": is_hiring,
+            "client_name": ai_res.get("client_name", p["author_name"]) if is_hiring else p["author_name"],
+            "job_type": ai_res.get("job_type", "Video Editor") if is_hiring else "Community Post",
+            "budget": ai_res.get("budget", "Negotiable") if is_hiring else "",
+            "contact_phone": ai_res.get("contact_phone", "") if is_hiring else "",
+            "contact_email": ai_res.get("contact_email", "") if is_hiring else "",
+            "contact_whatsapp": ai_res.get("contact_whatsapp", "") if is_hiring else "",
+            "contact_telegram": ai_res.get("contact_telegram", "") if is_hiring else "",
+            "confidence_score": ai_res.get("confidence_score", 95) if is_hiring else 0,
+            "ai_summary": ai_res.get("ai_summary", p["content"][:200]),
+            "telegram_sent": 0,
+            "telegram_sent_at": None
+        }
 
-            # Send Instant Telegram Alert
+        # Send Instant Telegram Alert ONLY if hiring
+        if is_hiring:
             sent_ok = alert_fb_hiring_post(alert_data)
             if sent_ok:
                 alert_data["telegram_sent"] = 1
                 alert_data["telegram_sent_at"] = datetime.now().isoformat()
-
-            insert_fb_alert(alert_data)
             new_jobs_count += 1
-            print(f"[FB Radar] 🎯 NEW JOB ALERT DISPATCHED: {alert_data['job_type']} in '{gname}'!")
+            print(f"[FB Radar] 🎯 NEW HIRING LEAD: {alert_data['job_type']} in '{gname}'!")
+
+        insert_fb_alert(alert_data)
 
     return new_jobs_count
 

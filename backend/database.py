@@ -692,7 +692,7 @@ def toggle_fb_group(group_id: int) -> int:
     conn.close()
     return 0
 
-def get_fb_alerts(limit: int = 50) -> list:
+def get_fb_alerts(limit: int = 1000) -> list:
     conn = get_db()
     rows = conn.execute("""
         SELECT * FROM fb_job_alerts ORDER BY id DESC LIMIT ?
@@ -723,8 +723,8 @@ def insert_fb_alert(data: dict) -> int:
         )
     """, data)
     aid = c.lastrowid
-    # Increment total_jobs_found on group
-    if data.get('group_id'):
+    # Increment total_jobs_found on group if hiring
+    if data.get('group_id') and data.get('is_hiring') == 1:
         c.execute("UPDATE fb_monitored_groups SET total_jobs_found = total_jobs_found + 1 WHERE id = ?", (data['group_id'],))
     conn.commit()
     conn.close()

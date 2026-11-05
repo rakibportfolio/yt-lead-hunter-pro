@@ -1656,8 +1656,9 @@ let FB_GROUPS_STATE = [];
 let FB_ALERTS_STATE = [];
 let SELECTED_FB_GROUP_ID = null;
 let SELECTED_FB_GROUP_NAME = '';
-let FB_TIME_FILTER = 'all';  // 'all', '15m', '1h', '3h', '24h'
-let FB_SORT_ORDER = 'newest'; // 'newest' (1m -> 2m -> 1h), 'oldest'
+let FB_POST_TYPE_FILTER = 'all'; // 'all' (All Posts), 'hiring' (Hiring Only)
+let FB_TIME_FILTER = 'all';      // 'all', '15m', '1h', '3h', '24h'
+let FB_SORT_ORDER = 'newest';    // 'newest' (1m -> 2m -> 1h), 'oldest'
 
 // Helper to extract post freshness / age in minutes
 function getPostAgeInMinutes(alert) {
@@ -1707,6 +1708,16 @@ function selectFbGroup(gid, gname) {
   SELECTED_FB_GROUP_NAME = gname;
   renderFbGroupsList();
   renderFbAlertsList();
+
+  // If this group has no posts loaded yet, auto-scan so the user immediately gets all posts!
+  const hasPosts = FB_ALERTS_STATE.some(a => {
+    if (a.group_id && a.group_id === gid) return true;
+    if (a.group_name && gname && (a.group_name.toLowerCase().includes(gname.toLowerCase()) || gname.toLowerCase().includes(a.group_name.toLowerCase()))) return true;
+    return false;
+  });
+  if (!hasPosts) {
+    scanSelectedGroupNow();
+  }
 }
 
 function clearSelectedFbGroup() {
@@ -1717,8 +1728,10 @@ function clearSelectedFbGroup() {
 }
 
 function onFbFilterChange() {
+  const typeSelect = document.getElementById('fbPostTypeFilter');
   const timeSelect = document.getElementById('fbTimeFilterSelect');
   const sortSelect = document.getElementById('fbSortSelect');
+  if (typeSelect) FB_POST_TYPE_FILTER = typeSelect.value;
   if (timeSelect) FB_TIME_FILTER = timeSelect.value;
   if (sortSelect) FB_SORT_ORDER = sortSelect.value;
   renderFbAlertsList();
@@ -1793,7 +1806,7 @@ async function loadFbAlerts() {
 
 function updateFbStats() {
   const gCount = FB_GROUPS_STATE.length;
-  const jCount = FB_ALERTS_STATE.length;
+  const jCount = FB_ALERTS_STATE.filter(a => a.is_hiring === 1).length;
   const tCount = FB_ALERTS_STATE.filter(a => a.telegram_sent === 1).length;
 
   const elG = document.getElementById('fbGroupCount');
@@ -1883,7 +1896,7 @@ function renderFbAlertsList() {
     const selGroup = FB_GROUPS_STATE.find(g => g.id === SELECTED_FB_GROUP_ID);
     if (banner && bannerName) {
       banner.style.display = 'flex';
-      bannerName.textContent = `Showing posts for: ${SELECTED_FB_GROUP_NAME || selGroup?.name || 'Selected Group'}`;
+      bannerName.textContent = `Showing all posts for: ${SELECTED_FB_GROUP_NAME || selGroup?.name || 'Selected Group'}`;
     }
     filtered = filtered.filter(a => {
       if (a.group_id && a.group_id === SELECTED_FB_GROUP_ID) return true;
@@ -1902,13 +1915,18 @@ function renderFbAlertsList() {
     if (banner) banner.style.display = 'none';
   }
 
-  // 2. Filter by Time Window
+  // 2. Filter by Post Type (All Posts vs Hiring Only)
+  if (FB_POST_TYPE_FILTER === 'hiring') {
+    filtered = filtered.filter(a => a.is_hiring === 1);
+  }
+
+  // 3. Filter by Time Window
   if (FB_TIME_FILTER !== 'all') {
     const maxMins = FB_TIME_FILTER === '15m' ? 15 : (FB_TIME_FILTER === '1h' ? 60 : (FB_TIME_FILTER === '3h' ? 180 : 1440));
     filtered = filtered.filter(a => getPostAgeInMinutes(a) <= maxMins);
   }
 
-  // 3. Sort chronologically (Newest first: 1m -> 2m -> 5m -> 1h)
+  // 4. Sort chronologically (Newest first: 1m -> 2m -> 5m -> 1h)
   filtered.sort((a, b) => {
     const ageA = getPostAgeInMinutes(a);
     const ageB = getPostAgeInMinutes(b);
@@ -1916,16 +1934,18 @@ function renderFbAlertsList() {
   });
 
   if (subtitle) {
-    subtitle.textContent = `Showing ${filtered.length} posts ${SELECTED_FB_GROUP_NAME ? `in "${SELECTED_FB_GROUP_NAME}"` : 'across all groups'} (Sorted by: ${FB_SORT_ORDER === 'newest' ? 'Newest first' : 'Oldest first'})`;
+    subtitle.textContent = `Showing ${filtered.length} posts ${SELECTED_FB_GROUP_NAME ? `in "${SELECTED_FB_GROUP_NAME}"` : 'across all groups'} (Sorted by: ${FB_SORT_ORDER === 'newest' ? 'Newest first (1m → 2m → 1h)' : 'Oldest first'})`;
   }
 
   if (filtered.length === 0) {
     list.innerHTML = `
       <div style="text-align:center;padding:48px 20px;color:var(--text-muted);">
-        <div style="font-size:32px;margin-bottom:8px;">🎯</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">No hiring posts found for this selection</div>
-        <div style="font-size:12px;margin-bottom:12px;">Try changing the time filter above or click "Scan This Group Now" to scrape the freshest posts right now.</div>
-        ${SELECTED_FB_GROUP_ID ? `<button onclick="scanSelectedGroupNow()" class="btn-primary" style="background:#1877F2;border-color:#1877F2;padding:6px 14px;font-size:11px;">⚡ Scan This Group Now</button>` : ''}
+        <div style="font-size:36px;margin-bottom:8px;">👥</div>
+        <div style="font-weight:800;font-size:15px;color:#1e293b;margin-bottom:6px;">No posts loaded yet for ${SELECTED_FB_GROUP_NAME ? `"${escapeHtml(SELECTED_FB_GROUP_NAME)}"` : 'this selection'}</div>
+        <div style="font-size:12.5px;color:#64748b;margin-bottom:16px;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.5;">
+          Click the button below to fetch all live posts from this Facebook group right now in real time!
+        </div>
+        ${SELECTED_FB_GROUP_ID ? `<button onclick="scanSelectedGroupNow()" class="btn-primary" style="background:#1877F2;border-color:#1877F2;padding:9px 20px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(24,119,242,0.3);cursor:pointer;">⚡ Fetch All Posts From Group Now</button>` : ''}
       </div>
     `;
     return;
@@ -1937,26 +1957,30 @@ function renderFbAlertsList() {
     const imgHtml = a.image_url ? `<img src="${escapeHtml(a.image_url)}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid var(--border-color);" />` : '';
     const ageMins = getPostAgeInMinutes(a);
     const ageLabel = formatPostAgeLabel(ageMins);
+    const isHiring = a.is_hiring === 1;
+    const hiringBadge = isHiring
+      ? `<span style="background:#dcfce7;color:#166534;border:1px solid #86efac;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:900;">🎯 HIRING LEAD</span>`
+      : `<span style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">💬 Group Post</span>`;
 
     return `
-      <div style="padding:14px 16px;background:#fff;border-radius:8px;border:1px solid var(--border-color);box-shadow:0 1px 3px rgba(0,0,0,0.04);display:flex;gap:14px;align-items:flex-start;">
+      <div style="padding:14px 16px;background:#fff;border-radius:8px;border:${isHiring ? '2px solid #86efac' : '1px solid var(--border-color)'};box-shadow:0 1px 3px rgba(0,0,0,0.04);display:flex;gap:14px;align-items:flex-start;">
         ${imgHtml}
         <div style="flex:1;">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;flex-wrap:wrap;gap:6px;">
             <div>
-              <span style="font-weight:800;font-size:13.5px;color:var(--text-main);">${escapeHtml(a.client_name || a.author_name || 'Client')}</span>
+              <span style="font-weight:800;font-size:13.5px;color:var(--text-main);">${escapeHtml(a.client_name || a.author_name || 'Facebook User')}</span>
               <span style="font-size:11px;color:var(--text-muted);margin-left:6px;">in <b>${escapeHtml(a.group_name || 'Group')}</b></span>
             </div>
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
               <span style="background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">${ageLabel}</span>
-              <span style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">${escapeHtml(a.job_type || 'Video Editor')}</span>
-              <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">${escapeHtml(a.budget || 'Negotiable')}</span>
-              <span style="background:#f0fdf4;color:#15803d;padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;">${a.confidence_score || 95}% AI</span>
+              ${hiringBadge}
+              ${isHiring ? `<span style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">${escapeHtml(a.job_type || 'Video Editor')}</span>` : ''}
+              ${isHiring && a.budget ? `<span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">${escapeHtml(a.budget)}</span>` : ''}
             </div>
           </div>
           
-          <p style="font-size:12px;color:var(--text-main);margin:6px 0 10px 0;line-height:1.45;background:var(--bg-subtle);padding:8px 10px;border-radius:6px;">
-            "${escapeHtml(a.ai_summary || a.content || '')}"
+          <p style="font-size:12px;color:var(--text-main);margin:6px 0 10px 0;line-height:1.45;background:var(--bg-subtle);padding:8px 10px;border-radius:6px;white-space:pre-wrap;">
+${escapeHtml(a.content || a.ai_summary || '')}
           </p>
 
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">

@@ -689,7 +689,7 @@ def api_toggle_fb_group(group_id: int):
     return {"ok": True, "active": active}
 
 @app.get("/api/fb/alerts")
-def api_get_fb_alerts(limit: int = 50):
+def api_get_fb_alerts(limit: int = 1000):
     alerts = get_fb_alerts(limit)
     return {"ok": True, "alerts": alerts}
 
@@ -715,7 +715,7 @@ def api_scan_single_fb_group(group_id: int):
         raise HTTPException(status_code=404, detail="Group not found")
     g = matched[0]
     new_jobs = process_single_fb_group(g)
-    alerts = get_fb_alerts(50)
+    alerts = get_fb_alerts(1000)
     return {
         "ok": True,
         "jobs_found": new_jobs,
