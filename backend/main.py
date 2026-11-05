@@ -7,7 +7,8 @@ if BACKEND_DIR not in sys.path:
     sys.path.insert(0, BACKEND_DIR)
 
 from fb_group_monitor import (
-    start_fb_monitor, stop_fb_monitor, process_single_fb_group, send_test_fb_hiring_alert
+    start_fb_monitor, stop_fb_monitor, process_single_fb_group, send_test_fb_hiring_alert,
+    is_post_fresh, classify_fb_post_with_ai
 )
 # ============================================================
 # ZENTIC MEDIA — CLIENT HUNTING AUTOMATION
@@ -705,6 +706,88 @@ def api_scan_fb_groups(background_tasks: BackgroundTasks):
             process_single_fb_group(g)
     background_tasks.add_task(run_all)
     return {"ok": True, "message": f"Scanning {len(groups)} active groups in background"}
+
+
+class IngestPostItem(BaseModel):
+    content: str
+    author_name: Optional[str] = "Facebook User"
+    post_url: Optional[str] = ""
+    group_name: Optional[str] = "Facebook Group"
+    image_url: Optional[str] = ""
+
+class IngestBatch(BaseModel):
+    posts: List[IngestPostItem]
+
+@app.post("/api/fb/ingest")
+def api_ingest_fb_posts(batch: IngestBatch):
+    """
+    Ingest live posts directly from Chrome browser / Extension / scraper.
+    Applies STRICT 3-hour freshness filter + AI intent classification.
+    Sends INSTANT Telegram alerts for qualified hiring posts!
+    """
+    from database import is_fb_post_seen, insert_fb_alert
+    from telegram_bot import alert_fb_hiring_post
+    from datetime import datetime
+
+    dispatched = 0
+    skipped_old = 0
+    skipped_not_hiring = 0
+    alerts_created = []
+
+    for item in batch.posts:
+        content = item.content.strip()
+        if len(content) < 25:
+            continue
+
+        # 1. STRICT FRESHNESS CHECK (Max 3 Hours)
+        if not is_post_fresh(content, max_hours=3):
+            skipped_old += 1
+            continue
+
+        pid = f"fb_{abs(hash(content[:80]))}"
+        if is_fb_post_seen(pid):
+            continue
+
+        ai_res = classify_fb_post_with_ai(content, item.author_name or "Client", item.group_name or "Facebook Group")
+        if ai_res.get("is_hiring"):
+            alert_data = {
+                "group_id": None,
+                "group_name": item.group_name or "Facebook Group",
+                "post_id": pid,
+                "author_name": item.author_name or "Client",
+                "post_url": item.post_url or "https://facebook.com",
+                "content": content,
+                "image_url": item.image_url or "",
+                "is_hiring": 1,
+                "client_name": ai_res.get("client_name", item.author_name or "Client"),
+                "job_type": ai_res.get("job_type", "Video Editor"),
+                "budget": ai_res.get("budget", "Negotiable"),
+                "contact_phone": ai_res.get("contact_phone", ""),
+                "contact_email": ai_res.get("contact_email", ""),
+                "contact_whatsapp": ai_res.get("contact_whatsapp", ""),
+                "contact_telegram": ai_res.get("contact_telegram", ""),
+                "confidence_score": ai_res.get("confidence_score", 95),
+                "ai_summary": ai_res.get("ai_summary", content[:200]),
+                "telegram_sent": 0,
+                "telegram_sent_at": None
+            }
+            sent_ok = alert_fb_hiring_post(alert_data)
+            if sent_ok:
+                alert_data["telegram_sent"] = 1
+                alert_data["telegram_sent_at"] = datetime.now().isoformat()
+            insert_fb_alert(alert_data)
+            alerts_created.append(alert_data)
+            dispatched += 1
+        else:
+            skipped_not_hiring += 1
+
+    return {
+        "ok": True,
+        "dispatched_to_telegram": dispatched,
+        "skipped_old": skipped_old,
+        "skipped_not_hiring": skipped_not_hiring,
+        "alerts": alerts_created
+    }
 
 class TelegramSettings(BaseModel):
     bot_token: str

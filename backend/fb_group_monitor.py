@@ -21,6 +21,44 @@ from database import (
 )
 from telegram_bot import alert_fb_hiring_post
 
+# ── Strict Freshness Filter (Max 3 Hours) ───────────────────
+def is_post_fresh(content: str, max_hours: int = 3) -> bool:
+    """
+    STRICT FILTER: Rejects old posts so ONLY fresh hiring leads (<= 3 hours)
+    are sent to Telegram.
+    Rejects posts with 'yesterday', 'days ago', 'weeks ago', or hours > max_hours.
+    """
+    t = content.lower()
+
+    # Reject explicit old indicators in English and Bengali
+    old_keywords = [
+        'yesterday', 'গতকাল', 'days ago', 'দিন আগে', 'day ago',
+        'weeks ago', 'সপ্তাহ আগে', 'week ago',
+        'months ago', 'মাস আগে', 'month ago',
+        'years ago', 'বছর আগে', 'year ago',
+        'last week', 'last month', 'last year',
+        'গত সপ্তাহে', 'গত মাসে', 'গত বছর'
+    ]
+    for old in old_keywords:
+        if old in t:
+            return False
+
+    # Check for days: e.g. "1d", "2d", "5 days"
+    if re.search(r'\b\d+\s*(?:d|days?|দিন)\b', t):
+        return False
+
+    # Check for hours: e.g. "4h", "5 hrs", "6 hours ago", "৪ ঘণ্টা"
+    hr_match = re.search(r'(\d+)\s*(?:h|hr|hrs|hours?|ঘণ্টা|ঘন্টা)\b', t)
+    if hr_match:
+        try:
+            hrs = int(hr_match.group(1))
+            if hrs > max_hours:
+                return False
+        except ValueError:
+            pass
+
+    return True
+
 # ── AI / Intent Classification using Gemini LLM ──────────────
 def classify_fb_post_with_ai(content: str, author_name: str = "", group_name: str = "") -> Dict[str, Any]:
     """
@@ -28,6 +66,14 @@ def classify_fb_post_with_ai(content: str, author_name: str = "", group_name: st
     or a FREELANCER looking for work.
     Extracts contact info, budget, job type, and summary.
     """
+    # 0. STRICT 3-Hour Freshness Check — drops old posts immediately
+    if not is_post_fresh(content, max_hours=3):
+        return {
+            "is_hiring": False,
+            "confidence_score": 0,
+            "reason": "Post is older than 3 hours"
+        }
+
     # 1. Try Gemini AI if API Key is available
     if cfg.GEMINI_API_KEY:
         try:
@@ -122,30 +168,20 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
 
     is_freelancer = any(re.search(p, c_lower) for p in freelancer_patterns)
 
-    # Positive hiring patterns
+    # Positive hiring patterns (English + Banglish + Bengali)
     hiring_patterns = [
-        r'\bneed\s+(a\s+)?video\s+editor\b',
-        r'\blooking\s+for\s+(a\s+)?video\s+editor\b',
-        r'\bhiring\s+(a\s+)?video\s+editor\b',
-        r'\bwe\s+are\s+hiring\b',
-        r'\burgently\s+need\b',
-        r'\burgent\s+requirement\b',
-        r'\bvideo\s+editor\s+lagbe\b',
-        r'\bvideo\s+editor\s+dorkar\b',
-        r'\beditor\s+lagbe\b',
-        r'\beditor\s+dorkar\b',
-        r'\bjob\s+offer\b',
-        r'\bpay\s*[:=]\s*\$?\d+',
-        r'\bbudget\s*[:=]\s*\$?\d+',
-        r'\bsalary\s*[:=]\s*\d+',
-        r'\bsend\s+portfolio\s+to\b',
-        r'\binbox\s+with\s+portfolio\b',
-        r'\binbox\s+your\s+rate\b',
-        r'\bapply\s+at\b',
-        r'\bseeking\s+video\s+editor\b',
-        r'\bwho\s+can\s+edit\s+my\s+videos\b',
-        r'\blooking\s+for\s+reels\s+editor\b',
-        r'\blooking\s+for\s+youtube\s+editor\b'
+        r'\b(?:need|looking\s+for|hiring|seeking|want|require)\b[^\.\n\?!]{0,40}\b(?:video\s+editor|editor|motion\s+designer|animator)\b',
+        r'\b(?:video\s+editor|editor)\s+(?:lagbe|dorkar|khujchi|chahida|need|hiring)\b',
+        r'\b(?:we\s+are\s+hiring|urgently\s+need|urgent\s+requirement|job\s+offer|job\s+circular)\b',
+        r'\b(?:pay|budget|salary|rate)\s*[:=–-]?\s*\$?\d+',
+        r'\b(?:send\s+portfolio|inbox\s+with\s+portfolio|inbox\s+your\s+rate|apply\s+at)\b',
+        r'\b(?:who\s+can\s+edit\s+my\s+videos|need\s+someone\s+to\s+edit)\b',
+        r'ভিডিও\s*এডিটর\s*লাগবে',
+        r'ভিডিও\s*এডিটর\s*দরকার',
+        r'এডিটর\s*লাগবে',
+        r'এডিটর\s*আবশ্যক',
+        r'ভিডিও\s*এডিটর\s*আবশ্যক',
+        r'ভিডিও\s*এডিটর\s*খুঁজছি'
     ]
 
     is_hiring = any(re.search(p, c_lower) for p in hiring_patterns)
