@@ -1079,93 +1079,138 @@ Micro-Niche
        PAGE 8: FACEBOOK GROUP HIRING RADAR
        ============================================================ -->
   <section class="page-view" id="view-fb-radar">
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:15px;">
-      <div>
-        <h2 class="page-title">🎯 Facebook Group Hiring Radar</h2>
-        <p class="page-subtitle">Real-time AI monitoring for video editor hiring posts with instant Telegram alerts</p>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-primary" style="background:#1877F2;border-color:#1877F2;" onclick="openAddGroupModal()">➕ Add Facebook Group</button>
-        <button class="btn-secondary" onclick="testFbAlert()">⚡ Test Telegram Alert</button>
-        <button class="btn-secondary" onclick="scanFbNow()">🔍 Scan Active Groups</button>
-      </div>
-    </div>
 
-    <!-- Radar Stats Bar -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
-      <div class="card-box" style="text-align:center;padding:14px 10px;">
-        <div style="font-size:22px;font-weight:800;color:#1877F2;" id="fbGroupCount">0</div>
-        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Monitored Groups</div>
-      </div>
-      <div class="card-box" style="text-align:center;padding:14px 10px;">
-        <div style="font-size:22px;font-weight:800;color:#166534;" id="fbRadarStatus">🟢 ACTIVE</div>
-        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Radar Status (Every 60s)</div>
-      </div>
-      <div class="card-box" style="text-align:center;padding:14px 10px;">
-        <div style="font-size:22px;font-weight:800;color:var(--primary-red);" id="fbJobsFound">0</div>
-        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Hiring Posts Detected</div>
-      </div>
-      <div class="card-box" style="text-align:center;padding:14px 10px;">
-        <div style="font-size:22px;font-weight:800;color:#0A66C2;" id="fbTelegramSent">0</div>
-        <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Telegram Alerts Dispatched</div>
-      </div>
-    </div>
-
-    <!-- Telegram Quick Connect Card -->
-    <div class="card-box" style="margin-bottom:20px;padding:16px 20px;border-left:4px solid #229ED9;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:20px;">✈️</span>
-          <div>
-            <h4 style="margin:0;font-size:14px;color:var(--text-main);">Telegram Instant Alert Delivery</h4>
-            <span style="font-size:11.5px;color:var(--text-muted);">Hiring alerts with contact numbers, client name, and budget will be sent directly to your phone.</span>
+    <!-- Hero Header -->
+    <div style="background:linear-gradient(135deg,#1877F2 0%,#0d5dbf 60%,#0a4a99 100%);border-radius:16px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:-20px;width:160px;height:160px;background:rgba(255,255,255,0.06);border-radius:50%;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;position:relative;z-index:1;">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px 12px;font-size:22px;">&#127919;</div>
+            <div>
+              <h2 style="margin:0;font-size:22px;font-weight:800;color:#fff;">Facebook Group Hiring Radar</h2>
+              <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.75);">AI scans FB groups every 60s &mdash; instant Telegram alert when someone hires a video editor</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+            <span style="background:rgba(255,255,255,0.15);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">&#129302; Gemini AI Filter</span>
+            <span style="background:rgba(255,255,255,0.15);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">&#128242; Telegram Alert</span>
+            <span style="background:rgba(255,255,255,0.15);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">&#127758; English + Bengali</span>
           </div>
         </div>
-        <button class="btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="toggleTelegramConfig()">⚙ Configure Token</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="openAddGroupModal()" style="background:#fff;color:#1877F2;border:none;padding:10px 18px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">&#10133; Add FB Group</button>
+          <button onclick="testFbAlert()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:10px 14px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;">&#9889; Test Alert</button>
+          <button onclick="scanFbNow()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:10px 14px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;">&#128269; Scan Now</button>
+        </div>
       </div>
-      <div id="telegramConfigBox" style="display:none;padding-top:12px;border-top:1px solid var(--border-color);margin-top:10px;">
+    </div>
+
+    <!-- Stats Row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 14px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+        <div style="background:#eff6ff;border-radius:10px;padding:10px;font-size:20px;">&#128101;</div>
+        <div>
+          <div style="font-size:24px;font-weight:800;color:#1877F2;" id="fbGroupCount">0</div>
+          <div style="font-size:11px;color:#64748b;font-weight:600;">Groups Monitored</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 14px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+        <div style="background:#f0fdf4;border-radius:10px;padding:10px;font-size:20px;">&#128225;</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:#16a34a;" id="fbRadarStatus">ACTIVE</div>
+          <div style="font-size:11px;color:#64748b;font-weight:600;">Radar (Every 60s)</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 14px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+        <div style="background:#fff1f2;border-radius:10px;padding:10px;font-size:20px;">&#128680;</div>
+        <div>
+          <div style="font-size:24px;font-weight:800;color:#e11d48;" id="fbJobsFound">0</div>
+          <div style="font-size:11px;color:#64748b;font-weight:600;">Hiring Posts Found</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 14px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+        <div style="background:#f0f9ff;border-radius:10px;padding:10px;font-size:20px;">&#10208;</div>
+        <div>
+          <div style="font-size:24px;font-weight:800;color:#0284c7;" id="fbTelegramSent">0</div>
+          <div style="font-size:11px;color:#64748b;font-weight:600;">Alerts Sent</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How it Works Banner -->
+    <div style="background:linear-gradient(135deg,#f8fafc,#eff6ff);border:1px dashed #93c5fd;border-radius:14px;padding:24px 28px;margin-bottom:20px;">
+      <h3 style="margin:0 0 16px;font-size:15px;font-weight:800;color:#1e3a8a;">&#128640; How to get started &mdash; 3 easy steps:</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+        <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid #dbeafe;text-align:center;">
+          <div style="font-size:28px;margin-bottom:8px;">&#49;&#65039;&#8419;</div>
+          <div style="font-weight:700;font-size:13px;color:#1e3a8a;margin-bottom:6px;">Add a Facebook Group</div>
+          <div style="font-size:11.5px;color:#64748b;line-height:1.6;">Click "Add FB Group" button above. Paste the group URL like:<br><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:10px;">facebook.com/groups/videoeditors</code></div>
+        </div>
+        <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid #dbeafe;text-align:center;">
+          <div style="font-size:28px;margin-bottom:8px;">&#50;&#65039;&#8419;</div>
+          <div style="font-weight:700;font-size:13px;color:#1e3a8a;margin-bottom:6px;">AI Scans Every 60s</div>
+          <div style="font-size:11.5px;color:#64748b;line-height:1.6;">Gemini AI reads every post and detects if someone is HIRING a video editor &mdash; ignoring freelancer promo posts</div>
+        </div>
+        <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid #dbeafe;text-align:center;">
+          <div style="font-size:28px;margin-bottom:8px;">&#51;&#65039;&#8419;</div>
+          <div style="font-weight:700;font-size:13px;color:#1e3a8a;margin-bottom:6px;">Get Telegram Alert</div>
+          <div style="font-size:11.5px;color:#64748b;line-height:1.6;">Instant Telegram message with client name, contact number, budget &mdash; reply before anyone else!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telegram Config Card -->
+    <div style="background:#fff;border:1px solid #e2e8f0;border-left:4px solid #229ED9;border-radius:12px;padding:16px 20px;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="background:#e0f7ff;border-radius:8px;padding:8px;font-size:18px;">&#128242;</div>
+          <div>
+            <h4 style="margin:0;font-size:13px;font-weight:700;color:#0f172a;">Telegram Alert Setup</h4>
+            <span style="font-size:11.5px;color:#64748b;">Connect your Telegram bot to receive instant hiring alerts on your phone</span>
+          </div>
+        </div>
+        <button onclick="toggleTelegramConfig()" style="background:#f1f5f9;border:1px solid #e2e8f0;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;color:#334155;">&#9881; Configure</button>
+      </div>
+      <div id="telegramConfigBox" style="display:none;padding-top:14px;border-top:1px solid #f1f5f9;margin-top:14px;">
+        <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;font-size:11.5px;color:#475569;line-height:1.6;">
+          <strong>How to get Bot Token:</strong> Open Telegram &rarr; search <code>@BotFather</code> &rarr; send <code>/newbot</code> &rarr; copy the token<br>
+          <strong>How to get Chat ID:</strong> Search <code>@userinfobot</code> in Telegram &rarr; send any message &rarr; copy the ID number
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:flex-end;">
           <div>
-            <label style="font-size:11px;font-weight:700;color:var(--text-muted);">BOT TOKEN</label>
-            <input type="text" id="tgBotTokenInput" placeholder="e.g. 123456789:ABCdefGhI..." style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--border-color);font-size:12px;" />
+            <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">BOT TOKEN</label>
+            <input type="text" id="tgBotTokenInput" placeholder="123456789:ABCdefGhI..." style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid #e2e8f0;font-size:12px;" />
           </div>
           <div>
-            <label style="font-size:11px;font-weight:700;color:var(--text-muted);">CHAT ID</label>
-            <input type="text" id="tgChatIdInput" placeholder="e.g. 987654321" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--border-color);font-size:12px;" />
+            <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">CHAT ID</label>
+            <input type="text" id="tgChatIdInput" placeholder="987654321" style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid #e2e8f0;font-size:12px;" />
           </div>
-          <button class="btn-primary" style="background:#229ED9;border-color:#229ED9;padding:8px 16px;font-size:12px;" onclick="saveTelegramSettings()">Save & Activate</button>
+          <button onclick="saveTelegramSettings()" style="background:#229ED9;color:#fff;border:none;padding:9px 16px;border-radius:7px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;">Save &amp; Activate</button>
         </div>
       </div>
     </div>
 
-    <!-- Main Content: Groups on Left, Live Hiring Feed on Right -->
-    <div style="display:grid;grid-template-columns:360px 1fr;gap:18px;">
-      
-      <!-- Left Column: Monitored Groups -->
-      <div class="card-box" style="padding:18px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-          <h3 style="font-size:14px;font-weight:800;color:var(--text-main);margin:0;">Monitored Groups</h3>
-          <span style="font-size:11px;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-weight:700;" id="fbGroupsBadge">0 Groups</span>
+    <!-- Main 2-column layout -->
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:18px;">
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 style="font-size:14px;font-weight:800;color:#0f172a;margin:0;">Monitored Groups</h3>
+          <span style="font-size:11px;background:#eff6ff;color:#1d4ed8;padding:3px 10px;border-radius:12px;font-weight:700;" id="fbGroupsBadge">0 Groups</span>
         </div>
-        <div id="fbGroupsList" style="display:flex;flex-direction:column;gap:10px;max-height:480px;overflow-y:auto;">
-          <!-- Rendered by JS -->
-        </div>
+        <button onclick="openAddGroupModal()" style="width:100%;background:#eff6ff;border:2px dashed #93c5fd;color:#1877F2;padding:10px;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer;margin-bottom:14px;">&#10133; Add Facebook Group</button>
+        <div id="fbGroupsList" style="display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;"></div>
       </div>
-
-      <!-- Right Column: Live Hiring Job Alerts Feed -->
-      <div class="card-box" style="padding:18px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
           <div>
-            <h3 style="font-size:14px;font-weight:800;color:var(--text-main);margin:0;">🚨 Detected Hiring Posts</h3>
-            <span style="font-size:11px;color:var(--text-muted);">AI filtered — only clients recruiting video editors</span>
+            <h3 style="font-size:14px;font-weight:800;color:#0f172a;margin:0;">&#128680; Detected Hiring Posts</h3>
+            <span style="font-size:11px;color:#64748b;">AI filtered &mdash; only clients recruiting video editors</span>
           </div>
-          <button class="btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="loadFbAlerts()">🔄 Refresh Feed</button>
+          <button onclick="loadFbAlerts()" style="background:#f1f5f9;border:1px solid #e2e8f0;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;color:#334155;">&#128260; Refresh</button>
         </div>
-        <div id="fbAlertsList" style="display:flex;flex-direction:column;gap:12px;max-height:600px;overflow-y:auto;">
-          <!-- Rendered by JS -->
-        </div>
+        <div id="fbAlertsList" style="display:flex;flex-direction:column;gap:12px;max-height:560px;overflow-y:auto;"></div>
       </div>
-
     </div>
   </section>
 
