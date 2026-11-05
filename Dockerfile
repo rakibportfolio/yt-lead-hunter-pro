@@ -24,8 +24,8 @@ ENV DEBUG=false
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH="/app/backend:/app"
 ENV GEMINI_API_KEY=""
-ENV TELEGRAM_BOT_TOKEN=""
-ENV TELEGRAM_CHAT_ID=""
+ENV TELEGRAM_BOT_TOKEN="8874694866:AAEmdXxd3DP3B8J4L2sHS0pIxVR98HV9vqI"
+ENV TELEGRAM_CHAT_ID="8279465535"
 
 # Start FastAPI backend
 CMD ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -58,11 +58,11 @@ app.add_middleware(
 # Initialize DB on startup
 @app.on_event("startup")
 def startup():
+    init_db()
     try:
         start_fb_monitor()
     except Exception as e:
         print(f"[Startup Warning] Could not start FB monitor: {e}")
-    init_db()
     print(f"\n{'='*50}")
     print("  [ZENTIC MEDIA] Client Hunter Backend")
     print(f"  Running at: http://localhost:8000")
