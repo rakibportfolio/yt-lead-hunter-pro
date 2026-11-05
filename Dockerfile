@@ -20,7 +20,11 @@ COPY . .
 EXPOSE 8000
 
 ENV PORT=8000
+ENV DEBUG=false
 ENV PYTHONUNBUFFERED=1
+ENV GEMINI_API_KEY=""
+ENV TELEGRAM_BOT_TOKEN=""
+ENV TELEGRAM_CHAT_ID=""
 
 # Start FastAPI backend
 CMD ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
