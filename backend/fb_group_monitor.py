@@ -26,33 +26,50 @@ def is_post_fresh(content: str, max_hours: int = 3) -> bool:
     """
     STRICT FILTER: Rejects old posts so ONLY fresh hiring leads (<= 3 hours)
     are sent to Telegram.
-    Rejects posts with 'yesterday', 'days ago', 'weeks ago', or hours > max_hours.
+    Rejects posts with past dates (e.g. '6 February 2025', '17 August'),
+    'yesterday', 'days ago', 'weeks ago', or hours > max_hours.
     """
     t = content.lower()
 
-    # Reject explicit old indicators in English and Bengali
+    # 1. Any calendar date (e.g. 'February 6', '6 February', '17 August') means days/months/years old!
+    months = [
+        'january', 'february', 'march', 'april', 'may', 'june',
+        'july', 'august', 'september', 'october', 'november', 'december',
+        'jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+        'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+        'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+    ]
+    for m in months:
+        if re.search(r'\b\d{1,2}\s+' + m + r'\b|\b' + m + r'\s+\d{1,2}\b', t):
+            return False
+
+    # 2. Any past year (e.g. 2020-2025)
+    if re.search(r'\b(201\d|202[0-5])\b', t):
+        return False
+
+    # 3. Explicit old indicators in English and Bengali
     old_keywords = [
         'yesterday', 'গতকাল', 'days ago', 'দিন আগে', 'day ago',
         'weeks ago', 'সপ্তাহ আগে', 'week ago',
         'months ago', 'মাস আগে', 'month ago',
         'years ago', 'বছর আগে', 'year ago',
         'last week', 'last month', 'last year',
+        'a day ago', '1 day ago', '2 days ago',
         'গত সপ্তাহে', 'গত মাসে', 'গত বছর'
     ]
     for old in old_keywords:
         if old in t:
             return False
 
-    # Check for days: e.g. "1d", "2d", "5 days"
+    # 4. Check for days: e.g. "1d", "2d", "5 days"
     if re.search(r'\b\d+\s*(?:d|days?|দিন)\b', t):
         return False
 
-    # Check for hours: e.g. "4h", "5 hrs", "6 hours ago", "৪ ঘণ্টা"
-    hr_match = re.search(r'(\d+)\s*(?:h|hr|hrs|hours?|ঘণ্টা|ঘন্টা)\b', t)
-    if hr_match:
+    # 5. Check for hours: e.g. "4h", "5 hrs", "6 hours ago", "৪ ঘণ্টা"
+    hr_matches = re.findall(r'(\d+)\s*(?:h|hr|hrs|hours?|ঘণ্টা|ঘন্টা)\b', t)
+    for hr_str in hr_matches:
         try:
-            hrs = int(hr_match.group(1))
-            if hrs > max_hours:
+            if int(hr_str) > max_hours:
                 return False
         except ValueError:
             pass
