@@ -49,7 +49,7 @@ class Config:
     GEMINI_API_KEY = _clean_val(os.getenv("GEMINI_API_KEY", ""))
 
     # ── Facebook Session Cookies ─────────────────────────────
-    FB_COOKIES = os.getenv("FB_COOKIES", "")
+    FB_COOKIES = os.getenv("FB_COOKIES", "c_user=61596189753927; xs=10%3A7PDqH_pgyfvaYg%3A2%3A1793872866%3A-1%3A-1%3A%3AAc13S0OyRBF97oQgiYi5h6VVjV-ukklOAr0-jbJ6jw; datr=HFPsam-TCd_zqJqyJj5z_EUP; fr=1kTTEA8FDCKBEY8CG.AWe7PlK5aYABxOPONIm-yfAqOfz2wee-5JZTMaHH0AZ4tJUtE34.Bq7HAR..AAA.0.0.Bq7HyO.AWcuTG8ZLFDxfxICZUvOnTRgDjw; sb=UsxtatoCptXE8jKBsA-hWEps; ps_l=1; ps_n=1; locale=en_GB; wd=1920x911")
 
     # ── Telegram Bot ──────────────────────────────────────────
     TELEGRAM_BOT_TOKEN = _clean_val(os.getenv("TELEGRAM_BOT_TOKEN", "8874694866:AAEmdXxd3DP3B8J4L2sHS0pIxVR98HV9vqI"))

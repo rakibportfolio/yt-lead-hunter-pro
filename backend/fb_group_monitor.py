@@ -25,54 +25,36 @@ from telegram_bot import alert_fb_hiring_post
 def is_post_fresh(content: str, max_hours: int = 3) -> bool:
     """
     SMART FILTER: Accepts fresh leads posted within the last 3 hours.
-    If NO timestamp is found in the post, we ALLOW it (assume it could be recent).
+    Checks the post HEADER (first 350 chars where author & post timestamp live)
+    so recent comments on old posts don't cause false positives.
     Only EXPLICITLY OLD posts (yesterday, 4h+, past dates) are rejected.
     """
-    t = content.lower()
+    header = content[:350].lower()
+    full = content.lower()
 
-    # 1. Immediate Fresh Signals (< 1 hour) → ACCEPT immediately
-    if 'just now' in t or 'এইমাত্র' in t:
-        return True
-    if re.search(r'\b\d+\s*(?:m|min|mins|minutes?|মিনিট)\b', t):
-        return True
-
-    # 2. Fresh Hours Check (<= max_hours) → ACCEPT
-    if 'about an hour' in t or 'an hour ago' in t or '১ ঘণ্টা' in t or '1 hour' in t:
-        return True
-
-    hr_matches = re.findall(r'\b(\d+)\s*(?:h|hr|hrs|hours?|ঘণ্টা|ঘন্টা)\b', t)
-    if hr_matches:
-        try:
-            min_hr = min(int(h) for h in hr_matches)
-            if min_hr <= max_hours:
-                return True
-            else:
-                return False  # explicitly 4h+ → reject
-        except ValueError:
-            pass
-
-    # 3. Explicit OLD indicators → REJECT
+    # 1. Explicit OLD indicators in post header -> REJECT IMMEDIATELY
     old_keywords = [
         'yesterday', 'গতকাল', 'days ago', 'দিন আগে', 'day ago',
         'weeks ago', 'সপ্তাহ আগে', 'week ago',
         'months ago', 'মাস আগে', 'month ago',
         'years ago', 'বছর আগে', 'year ago',
         'last week', 'last month', 'last year',
-        'a day ago', '1 day ago', '2 days ago',
+        '2 days ago', '3 days ago', '4 days ago', '5 days ago',
         'গত সপ্তাহে', 'গত মাসে', 'গত বছর'
     ]
     for old in old_keywords:
-        if old in t:
+        if old in header:
             return False
 
-    if re.search(r'\b\d+\s*(?:d|days?)\b', t):  # e.g. "2d", "3 days"
+    # Check for '2d', '3d', '1w' in header
+    if re.search(r'\b\d+\s*(?:d|days?|দিন|w|weeks?)\b', header):
         return False
 
-    # 4. Past years (2020-2025) → REJECT
-    if re.search(r'\b(201\d|202[0-5])\b', t):
+    # Check past years (2020-2025) in header
+    if re.search(r'\b(201\d|202[0-5])\b', header):
         return False
 
-    # 5. Specific OLD calendar months → REJECT only if paired with a day number
+    # Specific OLD calendar months paired with a day number in header
     old_months = [
         'january', 'february', 'march', 'april', 'june',
         'july', 'august', 'september', 'october', 'december',
@@ -81,11 +63,36 @@ def is_post_fresh(content: str, max_hours: int = 3) -> bool:
         'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'ডিসেম্বর'
     ]
     for m in old_months:
-        if re.search(r'\b\d{1,2}\s+' + m + r'\b|\b' + m + r'\s+\d{1,2}\b', t):
+        if re.search(r'\b\d{1,2}\s+' + m + r'\b|\b' + m + r'\s+\d{1,2}\b', header):
             return False
 
-    # 6. No timestamp found at all → ALLOW (assume could be recent)
-    # This is the KEY fix: when FB hides timestamps (login wall), we still scan the content
+    # 2. Fresh signals in header (< 1 hour) -> ACCEPT
+    if 'just now' in header or 'এইমাত্র' in header:
+        return True
+    if re.search(r'\b\d+\s*(?:m|min|mins|minutes?|মিনিট)\b', header):
+        return True
+
+    # 3. Fresh Hours in header (<= max_hours) -> ACCEPT
+    if 'about an hour' in header or 'an hour ago' in header or '১ ঘণ্টা' in header or '1 hour' in header:
+        return True
+
+    hr_matches = re.findall(r'\b(\d+)\s*(?:h|hr|hrs|hours?|ঘণ্টা|ঘন্টা)\b', header)
+    if hr_matches:
+        try:
+            min_hr = min(int(h) for h in hr_matches)
+            if min_hr <= max_hours:
+                return True
+            else:
+                return False  # explicitly 4h+ -> reject
+        except ValueError:
+            pass
+
+    # 4. Fallback check across full text for explicit old indicators
+    for old in old_keywords:
+        if old in full:
+            return False
+
+    # 5. No timestamp found -> ALLOW (login wall / hidden timestamp)
     return True
 
 # ── AI / Intent Classification using Gemini LLM ──────────────
@@ -185,6 +192,14 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
         r'\bavailable for work\b',
         r'\blooking for clients\b',
         r'\bavailable for hire\b',
+        r'\bavailable for projects\b',
+        r'\bare you looking for (?:a |an )?(?:video )?editor\b',
+        r'\bdo you need (?:a |an )?(?:video )?editor\b',
+        r'\bopen for commissions\b',
+        r'\bopen for projects\b',
+        r'\baccepting new clients\b',
+        r'\bfeel free to dm\b',
+        r'\bping me for editing\b',
         r'\bami video editor\b',
         r'\bami kaj korbo\b',
         r'\bamar portfolio\b',
@@ -261,104 +276,161 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
     }
 
 
+def _parse_fb_cookies() -> tuple:
+    """Parses cfg.FB_COOKIES from JSON string or semicolon-separated format."""
+    raw = (getattr(cfg, "FB_COOKIES", "") or "").strip()
+    if not raw:
+        return [], ""
+
+    cookie_list = []
+    # If JSON list of cookie dicts
+    if raw.startswith("["):
+        try:
+            items = json.loads(raw)
+            c_parts = []
+            for item in items:
+                name = item.get("name", "")
+                val = item.get("value", "")
+                if name and val:
+                    cookie_list.append({
+                        "name": name,
+                        "value": str(val),
+                        "domain": item.get("domain", ".facebook.com"),
+                        "path": item.get("path", "/")
+                    })
+                    c_parts.append(f"{name}={val}")
+            return cookie_list, "; ".join(c_parts)
+        except Exception:
+            pass
+
+    # Semicolon separated string
+    c_parts = []
+    for part in raw.split(';'):
+        if '=' in part:
+            k, v = part.strip().split('=', 1)
+            k, v = k.strip(), v.strip()
+            if k and v:
+                cookie_list.append({
+                    "name": k,
+                    "value": v,
+                    "domain": ".facebook.com",
+                    "path": "/"
+                })
+                c_parts.append(f"{k}={v}")
+    return cookie_list, "; ".join(c_parts)
+
+
 # ── Facebook Group Post Scraper ──────────────────────────────
 def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[str, Any]]:
     """
     Scrape recent posts from a Facebook Group.
-    Tries HTTP headers first, then Playwright headless if needed.
+    Uses authenticated Playwright session with user cookies for high accuracy.
+    Captures posts during incremental scrolls before React virtualizes them away.
     """
     clean_url = group_url.strip().rstrip('/')
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-    }
-
+    cookie_list, cookie_header = _parse_fb_cookies()
     posts = []
+    seen_texts = set()
 
-    # 1. Direct Web Request with Mobile User-Agent / mbasic fallback
+    # 1. Playwright Headless with injected session cookies
     try:
-        # Check mbasic endpoint for public groups
-        m_url = re.sub(r'https?://(?:www\.)?facebook\.com', 'https://mbasic.facebook.com', clean_url)
-        r = requests.get(m_url, headers=headers, timeout=12)
-        if r.status_code == 200 and len(r.text) > 1000:
-            soup = BeautifulSoup(r.text, "html.parser")
-            # Parse articles / post divs
-            articles = soup.find_all(["article", "div"], role="article") or soup.find_all("div", id=re.compile(r"^u_"))
-            for art in articles[:limit]:
-                text = art.get_text(separator=" ").strip()
-                if len(text) > 25:
-                    author_el = art.find(["h3", "strong", "a"])
-                    author = author_el.get_text().strip() if author_el else "Facebook User"
-                    link_el = art.find("a", href=re.compile(r"/story\.php|/posts/|/permalink/"))
-                    p_url = ("https://facebook.com" + link_el["href"]) if link_el else clean_url
-                    img_el = art.find("img")
-                    img_url = img_el.get("src", "") if img_el else ""
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                viewport={"width": 1280, "height": 800}
+            )
 
-                    pid = f"fb_{abs(hash(text[:80]))}"
-                    posts.append({
-                        "post_id": pid,
-                        "author_name": author,
-                        "post_url": p_url,
-                        "content": text,
-                        "image_url": img_url
-                    })
-    except Exception as e:
-        print(f"[FB Scraper] HTTP scrape warning for {group_url}: {e}")
+            if cookie_list:
+                try:
+                    context.add_cookies(cookie_list)
+                except Exception as ce:
+                    print(f"[FB Cookies] Note adding cookies: {ce}")
 
-    # 2. Playwright Headless fallback for JS-heavy feeds
-    if len(posts) == 0:
-        try:
-            from playwright.sync_api import sync_playwright
-            with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True)
-                context = browser.new_context(
-                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-                )
+            page = context.new_page()
+            page.goto(clean_url, timeout=25000, wait_until="domcontentloaded")
+            page.wait_for_timeout(3000)
 
-                # Inject logged-in Facebook cookies if available (100% bypasses login popup)
-                if cfg.FB_COOKIES:
-                    cookie_list = []
-                    for part in cfg.FB_COOKIES.split(';'):
-                        if '=' in part:
-                            k, v = part.strip().split('=', 1)
-                            cookie_list.append({'name': k.strip(), 'value': v.strip(), 'domain': '.facebook.com', 'path': '/'})
-                    if cookie_list:
-                        try:
-                            context.add_cookies(cookie_list)
-                        except Exception as ce:
-                            print(f"[FB Cookies] Note adding cookies: {ce}")
+            # Incremental scrolls: grab posts as they appear in the DOM
+            for _ in range(4):
+                if len(posts) >= limit:
+                    break
 
-                page = context.new_page()
-                page.goto(clean_url, timeout=20000, wait_until="domcontentloaded")
-                time.sleep(2)
+                feed_posts = page.query_selector_all('div[role="feed"] div[role="article"], div[role="article"], div[data-ad-preview="message"]')
+                for f_post in feed_posts:
+                    if len(posts) >= limit:
+                        break
+                    try:
+                        txt = f_post.inner_text().strip()
+                    except Exception:
+                        continue
 
-                # Scroll to load recent posts
-                page.evaluate("window.scrollBy(0, 1000)")
-                time.sleep(1.5)
-                page.evaluate("window.scrollBy(0, 1000)")
-                time.sleep(1.5)
-
-                feed_posts = page.query_selector_all('div[role="feed"] div[role="article"], div[role="article"]')
-                for f_post in feed_posts[:limit]:
-                    txt = f_post.inner_text().strip()
-                    if len(txt) > 30:
+                    if len(txt) > 30 and txt not in seen_texts:
+                        seen_texts.add(txt)
                         img_tag = f_post.query_selector('img[src*="scontent"], img')
                         img_src = img_tag.get_attribute("src") if img_tag else ""
                         link_tag = f_post.query_selector('a[href*="/posts/"], a[href*="/permalink/"]')
                         p_href = link_tag.get_attribute("href") if link_tag else clean_url
-                        pid = f"fb_{abs(hash(txt[:80]))}"
 
+                        # Author name extraction
+                        author_el = f_post.query_selector('h2, h3, strong, a[role="link"]')
+                        author = author_el.inner_text().strip() if author_el else "Facebook User"
+                        if '\n' in author:
+                            author = author.split('\n')[0].strip()
+
+                        pid = f"fb_{abs(hash(txt[:80]))}"
                         posts.append({
                             "post_id": pid,
-                            "author_name": "Facebook User",
+                            "author_name": author or "Facebook User",
                             "post_url": p_href if p_href.startswith("http") else f"https://facebook.com{p_href}",
                             "content": txt,
                             "image_url": img_src or ""
                         })
-                browser.close()
-        except Exception as pe:
-            print(f"[FB Playwright] Playwright scrape note: {pe}")
+
+                # Scroll down
+                page.evaluate("window.scrollBy(0, 1000)")
+                page.wait_for_timeout(1500)
+
+            browser.close()
+    except Exception as pe:
+        print(f"[FB Playwright] Playwright scrape warning: {pe}")
+
+    # 2. HTTP Fallback (in case Playwright fails)
+    if len(posts) == 0:
+        try:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                "Accept-Language": "en-US,en;q=0.9",
+            }
+            if cookie_header:
+                headers["Cookie"] = cookie_header
+
+            m_url = re.sub(r'https?://(?:www\.)?facebook\.com', 'https://mbasic.facebook.com', clean_url)
+            r = requests.get(m_url, headers=headers, timeout=10)
+            if r.status_code == 200 and len(r.text) > 1000 and "<title>Error</title>" not in r.text:
+                soup = BeautifulSoup(r.text, "html.parser")
+                articles = soup.find_all(["article", "div"], role="article")
+                for art in articles[:limit]:
+                    text = art.get_text(separator=" ").strip()
+                    if len(text) > 25:
+                        author_el = art.find(["h3", "strong", "a"])
+                        author = author_el.get_text().strip() if author_el else "Facebook User"
+                        link_el = art.find("a", href=re.compile(r"/story\.php|/posts/|/permalink/"))
+                        p_url = ("https://facebook.com" + link_el["href"]) if link_el else clean_url
+                        img_el = art.find("img")
+                        img_url = img_el.get("src", "") if img_el else ""
+
+                        pid = f"fb_{abs(hash(text[:80]))}"
+                        posts.append({
+                            "post_id": pid,
+                            "author_name": author,
+                            "post_url": p_url,
+                            "content": text,
+                            "image_url": img_url
+                        })
+        except Exception as e:
+            print(f"[FB Scraper] HTTP fallback warning for {group_url}: {e}")
 
     return posts
 
