@@ -727,8 +727,10 @@ def api_scan_single_fb_group(group_id: int):
 class IngestPostItem(BaseModel):
     content: str
     author_name: Optional[str] = "Facebook User"
+    author_url: Optional[str] = ""
     post_url: Optional[str] = ""
     group_name: Optional[str] = "Facebook Group"
+    group_id: Optional[int] = None
     image_url: Optional[str] = ""
 
 class IngestBatch(BaseModel):
@@ -755,47 +757,49 @@ def api_ingest_fb_posts(batch: IngestBatch):
         if len(content) < 25:
             continue
 
-        # 1. STRICT FRESHNESS CHECK (Max 3 Hours)
-        if not is_post_fresh(content, max_hours=3):
+        # 1. Freshness Check (≤ 3 Hours for hiring alert)
+        fresh = is_post_fresh(content, max_hours=3)
+        if not fresh:
             skipped_old += 1
-            continue
 
         pid = f"fb_{abs(hash(content[:80]))}"
         if is_fb_post_seen(pid):
             continue
 
         ai_res = classify_fb_post_with_ai(content, item.author_name or "Client", item.group_name or "Facebook Group")
-        if ai_res.get("is_hiring"):
-            alert_data = {
-                "group_id": None,
-                "group_name": item.group_name or "Facebook Group",
-                "post_id": pid,
-                "author_name": item.author_name or "Client",
-                "post_url": item.post_url or "https://facebook.com",
-                "content": content,
-                "image_url": item.image_url or "",
-                "is_hiring": 1,
-                "client_name": ai_res.get("client_name", item.author_name or "Client"),
-                "job_type": ai_res.get("job_type", "Video Editor"),
-                "budget": ai_res.get("budget", "Negotiable"),
-                "contact_phone": ai_res.get("contact_phone", ""),
-                "contact_email": ai_res.get("contact_email", ""),
-                "contact_whatsapp": ai_res.get("contact_whatsapp", ""),
-                "contact_telegram": ai_res.get("contact_telegram", ""),
-                "confidence_score": ai_res.get("confidence_score", 95),
-                "ai_summary": ai_res.get("ai_summary", content[:200]),
-                "telegram_sent": 0,
-                "telegram_sent_at": None
-            }
+        is_hiring = 1 if (fresh and ai_res.get("is_hiring")) else 0
+        alert_data = {
+            "group_id": item.group_id or None,
+            "group_name": item.group_name or "Facebook Group",
+            "post_id": pid,
+            "author_name": item.author_name or "Client",
+            "author_url": item.author_url or "",
+            "post_url": item.post_url or "https://facebook.com",
+            "content": content,
+            "image_url": item.image_url or "",
+            "is_hiring": is_hiring,
+            "client_name": ai_res.get("client_name", item.author_name or "Client"),
+            "job_type": ai_res.get("job_type", "Video Editor") if is_hiring else "Group Post",
+            "budget": ai_res.get("budget", "Negotiable") if is_hiring else "",
+            "contact_phone": ai_res.get("contact_phone", ""),
+            "contact_email": ai_res.get("contact_email", ""),
+            "contact_whatsapp": ai_res.get("contact_whatsapp", ""),
+            "contact_telegram": ai_res.get("contact_telegram", ""),
+            "confidence_score": ai_res.get("confidence_score", 95) if is_hiring else 0,
+            "ai_summary": ai_res.get("ai_summary", content[:200]),
+            "telegram_sent": 0,
+            "telegram_sent_at": None
+        }
+        if is_hiring:
             sent_ok = alert_fb_hiring_post(alert_data)
             if sent_ok:
                 alert_data["telegram_sent"] = 1
                 alert_data["telegram_sent_at"] = datetime.now().isoformat()
-            insert_fb_alert(alert_data)
-            alerts_created.append(alert_data)
             dispatched += 1
         else:
             skipped_not_hiring += 1
+        insert_fb_alert(alert_data)
+        alerts_created.append(alert_data)
 
     return {
         "ok": True,

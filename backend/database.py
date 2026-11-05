@@ -554,14 +554,16 @@ def init_db():
             }
         ]
         for a in INITIAL_ALERTS:
+            gid_row = c.execute("SELECT id FROM fb_monitored_groups WHERE name = ?", (a['group_name'],)).fetchone()
+            a['group_id'] = gid_row[0] if gid_row else None
             c.execute("""
                 INSERT OR IGNORE INTO fb_job_alerts (
-                    group_name, post_id, author_name, author_url, post_url, content, image_url,
+                    group_id, group_name, post_id, author_name, author_url, post_url, content, image_url,
                     is_hiring, client_name, job_type, budget, contact_phone, contact_email,
                     contact_whatsapp, contact_telegram, confidence_score, ai_summary,
                     telegram_sent, telegram_sent_at, created_at
                 ) VALUES (
-                    :group_name, :post_id, :author_name, :author_url, :post_url, :content, :image_url,
+                    :group_id, :group_name, :post_id, :author_name, :author_url, :post_url, :content, :image_url,
                     :is_hiring, :client_name, :job_type, :budget, :contact_phone, :contact_email,
                     :contact_whatsapp, :contact_telegram, :confidence_score, :ai_summary,
                     :telegram_sent, :telegram_sent_at, datetime('now')

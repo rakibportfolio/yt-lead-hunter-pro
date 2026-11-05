@@ -1660,6 +1660,21 @@ let FB_POST_TYPE_FILTER = 'all'; // 'all' (All Posts), 'hiring' (Hiring Only)
 let FB_TIME_FILTER = 'all';      // 'all', '15m', '1h', '3h', '24h'
 let FB_SORT_ORDER = 'newest';    // 'newest' (1m -> 2m -> 1h), 'oldest'
 
+// Helper to extract clean group vanity slug or ID from URL
+function getGroupSlug(url) {
+  if (!url) return '';
+  try {
+    const clean = url.split('?')[0].split('#')[0].replace(/\/+$/, '');
+    const parts = clean.split('/groups/');
+    if (parts.length > 1) {
+      return parts[1].split('/')[0].trim().toLowerCase();
+    }
+    return '';
+  } catch (_) {
+    return '';
+  }
+}
+
 // Helper to extract post freshness / age in minutes
 function getPostAgeInMinutes(alert) {
   const t = (alert.content || alert.ai_summary || '').toLowerCase();
@@ -1849,7 +1864,20 @@ function renderFbGroupsList() {
     const isSelected = SELECTED_FB_GROUP_ID === g.id;
     const isVip = (g.priority && g.priority >= 10);
     const safeName = (g.name || 'Facebook Group').replace(/'/g, "\\'");
-    const vipBadge = isVip ? '<span style="background:#fef3c7;color:#b45309;font-size:9.5px;font-weight:900;padding:2px 6px;border-radius:4px;margin-left:5px;border:1px solid #fde68a;">⭐ VIP (Top Priority)</span>' : '';
+    const vipBadge = isVip ? '<span style="background:#fef3c7;color:#b45309;font-size:9.5px;font-weight:900;padding:2px 6px;border-radius:4px;margin-left:5px;border:1px solid #fde68a;">⭐ VIP</span>' : '';
+    const gSlug = getGroupSlug(g.url);
+    const matchedAlerts = FB_ALERTS_STATE.filter(a => {
+      if (a.group_id && a.group_id === g.id) return true;
+      if (a.group_name && g.name) {
+        const agn = a.group_name.toLowerCase().trim();
+        const sgn = g.name.toLowerCase().trim();
+        if (agn === sgn || agn.includes(sgn) || sgn.includes(agn)) return true;
+      }
+      if (gSlug && a.post_url && a.post_url.toLowerCase().includes(gSlug)) return true;
+      return false;
+    });
+    const postsCount = matchedAlerts.length;
+    const hiringCount = matchedAlerts.filter(a => a.is_hiring === 1).length;
     return `
       <div onclick="selectFbGroup(${g.id}, '${safeName}')" style="padding:11px 12px;border-radius:8px;cursor:pointer;display:flex;flex-direction:column;gap:5px;transition:all 0.15s ease;${isSelected ? 'background:#eff6ff;border:2px solid #1877F2;box-shadow:0 0 0 2px rgba(24,119,242,0.2);' : (isVip ? 'background:#fffbeb;border:1px solid #fde68a;' : 'background:var(--bg-subtle);border:1px solid var(--border-color);')}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
@@ -1865,8 +1893,8 @@ function renderFbGroupsList() {
           </button>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:var(--text-muted);padding-top:4px;border-top:1px dashed var(--border-color);margin-top:2px;">
-          <span>Checks: every ${g.check_interval_min || 1}m</span>
-          <span>Jobs: <b>${g.total_jobs_found || 0}</b></span>
+          <span>Posts: <b style="color:#1877F2;">${postsCount}</b></span>
+          <span>Hiring: <b style="color:#16a34a;">${hiringCount}</b></span>
           <button onclick="event.stopPropagation();deleteFbGroupItem(${g.id})" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:11px;" title="Delete group">🗑</button>
         </div>
       </div>
@@ -1893,17 +1921,15 @@ function renderFbAlertsList() {
       banner.style.display = 'flex';
       bannerName.textContent = `Showing all posts for: ${SELECTED_FB_GROUP_NAME || selGroup?.name || 'Selected Group'}`;
     }
+    const selSlug = selGroup ? getGroupSlug(selGroup.url) : '';
     filtered = filtered.filter(a => {
       if (a.group_id && a.group_id === SELECTED_FB_GROUP_ID) return true;
       if (selGroup && a.group_name) {
-        const agn = a.group_name.toLowerCase();
-        const sgn = selGroup.name.toLowerCase();
-        if (agn.includes(sgn) || sgn.includes(agn)) return true;
+        const agn = a.group_name.toLowerCase().trim();
+        const sgn = selGroup.name.toLowerCase().trim();
+        if (agn === sgn || agn.includes(sgn) || sgn.includes(agn)) return true;
       }
-      if (selGroup && selGroup.url && a.post_url) {
-        const slug = selGroup.url.split('/groups/')[1]?.split('/')[0]?.replace(/\/$/, '');
-        if (slug && a.post_url.includes(slug)) return true;
-      }
+      if (selSlug && a.post_url && a.post_url.toLowerCase().includes(selSlug)) return true;
       return false;
     });
   } else {
