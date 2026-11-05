@@ -200,12 +200,18 @@ def init_db():
             url                 TEXT UNIQUE NOT NULL,
             active              INTEGER DEFAULT 1,
             check_interval_min  INTEGER DEFAULT 2,
+            priority            INTEGER DEFAULT 0,
             last_checked_at     TEXT,
             total_posts_scanned INTEGER DEFAULT 0,
             total_jobs_found    INTEGER DEFAULT 0,
             created_at          TEXT DEFAULT (datetime('now'))
         )
     """)
+
+    try:
+        c.execute("ALTER TABLE fb_monitored_groups ADD COLUMN priority INTEGER DEFAULT 0")
+    except Exception:
+        pass
 
     c.execute("""
         CREATE TABLE IF NOT EXISTS fb_job_alerts (
@@ -235,35 +241,41 @@ def init_db():
 
     # Seed curated Facebook video editing groups automatically
     DEFAULT_GROUPS = [
-        ("MZ Studio BD", "https://www.facebook.com/groups/mzstudiobd/"),
-        ("Video Editors & Creators BD #291", "https://www.facebook.com/groups/291019220252715/"),
-        ("Video Editing Hub BD #359", "https://www.facebook.com/groups/359734483826735/"),
-        ("Video Editor Jobs BD #185", "https://www.facebook.com/groups/1851439782436285/"),
-        ("Video Editors Freelancer BD #147", "https://www.facebook.com/groups/147032671260514/"),
-        ("Creative Video Editors BD #384", "https://www.facebook.com/groups/3847335125558578/"),
-        ("Video Editing Community #752", "https://www.facebook.com/groups/752472806507912/"),
-        ("Editors & Animators BD #874", "https://www.facebook.com/groups/874914633509210/"),
-        ("Video Editors Bangladesh Official", "https://www.facebook.com/groups/videoeditorsbangladeshofficial/"),
-        ("BD Video Creators & Editors #100", "https://www.facebook.com/groups/1001939884944907/"),
-        ("Video Editing Zone BD #286", "https://www.facebook.com/groups/286521763690926/"),
-        ("Video Editing & Hiring BD #109", "https://www.facebook.com/groups/1096533198753530/"),
-        ("Video Editor Job Bangladesh", "https://www.facebook.com/groups/VideoditorJobBangladesh/"),
-        ("Video Editors YES", "https://www.facebook.com/groups/videoeditorsyes/"),
-        ("Professional Editors BD #229", "https://www.facebook.com/groups/2292891657639248/"),
-        ("Video Editing Freelance BD #117", "https://www.facebook.com/groups/1173532240001355/"),
-        ("BD Video Editing Network #294", "https://www.facebook.com/groups/294830932856749/"),
-        ("Video Editor in Bangladesh", "https://www.facebook.com/groups/videoeditorinbangladesh/"),
-        ("Bangladesh YouTube & Facebook Community", "https://www.facebook.com/groups/bangladeshyoututbeandfacebookcommunity/"),
-        ("Professional Video Editor", "https://www.facebook.com/groups/ProfessionalVideoEditor/"),
-        ("Video Editors Circle BD #151", "https://www.facebook.com/groups/1510297602711737/"),
-        ("Freelance Video Editors BD #310", "https://www.facebook.com/groups/310584494121197/"),
-        ("Video Editors Bangladesh PRO", "https://www.facebook.com/groups/videoeditorsbangladeshpro/"),
-        ("BD Content & Video Editors #449", "https://www.facebook.com/groups/449818040305896/"),
-        ("Digital Video Editors BD #185", "https://www.facebook.com/groups/185647597308414/"),
-        ("Video Editing BD Hub #343", "https://www.facebook.com/groups/343780916577699/"),
-        ("Creative Freelance Editors BD #656", "https://www.facebook.com/groups/6560510120739077/"),
-        ("AE Video Editors PH / Global", "https://www.facebook.com/groups/AEVideoEditorsPH/"),
-        ("Video Editing Masterclass BD #112", "https://www.facebook.com/groups/1126963997314568/"),
+        # ── 4 VIP TOP PRIORITY GROUPS (Always Scanned First) ──────
+        ("VIP: Video Editing Bangladesh", "https://www.facebook.com/groups/bangladeshyoututbeandfacebookcommunity/", 10),
+        ("VIP: Video Editor - VFX Bangladesh", "https://www.facebook.com/groups/videoeditorhire/", 10),
+        ("VIP: Video Editors Bangladesh BD", "https://www.facebook.com/groups/VideoEditorsBangladesh.BD/", 10),
+        ("VIP: Video Editors BD #229", "https://www.facebook.com/groups/2292891657639248/", 10),
+
+        # ── USER VERIFIED GROUPS ──────────────────────────────────
+        ("MZ Studio BD", "https://www.facebook.com/groups/mzstudiobd/", 5),
+        ("Video Editors & Creators BD #291", "https://www.facebook.com/groups/291019220252715/", 5),
+        ("Video Editing Hub BD #359", "https://www.facebook.com/groups/359734483826735/", 5),
+        ("Video Editor Jobs BD #185", "https://www.facebook.com/groups/1851439782436285/", 5),
+        ("Video Editors Freelancer BD #147", "https://www.facebook.com/groups/147032671260514/", 5),
+        ("Creative Video Editors BD #384", "https://www.facebook.com/groups/3847335125558578/", 5),
+        ("Video Editing Community #752", "https://www.facebook.com/groups/752472806507912/", 5),
+        ("Editors & Animators BD #874", "https://www.facebook.com/groups/874914633509210/", 5),
+        ("Video Editors Bangladesh Official", "https://www.facebook.com/groups/videoeditorsbangladeshofficial/", 5),
+        ("BD Video Creators & Editors #100", "https://www.facebook.com/groups/1001939884944907/", 5),
+        ("Video Editing Zone BD #286", "https://www.facebook.com/groups/286521763690926/", 5),
+        ("Video Editing & Hiring BD #109", "https://www.facebook.com/groups/1096533198753530/", 5),
+        ("Video Editor Job Bangladesh", "https://www.facebook.com/groups/VideoditorJobBangladesh/", 5),
+        ("Video Editors YES", "https://www.facebook.com/groups/videoeditorsyes/", 5),
+        ("Professional Editors BD #229", "https://www.facebook.com/groups/2292891657639248/", 5),
+        ("Video Editing Freelance BD #117", "https://www.facebook.com/groups/1173532240001355/", 5),
+        ("BD Video Editing Network #294", "https://www.facebook.com/groups/294830932856749/", 5),
+        ("Video Editor in Bangladesh", "https://www.facebook.com/groups/videoeditorinbangladesh/", 5),
+        ("Professional Video Editor", "https://www.facebook.com/groups/ProfessionalVideoEditor/", 5),
+        ("Video Editors Circle BD #151", "https://www.facebook.com/groups/1510297602711737/", 5),
+        ("Freelance Video Editors BD #310", "https://www.facebook.com/groups/310584494121197/", 5),
+        ("Video Editors Bangladesh PRO", "https://www.facebook.com/groups/videoeditorsbangladeshpro/", 5),
+        ("BD Content & Video Editors #449", "https://www.facebook.com/groups/449818040305896/", 5),
+        ("Digital Video Editors BD #185", "https://www.facebook.com/groups/185647597308414/", 5),
+        ("Video Editing BD Hub #343", "https://www.facebook.com/groups/343780916577699/", 5),
+        ("Creative Freelance Editors BD #656", "https://www.facebook.com/groups/6560510120739077/", 5),
+        ("AE Video Editors PH / Global", "https://www.facebook.com/groups/AEVideoEditorsPH/", 5),
+        ("Video Editing Masterclass BD #112", "https://www.facebook.com/groups/1126963997314568/", 5),
         ("Video Editor Bangladesh", "https://www.facebook.com/groups/videoeditorbd/"),
         ("Video Editing Jobs BD", "https://www.facebook.com/groups/videoeditingjobsbd/"),
         ("Freelancer Bangladesh", "https://www.facebook.com/groups/freelancerbd/"),
@@ -316,14 +328,18 @@ def init_db():
         ("Iman Gadzhi & Ali Abdaal Style Editors (25k+)", "https://www.facebook.com/groups/imangadzhistyleeditors/"),
         ("Final Cut Pro Users Global (40k+)", "https://www.facebook.com/groups/finalcutprox/")
     ]
-    for g_name, g_url in DEFAULT_GROUPS:
+    for item in DEFAULT_GROUPS:
+        g_name = item[0]
+        g_url = item[1]
+        prio = item[2] if len(item) > 2 else 0
         clean = g_url.strip()
         if not clean.endswith('/'):
             clean += '/'
         c.execute("""
-            INSERT OR IGNORE INTO fb_monitored_groups (name, url, active, check_interval_min)
-            VALUES (?, ?, 1, 2)
-        """, (g_name, clean))
+            INSERT INTO fb_monitored_groups (name, url, active, check_interval_min, priority)
+            VALUES (?, ?, 1, 1, ?)
+            ON CONFLICT(url) DO UPDATE SET priority=excluded.priority, name=excluded.name
+        """, (g_name, clean, prio))
 
     conn.commit()
     conn.close()
@@ -636,18 +652,22 @@ if __name__ == "__main__":
 # ── Facebook Radar Operations ──────────────────────────────────
 def get_all_fb_groups() -> list:
     conn = get_db()
-    rows = conn.execute("SELECT * FROM fb_monitored_groups ORDER BY id DESC").fetchall()
+    rows = conn.execute("SELECT * FROM fb_monitored_groups ORDER BY priority DESC, id ASC").fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
-def insert_fb_group(name: str, url: str, interval: int = 2) -> int:
+def insert_fb_group(name: str, url: str, interval: int = 2, priority: int = 0) -> int:
     conn = get_db()
     c = conn.cursor()
     c.execute("""
-        INSERT INTO fb_monitored_groups (name, url, check_interval_min)
-        VALUES (?, ?, ?)
-    """, (name, url, interval))
+        INSERT INTO fb_monitored_groups (name, url, check_interval_min, priority)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(url) DO UPDATE SET priority=excluded.priority, name=excluded.name
+    """, (name, url, interval, priority))
     gid = c.lastrowid
+    conn.commit()
+    conn.close()
+    return gid
     conn.commit()
     conn.close()
     return gid

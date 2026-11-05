@@ -348,6 +348,8 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                 except Exception as ce:
                     print(f"[FB Cookies] Note adding cookies: {ce}")
 
+            page = context.new_page()
+
             # First priority: target the group's hiring search feed to bypass noise/chatter
             search_url = f"{clean_url}/search/?q=hiring"
             try:
