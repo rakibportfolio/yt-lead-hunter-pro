@@ -148,3 +148,4 @@ def run_live_scrape(max_groups=15):
 
 if __name__ == "__main__":
     run_live_scrape(max_groups=12)
+

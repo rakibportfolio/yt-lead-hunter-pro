@@ -349,6 +349,73 @@ def _parse_fb_cookies() -> tuple:
     return cookie_list, "; ".join(c_parts)
 
 
+def extract_post_and_author_urls(f_post, clean_url: str) -> tuple:
+    """
+    Extracts the clean, direct post URL and the author profile URL from a Facebook post DOM element.
+    Never returns the generic group URL as a post URL.
+    """
+    post_url = ""
+    author_url = ""
+    author_name = "Facebook User"
+
+    all_links = f_post.query_selector_all("a")
+
+    for a in all_links:
+        href = (a.get_attribute("href") or "").strip()
+        aria = (a.get_attribute("aria-label") or "").strip()
+        txt = (a.inner_text() or "").strip()
+
+        if not href or href == "#":
+            continue
+
+        # 1. Post Link Detection (/posts/ or /permalink/ or multi_permalinks= or story_fbid=)
+        if not post_url:
+            if any(k in href for k in ["/posts/", "/permalink/", "story_fbid=", "multi_permalinks="]):
+                clean_p = href.split("?")[0] if ("?" in href and any(t in href for t in ["__cft__", "__tn__", "comment_id"])) else href
+                if clean_p.startswith("/"):
+                    clean_p = f"https://www.facebook.com{clean_p}"
+                if not any(sub in clean_p for sub in ["comment_id=", "reply_comment_id="]):
+                    post_url = clean_p
+
+        # 2. Author Profile URL Detection
+        if not author_url:
+            if "/user/" in href and "/groups/" in href:
+                clean_u = href.split("?")[0]
+                if clean_u.startswith("/"):
+                    clean_u = f"https://www.facebook.com{clean_u}"
+                author_url = clean_u
+            elif "profile.php?id=" in href:
+                pid = href.split("profile.php?id=")[1].split("&")[0]
+                author_url = f"https://www.facebook.com/profile.php?id={pid}"
+            elif not any(skip in href for skip in ["/groups/", "/posts/", "/permalink/", "/stories/", "/hashtag/", "/photo", "/watch", "/events"]):
+                clean_u = href.split("?")[0]
+                if clean_u.startswith("/"):
+                    clean_u = f"https://www.facebook.com{clean_u}"
+                if len(clean_u) > 25:
+                    author_url = clean_u
+
+        # Author Name Detection
+        if author_name == "Facebook User":
+            if aria and "view story" in aria.lower():
+                name_candidate = aria.split(",")[0].replace("view story", "").strip()
+                if name_candidate:
+                    author_name = name_candidate
+            elif txt and len(txt) < 35 and not any(skip in txt.lower() for skip in ["like", "comment", "share", "ago", "hours", "min", "see more", "admin", "moderator", "top fan"]):
+                if "/user/" in href or "profile.php" in href or (author_url and author_url in href):
+                    author_name = txt.split("\n")[0].strip()
+
+    if author_name == "Facebook User":
+        author_el = f_post.query_selector('h2 a, h3 a, a[role="link"][tabindex="0"], div[data-ad-rendering-role="profile_name"] a, h2, h3, strong')
+        if author_el:
+            t = author_el.inner_text().strip()
+            if t and '\n' in t:
+                t = t.split('\n')[0].strip()
+            if t and len(t) < 35 and not any(skip in t.lower() for skip in ["like", "comment", "share", "admin"]):
+                author_name = t
+
+    return post_url, author_url, author_name
+
+
 # ── Facebook Group Post Scraper ──────────────────────────────
 def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[str, Any]]:
     """
@@ -414,33 +481,14 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                         seen_texts.add(txt)
                         img_tag = f_post.query_selector('img[src*="scontent"], img')
                         img_src = img_tag.get_attribute("src") if img_tag else ""
-                        link_tag = f_post.query_selector('a[href*="/posts/"], a[href*="/permalink/"]')
-                        p_href = link_tag.get_attribute("href") if link_tag else clean_url
-
-                        # Author name & FB Profile URL extraction
-                        author_el = f_post.query_selector('h2 a, h3 a, a[role="link"][tabindex="0"], div[data-ad-rendering-role="profile_name"] a, h2, h3, strong, a[role="link"]')
-                        author = "Facebook User"
-                        author_url = ""
-                        if author_el:
-                            author = author_el.inner_text().strip()
-                            if '\n' in author:
-                                author = author.split('\n')[0].strip()
-                            href = author_el.get_attribute("href") or ""
-                            if href and not href.startswith("#") and "/groups/" not in href:
-                                if href.startswith("/"):
-                                    href = f"https://www.facebook.com{href}"
-                                if "profile.php?id=" in href:
-                                    pid_part = href.split("profile.php?id=")[1].split("&")[0]
-                                    author_url = f"https://www.facebook.com/profile.php?id={pid_part}"
-                                else:
-                                    author_url = href.split("?")[0]
+                        p_href, author_url, author = extract_post_and_author_urls(f_post, clean_url)
 
                         pid = f"fb_{abs(hash(txt[:80]))}"
                         posts.append({
                             "post_id": pid,
                             "author_name": author or "Facebook User",
                             "author_url": author_url or "",
-                            "post_url": p_href if p_href.startswith("http") else f"https://facebook.com{p_href}",
+                            "post_url": p_href or clean_url,
                             "content": txt,
                             "image_url": img_src or ""
                         })
@@ -467,31 +515,14 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                             seen_texts.add(txt)
                             img_tag = f_post.query_selector('img[src*="scontent"], img')
                             img_src = img_tag.get_attribute("src") if img_tag else ""
-                            link_tag = f_post.query_selector('a[href*="/posts/"], a[href*="/permalink/"]')
-                            p_href = link_tag.get_attribute("href") if link_tag else clean_url
-                            author_el = f_post.query_selector('h2 a, h3 a, a[role="link"][tabindex="0"], div[data-ad-rendering-role="profile_name"] a, h2, h3, strong, a[role="link"]')
-                            author = "Facebook User"
-                            author_url = ""
-                            if author_el:
-                                author = author_el.inner_text().strip()
-                                if '\n' in author:
-                                    author = author.split('\n')[0].strip()
-                                href = author_el.get_attribute("href") or ""
-                                if href and not href.startswith("#") and "/groups/" not in href:
-                                    if href.startswith("/"):
-                                        href = f"https://www.facebook.com{href}"
-                                    if "profile.php?id=" in href:
-                                        pid_part = href.split("profile.php?id=")[1].split("&")[0]
-                                        author_url = f"https://www.facebook.com/profile.php?id={pid_part}"
-                                    else:
-                                        author_url = href.split("?")[0]
+                            p_href, author_url, author = extract_post_and_author_urls(f_post, clean_url)
 
                             pid = f"fb_{abs(hash(txt[:80]))}"
                             posts.append({
                                 "post_id": pid,
                                 "author_name": author or "Facebook User",
                                 "author_url": author_url or "",
-                                "post_url": p_href if p_href.startswith("http") else f"https://facebook.com{p_href}",
+                                "post_url": p_href or clean_url,
                                 "content": txt,
                                 "image_url": img_src or ""
                             })

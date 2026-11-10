@@ -321,10 +321,14 @@ def alert_fb_hiring_post(job: dict) -> bool:
 🏢 <b>Group:</b> {group_name}
 👤 <b>Client:</b> {client_name}
 """
+    is_direct_post = bool(post_url and any(k in post_url for k in ["/posts/", "/permalink/", "story_fbid="]))
+
     if author_url:
-        caption += f"🔗 <b>FB Profile / ID:</b> <a href='{author_url}'>{author_url}</a>\n"
-    elif post_url:
-        caption += f"🔗 <b>FB Post & ID:</b> <a href='{post_url}'>Click to View & Message Poster</a>\n"
+        caption += f"👤 <b>FB Profile / DM:</b> <a href='{author_url}'>Click to Message Poster</a>\n"
+    if is_direct_post:
+        caption += f"🔗 <b>Direct Post Link:</b> <a href='{post_url}'>Open Exact Post</a>\n"
+    elif not author_url and post_url:
+        caption += f"🏢 <b>Group Link:</b> <a href='{post_url}'>{group_name}</a>\n"
 
     caption += f"""💼 <b>Need:</b> {job_type}
 💰 <b>Budget:</b> {budget}
@@ -343,19 +347,21 @@ def alert_fb_hiring_post(job: dict) -> bool:
 ━━━━━━━━━━━━━━━━━━━━
 ⚡ <b>React fast to secure this deal before other editors!</b>"""
 
-    # Build inline buttons (WhatsApp + Direct FB Profile/Post)
+    # Build inline buttons (WhatsApp + Direct FB Profile + Exact Post Link)
     inline_keyboard = []
     btn_row = []
     if clean_wa:
         btn_row.append({"text": "💬 WhatsApp Chat", "url": f"https://wa.me/{clean_wa}"})
     if author_url:
         btn_row.append({"text": "👤 Message on FB", "url": author_url})
-    elif post_url:
-        btn_row.append({"text": "🔗 Open FB Post", "url": post_url})
+    if is_direct_post:
+        btn_row.append({"text": "🔗 Open Direct Post", "url": post_url})
+    elif not author_url and post_url:
+        btn_row.append({"text": "🏢 Open Group", "url": post_url})
     if btn_row:
         inline_keyboard.append(btn_row)
 
-    if post_url and author_url:
+    if is_direct_post and author_url and len(btn_row) > 2:
         inline_keyboard.append([{"text": "🔗 View Full FB Post", "url": post_url}])
 
     reply_markup = {"inline_keyboard": inline_keyboard} if inline_keyboard else None
