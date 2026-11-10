@@ -62,17 +62,44 @@ def run_live_scrape(max_groups=15):
                 txt = p["content"]
                 pid = p["post_id"]
 
-                # Check if seen
-                if is_fb_post_seen(pid):
-                    print(f"    - Post {pid} already seen, skipping.")
-                    continue
-
                 # Freshness: accept posts up to 5 hours
                 fresh_5h = is_post_fresh(txt, max_hours=5)
 
                 # AI classification
                 ai_res = classify_fb_post_with_ai(txt, p["author_name"], gname)
                 is_hiring = 1 if (fresh_5h and ai_res.get("is_hiring")) else 0
+
+                # Check if seen
+                if is_fb_post_seen(pid):
+                    if is_hiring:
+                        conn = get_db()
+                        row = conn.execute("SELECT id, telegram_sent FROM fb_job_alerts WHERE post_id = ?", (pid,)).fetchone()
+                        conn.close()
+                        if row and row["telegram_sent"] == 0:
+                            alert_data = {
+                                "group_id": gid,
+                                "group_name": gname,
+                                "post_id": pid,
+                                "author_name": p["author_name"],
+                                "author_url": p.get("author_url", ""),
+                                "post_url": p["post_url"],
+                                "content": txt,
+                                "job_type": ai_res.get("job_type", "Video Editor"),
+                                "budget": ai_res.get("budget", ""),
+                                "ai_summary": ai_res.get("ai_summary", txt[:200]),
+                                "contact_whatsapp": ai_res.get("contact_whatsapp", ""),
+                                "contact_phone": ai_res.get("contact_phone", ""),
+                                "contact_email": ai_res.get("contact_email", ""),
+                            }
+                            sent_ok = alert_fb_hiring_post(alert_data)
+                            if sent_ok:
+                                conn = get_db()
+                                conn.execute("UPDATE fb_job_alerts SET telegram_sent = 1, telegram_sent_at = datetime('now') WHERE id = ?", (row["id"],))
+                                conn.commit()
+                                conn.close()
+                                total_hiring += 1
+                                print(f"    🎯 SENT PENDING HIRING LEAD TO TELEGRAM: {alert_data['job_type']}")
+                    continue
 
                 alert_data = {
                     "group_id": gid,
@@ -147,5 +174,5 @@ def run_live_scrape(max_groups=15):
             print(f"Coolify sync note: {ce}")
 
 if __name__ == "__main__":
-    run_live_scrape(max_groups=12)
+    run_live_scrape(max_groups=25)
 

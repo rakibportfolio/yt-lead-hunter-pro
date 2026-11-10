@@ -401,17 +401,35 @@ def extract_post_and_author_urls(f_post, clean_url: str) -> tuple:
                 if name_candidate:
                     author_name = name_candidate
             elif txt and len(txt) < 35 and not any(skip in txt.lower() for skip in ["like", "comment", "share", "ago", "hours", "min", "see more", "admin", "moderator", "top fan"]):
-                if "/user/" in href or "profile.php" in href or (author_url and author_url in href):
-                    author_name = txt.split("\n")[0].strip()
+                if not re.match(r'^\d+\s*(?:m|h|d|w|s|mins?|hours?|days?|weeks?)$', txt.strip(), re.IGNORECASE):
+                    if "/user/" in href or "profile.php" in href or (author_url and author_url in href):
+                        author_name = txt.split("\n")[0].strip()
 
-    if author_name == "Facebook User":
+    is_bad_author = (author_name == "Facebook User" or bool(re.match(r'^\d+\s*(?:m|h|d|w|s|mins?|hours?|days?|weeks?)$', author_name.strip(), re.IGNORECASE)))
+    if is_bad_author:
         author_el = f_post.query_selector('h2 a, h3 a, a[role="link"][tabindex="0"], div[data-ad-rendering-role="profile_name"] a, h2, h3, strong')
         if author_el:
             t = author_el.inner_text().strip()
             if t and '\n' in t:
                 t = t.split('\n')[0].strip()
-            if t and len(t) < 35 and not any(skip in t.lower() for skip in ["like", "comment", "share", "admin"]):
-                author_name = t
+            if t and len(t) < 35 and not any(skip in t.lower() for skip in ["like", "comment", "share", "admin", "member", "group"]):
+                if not re.match(r'^\d+\s*(?:m|h|d|w|s|mins?|hours?|days?|weeks?)$', t, re.IGNORECASE):
+                    author_name = t
+
+    # Final fallback: first line of post text is often the author's display name
+    is_bad_author = (author_name == "Facebook User" or bool(re.match(r'^\d+\s*(?:m|h|d|w|s|mins?|hours?|days?|weeks?)$', author_name.strip(), re.IGNORECASE)))
+    if is_bad_author:
+        try:
+            full_txt = f_post.inner_text()
+            lines = [l.strip() for l in full_txt.split('\n') if l.strip()]
+            if lines:
+                candidate = lines[0]
+                is_time_str = bool(re.match(r'^\d+\s*(?:m|h|d|w|s|mins?|hours?|days?|weeks?)$', candidate, re.IGNORECASE))
+                is_job_kw = any(w in candidate.lower() for w in ['hiring', 'looking', 'editor', 'video', 'need', 'job', 'require', 'urgent', '#', 'we are'])
+                if not is_time_str and not is_job_kw and 1 <= len(candidate.split()) <= 5 and len(candidate) < 35:
+                    author_name = candidate
+        except Exception:
+            pass
 
     return post_url, author_url, author_name
 
