@@ -180,44 +180,69 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
     """Smart Rule-based Classifier with regex contact extraction."""
     c_lower = content.lower()
 
-    # Negative patterns (freelancer promoting themselves)
+    # Negative patterns (freelancer promoting their own editing services)
     freelancer_patterns = [
-        r'\bi am a video editor\b',
-        r'\bi am professional video editor\b',
-        r'\bi will edit\b',
-        r'\bhire me\b',
-        r'\bmy portfolio\b',
-        r'\bcheck my portfolio\b',
-        r'\bportfolio link\b',
-        r'\bavailable for work\b',
-        r'\blooking for clients\b',
-        r'\bavailable for hire\b',
-        r'\bavailable for projects\b',
-        r'\bare you looking for (?:a |an )?(?:video )?editor\b',
-        r'\bdo you need (?:a |an )?(?:video )?editor\b',
-        r'\bopen for commissions\b',
-        r'\bopen for projects\b',
-        r'\baccepting new clients\b',
-        r'\bfeel free to dm\b',
-        r'\bping me for editing\b',
-        r'\bami video editor\b',
-        r'\bami kaj korbo\b',
-        r'\bamar portfolio\b',
-        r'\border now\b',
-        r'\bdm me for editing\b',
-        r'\bdiscount on editing\b',
-        r'\bcheap price\b',
-        r'\breasonable price\b'
+        # English self-identity & promos
+        r'\b(?:i|i[\'’]?m|im|hy\s+i[\'’]?m|hy\s+i\s+am|hello\s+i[\'’]?m|hello\s+i\s+am)\s+(?:a\s+)?(?:professional\s+|freelance\s+|skilled\s+)?(?:video\s+)?editor\b',
+        r'\b(?:i|i[\'’]?m|im)\s+(?:available|open|ready)\s+(?:for\s+)?(?:work|hire|projects?|clients?|commissions?|rush\s+edits?)\b',
+        r'\bopen\s+for\s+(?:work|hire|projects?|clients?|commissions?|rush\s+edits?)\b',
+        r'\baccepting\s+(?:new\s+)?(?:clients?|projects?|rush\s+edits?|orders?)\b',
+        r'\bhire\s+me\b',
+        r'\b(?:let\s+me|i\s+can|i\s+will)\s+edit\s+your\b',
+        r'\b(?:my|check\s+my|view\s+my|here\s+is\s+my)\s+portfolio\b',
+        r'\bportfolio\s*(?:link|below|here)?\s*[:=-]\s*https?',
+        r'\b(?:my|our)\s+recent\s+work\b',
+        r'\b(?:my|our)\s+services\b',
+        r'\border\s+now\b',
+        r'\bdiscount\s+on\s+editing\b',
+        r'\b(?:cheap|affordable|reasonable|negotiable)\s+(?:price|rate|cost)\b',
+        r'\bdm\s+(?:me\s+)?for\s+(?:work|editing|services|samples|portfolio|orders)\b',
+        r'\bping\s+me\s+for\s+editing\b',
+        r'\bfeel\s+free\s+to\s+dm\b',
+        r'\bmessage\s+me\s+for\s+editing\b',
+        r'\bcontact\s+me\s+if\s+you\s+need\b',
+        r'\bcontact\s+(?:karen|karo|me)\b',
+        r'\bserious\s+clients?\s+(?:contact|dm|inbox)\b',
+        
+        # Asking questions (Seller / Freelancer pitch)
+        r'\byou\s+are\s+in\s+the\s+right\s+place\b',
+        r'\b(?:are\s+you\s+|are\s+)?looking\s+for\s+(?:a\s+)?video\s+editor\s+then\b',
+        r'\b(?:need|looking\s+for|in\s+need\s+of)\s+(?:a\s+|an\s+)?(?:video\s+)?editor\s*\?',
+        r'\b(?:need|looking\s+for)\s+(?:a\s+|an\s+)?(?:video\s+)?editor\s*\?\s*(?:dm|inbox|contact|pm|message|ping)',
+        r'\b(?:do\s+you\s+need|are\s+you\s+looking\s+for)\s+(?:a\s+|an\s+)?(?:video\s+)?editor\b',
+        r'\bif\s+(?:you|anyone)\s+(?:need|needs|require|looking\s+for)\s+(?:a\s+|an\s+)?(?:video\s+)?editor\b',
+        r'\bif\s+you\s+want\s+(?:your\s+)?videos?\s+edited\b',
+
+        # Banglish promos
+        r'\bami\s+(?:ekjon\s+)?(?:video\s+)?editor\b',
+        r'\bami\s+(?:video\s+)?edit\s+(?:kori|korte\s+pari|korbo)\b',
+        r'\bamar\s+(?:portfolio|sample|kaj)\b',
+        r'\bkaro\s+(?:video\s+)?editor\s+lagle\b',
+        r'\bkaro\s+(?:video\s+)?editor\s+lagbe\s*\?',
+        r'\bkaro\s+(?:kono\s+)?edit\s+lagle\b',
+        r'\bkaro\s+lagle\s+(?:inbox|knock|dm|bolben|jogajog)\b',
+        r'\beditor\s+lagle\s+(?:inbox|knock|dm|message|jogajog)\s+(?:koren|korun|diben|din)\b',
+        r'\bkom\s+(?:taka|dame|kharoche|budget)\s*(?:e)?\s*video\s+edit\b',
+        
+        # Bengali promos
+        r'আমি\s+(?:একজন\s+)?(?:ভিডিও\s+)?এডিটর',
+        r'আমি\s+ভিডিও\s+এডিট\s+করি',
+        r'কারো\s+(?:ভিডিও\s+)?এডিটর\s+লাগলে',
+        r'কারো\s+(?:ভিডিও\s+)?এডিটর\s+লাগবে\s*\?',
+        r'কারো\s+লাগলে\s+ইনবক্স\s+করুন',
+        r'কারো\s+লাগলে\s+নক\s+দিয়েন',
+        r'কারো\s+কাজ\s+লাগলে',
+        r'কম\s+(?:বাজেটে|খরচে|টাকায়)\s+ভিডিও\s+এডিট',
+        r'আমার\s+পোর্টফোলিও'
     ]
 
     is_freelancer = any(re.search(p, c_lower) for p in freelancer_patterns)
 
-    # Positive hiring patterns (English + Banglish + Bengali)
+    # Positive hiring patterns (Client / Employer looking to PAY an editor)
     hiring_patterns = [
         r'\b(?:need|looking\s+for|hiring|seeking|want|require|wanted)\b[^\.\n\?!]{0,40}\b(?:video\s+editor|editor|motion\s+designer|animator)\b',
         r'\b(?:video\s+editor|editor|motion\s+designer)\s*(?:lagbe|dorkar|khujchi|chahida|need|hiring|chai|proyojon)\b',
         r'\b(?:urgent|urgently|urgent\s+requirement|we\s+are\s+hiring|job\s+offer|job\s+circular|recruitment)\b',
-        r'\b(?:pay|budget|salary|rate|remuneration)\s*[:=–-]?\s*\$?\d+',
         r'\b(?:send\s+portfolio|inbox\s+with\s+portfolio|inbox\s+your\s+rate|apply\s+at|drop\s+portfolio|send\s+cv|send\s+resume)\b',
         r'\b(?:who\s+can\s+edit\s+my\s+videos|need\s+someone\s+to\s+edit|can\s+anyone\s+edit|anyone\s+available\s+to\s+edit)\b',
         r'\b(?:video\s+edit\s+korate\s+chai|editing\s+er\s+lok\s+lagbe|editor\s+dorkar)\b',
@@ -234,8 +259,8 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
 
     is_hiring = any(re.search(p, c_lower) for p in hiring_patterns)
 
-    # If both detected, hiring wins only if explicitly hiring
-    if is_freelancer and not any(re.search(p, c_lower) for p in [r'\bwe are hiring\b', r'\bvideo editor lagbe\b', r'\bjob offer\b']):
+    # If freelancer self-promo detected, it is strictly NOT a hiring post
+    if is_freelancer:
         is_hiring = False
 
     # Extract Phone / WhatsApp
