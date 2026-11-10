@@ -23,7 +23,10 @@ class Config:
     DEBUG       = os.getenv("DEBUG", "true").lower() == "true"
 
     # ── Database ─────────────────────────────────────────────
-    DB_PATH     = os.getenv("DB_PATH", "zentic_data.db")
+    _DEFAULT_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "zentic_data.db")
+    DB_PATH     = os.getenv("DB_PATH", _DEFAULT_DB)
+    if not os.path.isabs(DB_PATH):
+        DB_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), DB_PATH))
 
     # ── Gmail / Email ─────────────────────────────────────────
     GMAIL_ADDRESS   = _clean_val(os.getenv("GMAIL_ADDRESS", ""))

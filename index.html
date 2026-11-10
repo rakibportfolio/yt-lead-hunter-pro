@@ -1212,6 +1212,12 @@ Micro-Niche
               <option value="all">📑 All Posts (সব পোস্ট)</option>
               <option value="hiring">🎯 Hiring Leads Only (শুধুমাত্র হায়ারিং)</option>
             </select>
+            <select id="fbPlatformFilterSelect" onchange="onFbFilterChange()" style="padding:6px 10px;border-radius:7px;border:1px solid #cbd5e1;font-size:11px;font-weight:700;background:#fff;color:#0f172a;cursor:pointer;">
+              <option value="all">🌐 All Platforms (FB + Reddit + RemoteOK)</option>
+              <option value="facebook">🔵 Facebook Groups (122)</option>
+              <option value="reddit">🔴 Reddit Subreddits</option>
+              <option value="remoteok">🟢 RemoteOK Jobs</option>
+            </select>
             <select id="fbTimeFilterSelect" onchange="onFbFilterChange()" style="padding:6px 10px;border-radius:7px;border:1px solid #cbd5e1;font-size:11px;font-weight:600;background:#fff;color:#1e293b;cursor:pointer;">
               <option value="all">🕒 All Time</option>
               <option value="15m">⚡ Last 15 Mins</option>
@@ -1223,6 +1229,9 @@ Micro-Niche
               <option value="newest" selected>⬇️ Newest First (1m &rarr; 2m &rarr; 1h)</option>
               <option value="oldest">⬆️ Oldest First</option>
             </select>
+            <button onclick="huntGlobalJobsNow()" style="background:#e11d48;color:#fff;border:none;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(225,29,72,0.3);">
+              🌍 Hunt Reddit & Global Jobs
+            </button>
             <button onclick="loadFbAlerts()" style="background:#f1f5f9;border:1px solid #e2e8f0;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;color:#334155;">&#128260; Refresh</button>
           </div>
         </div>
@@ -1286,6 +1295,39 @@ Micro-Niche
     </div>
   </div>
 
-  <script src="app.js?v=3.3" charset="UTF-8"></script>
+  <!-- AI Pitch Modal -->
+  <div id="aiPitchModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;backdrop-filter:blur(3px);">
+    <div style="background:#fff;border-radius:12px;width:90%;max-width:560px;box-shadow:0 20px 40px rgba(0,0,0,0.2);overflow:hidden;border:1px solid #e2e8f0;animation:fadeIn 0.2s ease;">
+      <div style="background:linear-gradient(135deg,#7c3aed,#4f46e5);padding:16px 20px;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:20px;">⚡</span>
+          <div>
+            <h3 style="margin:0;font-size:15px;font-weight:800;color:#fff;">1-Click AI Client Pitch Generator</h3>
+            <p style="margin:2px 0 0 0;font-size:11px;opacity:0.85;">Tailored cold proposal ready to copy & send to client</p>
+          </div>
+        </div>
+        <button onclick="closeAiPitchModal()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+      <div style="padding:20px;">
+        <div style="margin-bottom:12px;">
+          <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Your Portfolio URL (optional):</label>
+          <input id="aiPitchPortfolioInput" type="text" placeholder="https://drive.google.com/... or https://youtube.com/..." style="width:100%;box-sizing:border-box;padding:8px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;" />
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Personalized Proposal (AI Generated):</label>
+          <textarea id="aiPitchOutput" rows="9" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-size:12.5px;font-family:inherit;line-height:1.5;resize:vertical;background:#f8fafc;color:#1e293b;"></textarea>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span id="aiPitchCopyStatus" style="font-size:12px;color:#16a34a;font-weight:700;display:none;">✅ Copied to Clipboard!</span>
+          <div style="display:flex;gap:8px;margin-left:auto;">
+            <button onclick="regeneratePitch()" style="padding:8px 14px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;color:#334155;">🔄 Regenerate</button>
+            <button onclick="copyAiPitch()" style="padding:8px 18px;background:#7c3aed;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,0.3);">📋 Copy Pitch</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=3.4" charset="UTF-8"></script>
 </body>
 </html>

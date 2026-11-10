@@ -245,6 +245,11 @@ def init_db():
     except Exception:
         pass
 
+    try:
+        c.execute("ALTER TABLE fb_job_alerts ADD COLUMN platform TEXT DEFAULT 'facebook'")
+    except Exception:
+        pass
+
     # Seed curated Facebook video editing groups automatically
     DEFAULT_GROUPS = [
         # ── USER REQUESTED VIP HIGH PRIORITY GROUPS (Priority 10) ─────
@@ -777,11 +782,19 @@ def toggle_fb_group(group_id: int) -> int:
     conn.close()
     return 0
 
-def get_fb_alerts(limit: int = 1000) -> list:
+def get_fb_alerts(limit: int = 1000, platform: str = None, is_hiring: int = None) -> list:
     conn = get_db()
-    rows = conn.execute("""
-        SELECT * FROM fb_job_alerts ORDER BY id DESC LIMIT ?
-    """, (limit,)).fetchall()
+    query = "SELECT * FROM fb_job_alerts WHERE 1=1"
+    params = []
+    if platform and platform != "all":
+        query += " AND platform = ?"
+        params.append(platform)
+    if is_hiring is not None:
+        query += " AND is_hiring = ?"
+        params.append(is_hiring)
+    query += " ORDER BY id DESC LIMIT ?"
+    params.append(limit)
+    rows = conn.execute(query, params).fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
@@ -854,18 +867,20 @@ def insert_fb_alert(data: dict) -> int:
     c = conn.cursor()
     if "author_url" not in data:
         data["author_url"] = ""
+    if "platform" not in data:
+        data["platform"] = "facebook"
 
     # Generate deterministic post_id if missing or non-deterministic
     pid = data.get("post_id", "")
     content = data.get("content", "")
     post_url = data.get("post_url", "")
-    if not pid or (len(pid) < 5 or not any(pid.startswith(p) for p in ["fb_num_", "fb_url_", "fb_"])):
+    if not pid or (len(pid) < 5 or not any(pid.startswith(p) for p in ["fb_num_", "fb_url_", "fb_", "rd_", "ro_"])):
         pid = generate_fb_post_id(post_url, content)
         data["post_id"] = pid
 
     # Hard de-duplication guard: if seen, return existing ID without duplicate insert
     clean_purl = (post_url or "").split("?")[0].rstrip("/")
-    is_direct = bool(clean_purl and any(x in clean_purl for x in ["/posts/", "/permalink/", "story_fbid="]))
+    is_direct = bool(clean_purl and any(x in clean_purl for x in ["/posts/", "/permalink/", "story_fbid=", "/comments/", "/remote-jobs/"]))
 
     if is_direct:
         existing = c.execute("SELECT id FROM fb_job_alerts WHERE post_url LIKE ?", (f"{clean_purl}%",)).fetchone()
@@ -891,12 +906,12 @@ def insert_fb_alert(data: dict) -> int:
             group_id, group_name, post_id, author_name, author_url, post_url, content, image_url,
             is_hiring, client_name, job_type, budget, contact_phone, contact_email,
             contact_whatsapp, contact_telegram, confidence_score, ai_summary,
-            telegram_sent, telegram_sent_at
+            telegram_sent, telegram_sent_at, platform
         ) VALUES (
             :group_id, :group_name, :post_id, :author_name, :author_url, :post_url, :content, :image_url,
             :is_hiring, :client_name, :job_type, :budget, :contact_phone, :contact_email,
             :contact_whatsapp, :contact_telegram, :confidence_score, :ai_summary,
-            :telegram_sent, :telegram_sent_at
+            :telegram_sent, :telegram_sent_at, :platform
         )
     """, data)
     aid = c.lastrowid

@@ -21,7 +21,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T18:19:20.346824",
     "created_at": "2026-11-05 12:19:20",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 20,
@@ -45,7 +46,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T18:49:23.568052",
     "created_at": "2026-11-05 12:49:23",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 21,
@@ -69,7 +71,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T18:51:19.603639",
     "created_at": "2026-11-05 12:51:19",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 22,
@@ -93,7 +96,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T18:51:55.785983",
     "created_at": "2026-11-05 12:51:55",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 24,
@@ -117,7 +121,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T18:53:52.129488",
     "created_at": "2026-11-05 12:53:52",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 25,
@@ -141,7 +146,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T19:09:36.392631",
     "created_at": "2026-11-05 13:09:36",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 27,
@@ -165,7 +171,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T19:10:50.264090",
     "created_at": "2026-11-05 13:10:50",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 28,
@@ -189,7 +196,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T19:15:30.787314",
     "created_at": "2026-11-05 13:15:30",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 29,
@@ -213,7 +221,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T19:18:32.077337",
     "created_at": "2026-11-05 13:18:32",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 30,
@@ -237,7 +246,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T19:35:14.205354",
     "created_at": "2026-11-05 13:35:14",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 31,
@@ -261,7 +271,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:11:28",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 32,
@@ -285,7 +296,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:11:28",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 34,
@@ -309,7 +321,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:11:28",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 35,
@@ -333,7 +346,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:11:28",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 36,
@@ -357,7 +371,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:11:28",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 37,
@@ -381,7 +396,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:11:38",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 43,
@@ -405,7 +421,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:12:35",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 46,
@@ -429,7 +446,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:13:12",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 48,
@@ -453,7 +471,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:13:30",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 49,
@@ -477,7 +496,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:13:30",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 52,
@@ -501,7 +521,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:14:05",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 53,
@@ -525,7 +546,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:14:05",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 54,
@@ -549,7 +571,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:14:23",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 55,
@@ -573,7 +596,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:14:23",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 56,
@@ -597,7 +621,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:14:41",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 57,
@@ -621,7 +646,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:14:41",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 60,
@@ -645,7 +671,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:15:29",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 61,
@@ -669,7 +696,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:15:29",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 62,
@@ -693,7 +721,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:15:53.823111",
     "created_at": "2026-11-05 14:15:53",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 63,
@@ -717,7 +746,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:16:20",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 67,
@@ -741,7 +771,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:16:57",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 68,
@@ -765,7 +796,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:17:22",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 69,
@@ -789,7 +821,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:17:22",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 70,
@@ -813,7 +846,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:17:40",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 71,
@@ -837,7 +871,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:17:58",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 72,
@@ -861,7 +896,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:17:58",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 75,
@@ -885,7 +921,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:18:39",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 76,
@@ -909,7 +946,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:19:05",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 77,
@@ -933,7 +971,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:19:23",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 78,
@@ -957,7 +996,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:19:42",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 79,
@@ -981,7 +1021,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:19:42",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 82,
@@ -1005,7 +1046,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:20:17",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 89,
@@ -1029,7 +1071,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:21:34",
-    "author_url": null
+    "author_url": null,
+    "platform": "facebook"
   },
   {
     "id": 94,
@@ -1053,7 +1096,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:24:15",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 95,
@@ -1077,7 +1121,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:24:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 97,
@@ -1101,7 +1146,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:24:51",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 98,
@@ -1125,7 +1171,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:25:09",
-    "author_url": "https://www.facebook.com/stories/122093926971093804/UzpfSVNDOjIxODQ0Mzg5ODkwOTMxMTU=/"
+    "author_url": "https://www.facebook.com/stories/122093926971093804/UzpfSVNDOjIxODQ0Mzg5ODkwOTMxMTU=/",
+    "platform": "facebook"
   },
   {
     "id": 100,
@@ -1149,7 +1196,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:25:09",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 103,
@@ -1173,7 +1221,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:25:44",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 104,
@@ -1197,7 +1246,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:25:44",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 105,
@@ -1221,7 +1271,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:25:44",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 106,
@@ -1245,7 +1296,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:26:02",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 107,
@@ -1269,7 +1321,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:26:20",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 109,
@@ -1293,7 +1346,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:26:20",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 110,
@@ -1317,7 +1371,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:26:20",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 111,
@@ -1341,7 +1396,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:26:42",
-    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/"
+    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/",
+    "platform": "facebook"
   },
   {
     "id": 113,
@@ -1365,7 +1421,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:27:00",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 114,
@@ -1389,7 +1446,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:27:00",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 115,
@@ -1413,7 +1471,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:27:00",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 116,
@@ -1437,7 +1496,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:27:26",
-    "author_url": "https://www.facebook.com/stories/122098548572024170/UzpfSVNDOjE1NjIzNjcxOTIzMjQ1MzU=/"
+    "author_url": "https://www.facebook.com/stories/122098548572024170/UzpfSVNDOjE1NjIzNjcxOTIzMjQ1MzU=/",
+    "platform": "facebook"
   },
   {
     "id": 117,
@@ -1461,7 +1521,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:27:26",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 118,
@@ -1485,7 +1546,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:27:44",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 119,
@@ -1509,7 +1571,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:27:44",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 127,
@@ -1533,7 +1596,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:29:25",
-    "author_url": "https://www.facebook.com/stories/122098357646882636/UzpfSVNDOjE1MjY5MjI3NDI2MDU1MDU=/"
+    "author_url": "https://www.facebook.com/stories/122098357646882636/UzpfSVNDOjE1MjY5MjI3NDI2MDU1MDU=/",
+    "platform": "facebook"
   },
   {
     "id": 128,
@@ -1557,7 +1621,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:29:25",
-    "author_url": "https://www.facebook.com/hashtag/allah"
+    "author_url": "https://www.facebook.com/hashtag/allah",
+    "platform": "facebook"
   },
   {
     "id": 129,
@@ -1581,7 +1646,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:29:43",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 131,
@@ -1605,7 +1671,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:30:01",
-    "author_url": "https://www.facebook.com/stories/122106463455494730/UzpfSVNDOjEwMTk1OTI4NTQ1MDIzODE=/"
+    "author_url": "https://www.facebook.com/stories/122106463455494730/UzpfSVNDOjEwMTk1OTI4NTQ1MDIzODE=/",
+    "platform": "facebook"
   },
   {
     "id": 133,
@@ -1629,7 +1696,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:30:18",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 135,
@@ -1653,7 +1721,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:30:36",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 136,
@@ -1677,7 +1746,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:30:55",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 137,
@@ -1701,7 +1771,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:30:55",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 139,
@@ -1725,7 +1796,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:31:30",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 144,
@@ -1749,7 +1821,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:32:07",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 145,
@@ -1773,7 +1846,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:32:07",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 147,
@@ -1797,7 +1871,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:32:43",
-    "author_url": "https://www.facebook.com/stories/1504590226327089/UzpfSVNDOjExNDQxMTc2NjgyNjY4ODE=/"
+    "author_url": "https://www.facebook.com/stories/1504590226327089/UzpfSVNDOjExNDQxMTc2NjgyNjY4ODE=/",
+    "platform": "facebook"
   },
   {
     "id": 148,
@@ -1821,7 +1896,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:33:08",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 149,
@@ -1845,7 +1921,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:33:26",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 150,
@@ -1869,7 +1946,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:33:53",
-    "author_url": "https://www.facebook.com/stories/122097572222414887/UzpfSVNDOjE0NDY1ODcwODc2NTY1ODE=/"
+    "author_url": "https://www.facebook.com/stories/122097572222414887/UzpfSVNDOjE0NDY1ODcwODc2NTY1ODE=/",
+    "platform": "facebook"
   },
   {
     "id": 154,
@@ -1893,7 +1971,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:34:28",
-    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/"
+    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/",
+    "platform": "facebook"
   },
   {
     "id": 155,
@@ -1917,7 +1996,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:34:46",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 156,
@@ -1941,7 +2021,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:34:46",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 157,
@@ -1965,7 +2046,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:35:04",
-    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/"
+    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/",
+    "platform": "facebook"
   },
   {
     "id": 158,
@@ -1989,7 +2071,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:35:23.789761",
     "created_at": "2026-11-05 14:35:23",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 159,
@@ -2013,7 +2096,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:35:24.659791",
     "created_at": "2026-11-05 14:35:24",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 160,
@@ -2037,7 +2121,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:35:24",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 161,
@@ -2061,7 +2146,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:35:42",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 162,
@@ -2085,7 +2171,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:35:42",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 163,
@@ -2109,7 +2196,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:36:00",
-    "author_url": "https://www.facebook.com/stories/1554945587950060/UzpfSVNDOjE4ODkyNjU1ODUzNzU1NjI=/"
+    "author_url": "https://www.facebook.com/stories/1554945587950060/UzpfSVNDOjE4ODkyNjU1ODUzNzU1NjI=/",
+    "platform": "facebook"
   },
   {
     "id": 164,
@@ -2133,7 +2221,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:36:00",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 165,
@@ -2157,7 +2246,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:36:18",
-    "author_url": "https://www.facebook.com/stories/122093039097011628/UzpfSVNDOjk5MTkwNTIwNzMyMTg3Ng==/"
+    "author_url": "https://www.facebook.com/stories/122093039097011628/UzpfSVNDOjk5MTkwNTIwNzMyMTg3Ng==/",
+    "platform": "facebook"
   },
   {
     "id": 166,
@@ -2181,7 +2271,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:36:35",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 171,
@@ -2205,7 +2296,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:37:28",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 173,
@@ -2229,7 +2321,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:37:53",
-    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/"
+    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/",
+    "platform": "facebook"
   },
   {
     "id": 174,
@@ -2253,7 +2346,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:38:12",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 175,
@@ -2277,7 +2371,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:38:12",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 176,
@@ -2301,7 +2396,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:38:29",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 177,
@@ -2325,7 +2421,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:38:48",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 178,
@@ -2349,7 +2446,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:38:48",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 179,
@@ -2373,7 +2471,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:39:23",
-    "author_url": "https://www.facebook.com/stories/102817449490195/UzpfSVNDOjE2ODI5OTYxODY1MDk0Njg=/"
+    "author_url": "https://www.facebook.com/stories/102817449490195/UzpfSVNDOjE2ODI5OTYxODY1MDk0Njg=/",
+    "platform": "facebook"
   },
   {
     "id": 180,
@@ -2397,7 +2496,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:39:23",
-    "author_url": "https://www.facebook.com/hashtag/fyp%E3%82%B7%E3%82%9Aviral%E3%82%B7fyp%E3%82%B7%E3%82%9A"
+    "author_url": "https://www.facebook.com/hashtag/fyp%E3%82%B7%E3%82%9Aviral%E3%82%B7fyp%E3%82%B7%E3%82%9A",
+    "platform": "facebook"
   },
   {
     "id": 181,
@@ -2421,7 +2521,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:39:41",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 182,
@@ -2445,7 +2546,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:40:06.137276",
     "created_at": "2026-11-05 14:40:06",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 183,
@@ -2469,7 +2571,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:40:06",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 184,
@@ -2493,7 +2596,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:40:07.716944",
     "created_at": "2026-11-05 14:40:07",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 185,
@@ -2517,7 +2621,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:40:08.719294",
     "created_at": "2026-11-05 14:40:08",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 186,
@@ -2541,7 +2646,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:40:26",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 187,
@@ -2565,7 +2671,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:40:26",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 188,
@@ -2589,7 +2696,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:40:45",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 192,
@@ -2613,7 +2721,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:41:21",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 195,
@@ -2637,7 +2746,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:41:58.702436",
     "created_at": "2026-11-05 14:41:58",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 196,
@@ -2661,7 +2771,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:42:01.325948",
     "created_at": "2026-11-05 14:42:01",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 201,
@@ -2685,7 +2796,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:44:42",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 204,
@@ -2709,7 +2821,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:49:55",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 210,
@@ -2733,7 +2846,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:51:30",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 211,
@@ -2757,7 +2871,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:51:48",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 212,
@@ -2781,7 +2896,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:51:48",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 213,
@@ -2805,7 +2921,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:52:23",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 214,
@@ -2829,7 +2946,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:52:23",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 215,
@@ -2853,7 +2971,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:53:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 216,
@@ -2877,7 +2996,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:53:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 217,
@@ -2901,7 +3021,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:56:08",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 218,
@@ -2925,7 +3046,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:56:26",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 219,
@@ -2949,7 +3071,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:56:26",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 220,
@@ -2973,7 +3096,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:57:02",
-    "author_url": "https://www.facebook.com/stories/122093926971093804/UzpfSVNDOjIxODQ0Mzg5ODkwOTMxMTU=/"
+    "author_url": "https://www.facebook.com/stories/122093926971093804/UzpfSVNDOjIxODQ0Mzg5ODkwOTMxMTU=/",
+    "platform": "facebook"
   },
   {
     "id": 221,
@@ -2997,7 +3121,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:57:02",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 222,
@@ -3021,7 +3146,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:57:02",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 223,
@@ -3045,7 +3171,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:57:20",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 224,
@@ -3069,7 +3196,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:57:20",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 225,
@@ -3093,7 +3221,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:57:40.707933",
     "created_at": "2026-11-05 14:57:40",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 226,
@@ -3117,7 +3246,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:57:40",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 227,
@@ -3141,7 +3271,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:57:58",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 228,
@@ -3165,7 +3296,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:57:58",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 229,
@@ -3189,7 +3321,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:58:16",
-    "author_url": "https://www.facebook.com/stories/122096239629477485/UzpfSVNDOjExNDUxMTIwNzg0NTMzNTY=/"
+    "author_url": "https://www.facebook.com/stories/122096239629477485/UzpfSVNDOjExNDUxMTIwNzg0NTMzNTY=/",
+    "platform": "facebook"
   },
   {
     "id": 230,
@@ -3213,7 +3346,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:58:16",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 231,
@@ -3237,7 +3371,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:58:33",
-    "author_url": "https://www.facebook.com/stories/122106463455494730/UzpfSVNDOjEwMTk1OTI4NTQ1MDIzODE=/"
+    "author_url": "https://www.facebook.com/stories/122106463455494730/UzpfSVNDOjEwMTk1OTI4NTQ1MDIzODE=/",
+    "platform": "facebook"
   },
   {
     "id": 233,
@@ -3261,7 +3396,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:58:51",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 234,
@@ -3285,7 +3421,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:58:51",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 235,
@@ -3309,7 +3446,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:58:51",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 236,
@@ -3333,7 +3471,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:59:10.036840",
     "created_at": "2026-11-05 14:59:10",
-    "author_url": "https://www.facebook.com/stories/122102037458029786/UzpfSVNDOjE4MjcyMjYwNTUzOTY0ODA=/"
+    "author_url": "https://www.facebook.com/stories/122102037458029786/UzpfSVNDOjE4MjcyMjYwNTUzOTY0ODA=/",
+    "platform": "facebook"
   },
   {
     "id": 237,
@@ -3357,7 +3496,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T20:59:13.401168",
     "created_at": "2026-11-05 14:59:13",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 238,
@@ -3381,7 +3521,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:59:31",
-    "author_url": "https://www.facebook.com/stories/2028783903865422/UzpfSVNDOjQwNjAxMTg1Mzc2MjU0OTg=/"
+    "author_url": "https://www.facebook.com/stories/2028783903865422/UzpfSVNDOjQwNjAxMTg1Mzc2MjU0OTg=/",
+    "platform": "facebook"
   },
   {
     "id": 239,
@@ -3405,7 +3546,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:59:31",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 240,
@@ -3429,7 +3571,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:59:51",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 241,
@@ -3453,7 +3596,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:59:51",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 242,
@@ -3477,7 +3621,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 14:59:51",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 243,
@@ -3501,7 +3646,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:00:27",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 244,
@@ -3525,7 +3671,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:00:27",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 245,
@@ -3549,7 +3696,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:00:27",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 246,
@@ -3573,7 +3721,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:00:45",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 247,
@@ -3597,7 +3746,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:01:08",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 248,
@@ -3621,7 +3771,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:01:08",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 249,
@@ -3645,7 +3796,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:01:26",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 250,
@@ -3669,7 +3821,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:01:26",
-    "author_url": "https://www.facebook.com/hashtag/animation"
+    "author_url": "https://www.facebook.com/hashtag/animation",
+    "platform": "facebook"
   },
   {
     "id": 251,
@@ -3693,7 +3846,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:01:44",
-    "author_url": "https://www.facebook.com/stories/122106463455494730/UzpfSVNDOjEwMTk1OTI4NTQ1MDIzODE=/"
+    "author_url": "https://www.facebook.com/stories/122106463455494730/UzpfSVNDOjEwMTk1OTI4NTQ1MDIzODE=/",
+    "platform": "facebook"
   },
   {
     "id": 252,
@@ -3717,7 +3871,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:02:02",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 253,
@@ -3741,7 +3896,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:02:02",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 254,
@@ -3765,7 +3921,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:02:20",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 255,
@@ -3789,7 +3946,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:02:20",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 256,
@@ -3813,7 +3971,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:02:38",
-    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/"
+    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/",
+    "platform": "facebook"
   },
   {
     "id": 257,
@@ -3837,7 +3996,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:02:38",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 258,
@@ -3861,7 +4021,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:02:56",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 259,
@@ -3885,7 +4046,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:03:14",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 260,
@@ -3909,7 +4071,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:03:14",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 261,
@@ -3933,7 +4096,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:03:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 262,
@@ -3957,7 +4121,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:03:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 263,
@@ -3981,7 +4146,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:03:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 264,
@@ -4005,7 +4171,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:03:52",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 265,
@@ -4029,7 +4196,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:04:10",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 266,
@@ -4053,7 +4221,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:04:28",
-    "author_url": "https://www.facebook.com/stories/1504590226327089/UzpfSVNDOjExNDQxMTc2NjgyNjY4ODE=/"
+    "author_url": "https://www.facebook.com/stories/1504590226327089/UzpfSVNDOjExNDQxMTc2NjgyNjY4ODE=/",
+    "platform": "facebook"
   },
   {
     "id": 267,
@@ -4077,7 +4246,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:04:46",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 268,
@@ -4101,7 +4271,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:05:03",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 269,
@@ -4125,7 +4296,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:05:21",
-    "author_url": "https://www.facebook.com/stories/122097572222414887/UzpfSVNDOjE0NDY1ODcwODc2NTY1ODE=/"
+    "author_url": "https://www.facebook.com/stories/122097572222414887/UzpfSVNDOjE0NDY1ODcwODc2NTY1ODE=/",
+    "platform": "facebook"
   },
   {
     "id": 270,
@@ -4149,7 +4321,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:05:21",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 271,
@@ -4173,7 +4346,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:05:40",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 272,
@@ -4197,7 +4371,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:05:40",
-    "author_url": "https://www.facebook.com/hashtag/videoediting"
+    "author_url": "https://www.facebook.com/hashtag/videoediting",
+    "platform": "facebook"
   },
   {
     "id": 273,
@@ -4221,7 +4396,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:05:58",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 274,
@@ -4245,7 +4421,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:06:15",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 275,
@@ -4269,7 +4446,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:06:15",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 276,
@@ -4293,7 +4471,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:06:33",
-    "author_url": "https://www.facebook.com/stories/1733241896748213/UzpfSVNDOjI5MDEyOTgwMDY5MDg0Nzk=/"
+    "author_url": "https://www.facebook.com/stories/1733241896748213/UzpfSVNDOjI5MDEyOTgwMDY5MDg0Nzk=/",
+    "platform": "facebook"
   },
   {
     "id": 277,
@@ -4317,7 +4496,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T21:06:52.457355",
     "created_at": "2026-11-05 15:06:52",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 278,
@@ -4341,7 +4521,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:06:52",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 279,
@@ -4365,7 +4546,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T21:07:12.379345",
     "created_at": "2026-11-05 15:07:12",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 280,
@@ -4389,7 +4571,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:07:12",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 281,
@@ -4413,7 +4596,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:07:12",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 282,
@@ -4437,7 +4621,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:07:31",
-    "author_url": "https://www.facebook.com/stories/1554945587950060/UzpfSVNDOjE4ODkyNjU1ODUzNzU1NjI=/"
+    "author_url": "https://www.facebook.com/stories/1554945587950060/UzpfSVNDOjE4ODkyNjU1ODUzNzU1NjI=/",
+    "platform": "facebook"
   },
   {
     "id": 283,
@@ -4461,7 +4646,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:07:31",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 284,
@@ -4485,7 +4671,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:07:52",
-    "author_url": "https://www.facebook.com/stories/122093039097011628/UzpfSVNDOjk5MTkwNTIwNzMyMTg3Ng==/"
+    "author_url": "https://www.facebook.com/stories/122093039097011628/UzpfSVNDOjk5MTkwNTIwNzMyMTg3Ng==/",
+    "platform": "facebook"
   },
   {
     "id": 285,
@@ -4509,7 +4696,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:08:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 286,
@@ -4533,7 +4721,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:08:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 287,
@@ -4557,7 +4746,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:08:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 288,
@@ -4581,7 +4771,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:08:53",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 289,
@@ -4605,7 +4796,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:08:53",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 290,
@@ -4629,7 +4821,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:09:11",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 291,
@@ -4653,7 +4846,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:09:11",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 292,
@@ -4677,7 +4871,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:09:37",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 293,
@@ -4701,7 +4896,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:09:37",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 294,
@@ -4725,7 +4921,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:09:54",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 295,
@@ -4749,7 +4946,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:10:23",
-    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/"
+    "author_url": "https://www.facebook.com/stories/122094615764435645/UzpfSVNDOjI3MTgzNzkwODUyNDQ4ODc=/",
+    "platform": "facebook"
   },
   {
     "id": 296,
@@ -4773,7 +4971,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:10:42",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 297,
@@ -4797,7 +4996,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:11:00",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 298,
@@ -4821,7 +5021,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:11:18",
-    "author_url": "https://www.facebook.com/stories/122102037458029786/UzpfSVNDOjE4MjcyMjYwNTUzOTY0ODA=/"
+    "author_url": "https://www.facebook.com/stories/122102037458029786/UzpfSVNDOjE4MjcyMjYwNTUzOTY0ODA=/",
+    "platform": "facebook"
   },
   {
     "id": 299,
@@ -4845,7 +5046,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:11:18",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 300,
@@ -4869,7 +5071,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-05T21:11:43.010433",
     "created_at": "2026-11-05 15:11:43",
-    "author_url": "https://www.facebook.com/stories/122102037458029786/UzpfSVNDOjE4MjcyMjYwNTUzOTY0ODA=/"
+    "author_url": "https://www.facebook.com/stories/122102037458029786/UzpfSVNDOjE4MjcyMjYwNTUzOTY0ODA=/",
+    "platform": "facebook"
   },
   {
     "id": 301,
@@ -4893,7 +5096,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:12:01",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 302,
@@ -4917,7 +5121,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:12:01",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 303,
@@ -4941,7 +5146,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:12:01",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 304,
@@ -4965,7 +5171,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:12:01",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 305,
@@ -4989,7 +5196,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:12:26",
-    "author_url": "https://www.facebook.com/stories/122106463455494730/UzpfSVNDOjEwMTk1OTI4NTQ1MDIzODE=/"
+    "author_url": "https://www.facebook.com/stories/122106463455494730/UzpfSVNDOjEwMTk1OTI4NTQ1MDIzODE=/",
+    "platform": "facebook"
   },
   {
     "id": 306,
@@ -5013,7 +5221,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:12:44",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 307,
@@ -5037,7 +5246,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:13:09",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 308,
@@ -5061,7 +5271,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:13:09",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 309,
@@ -5085,7 +5296,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:13:27",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 310,
@@ -5109,7 +5321,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:13:27",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 311,
@@ -5133,7 +5346,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:13:45",
-    "author_url": "https://www.facebook.com/stories/122106463455494730/UzpfSVNDOjEwMTk1OTI4NTQ1MDIzODE=/"
+    "author_url": "https://www.facebook.com/stories/122106463455494730/UzpfSVNDOjEwMTk1OTI4NTQ1MDIzODE=/",
+    "platform": "facebook"
   },
   {
     "id": 314,
@@ -5157,7 +5371,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:14:21",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 316,
@@ -5181,7 +5396,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:15:14",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 317,
@@ -5205,7 +5421,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:15:14",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 318,
@@ -5229,7 +5446,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:15:14",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 319,
@@ -5253,7 +5471,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:17:02",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 320,
@@ -5277,7 +5496,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-05 15:17:02",
-    "author_url": "https://www.facebook.com/hashtag/saudiarabia"
+    "author_url": "https://www.facebook.com/hashtag/saudiarabia",
+    "platform": "facebook"
   },
   {
     "id": 321,
@@ -5301,7 +5521,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:16:15",
-    "author_url": "https://www.facebook.com/stories/122097688706274987/UzpfSVNDOjE0NjIyMTYzOTI3ODUxNDE=/"
+    "author_url": "https://www.facebook.com/stories/122097688706274987/UzpfSVNDOjE0NjIyMTYzOTI3ODUxNDE=/",
+    "platform": "facebook"
   },
   {
     "id": 322,
@@ -5325,7 +5546,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:16:33",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 324,
@@ -5349,7 +5571,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:16:33",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 325,
@@ -5373,7 +5596,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:16:50",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 329,
@@ -5397,7 +5621,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:17:43",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 330,
@@ -5421,7 +5646,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:17:43",
-    "author_url": "https://www.facebook.com/hashtag/everyonehighlights"
+    "author_url": "https://www.facebook.com/hashtag/everyonehighlights",
+    "platform": "facebook"
   },
   {
     "id": 331,
@@ -5445,7 +5671,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:18:00",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 332,
@@ -5469,7 +5696,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:18:18",
-    "author_url": "https://www.facebook.com/stories/122093097104485035/UzpfSVNDOjQ1MjY1MzQzMDQzMjk1MTM=/"
+    "author_url": "https://www.facebook.com/stories/122093097104485035/UzpfSVNDOjQ1MjY1MzQzMDQzMjk1MTM=/",
+    "platform": "facebook"
   },
   {
     "id": 333,
@@ -5493,7 +5721,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:18:35",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 335,
@@ -5517,7 +5746,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-10T15:18:54.760436",
     "created_at": "2026-11-10 09:18:54",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 338,
@@ -5541,7 +5771,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:19:12",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 339,
@@ -5565,7 +5796,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:19:12",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 340,
@@ -5589,7 +5821,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-10T15:19:30.780319",
     "created_at": "2026-11-10 09:19:30",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 341,
@@ -5613,7 +5846,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-10T15:19:49.007905",
     "created_at": "2026-11-10 09:19:49",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 342,
@@ -5637,7 +5871,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-10T15:19:49.892656",
     "created_at": "2026-11-10 09:19:49",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 343,
@@ -5661,7 +5896,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:19:49",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 348,
@@ -5685,7 +5921,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:21:00",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 349,
@@ -5709,7 +5946,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:21:00",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 350,
@@ -5733,7 +5971,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:21:18",
-    "author_url": "https://www.facebook.com/stories/122106327014773406/UzpfSVNDOjE0NjA1MDIxODI2OTQzNDI=/"
+    "author_url": "https://www.facebook.com/stories/122106327014773406/UzpfSVNDOjE0NjA1MDIxODI2OTQzNDI=/",
+    "platform": "facebook"
   },
   {
     "id": 351,
@@ -5757,7 +5996,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:21:18",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 353,
@@ -5781,7 +6021,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:21:36",
-    "author_url": "https://www.facebook.com/stories/122103824199469764/UzpfSVNDOjI1NDAyODQzOTY0NDkyNjE=/"
+    "author_url": "https://www.facebook.com/stories/122103824199469764/UzpfSVNDOjI1NDAyODQzOTY0NDkyNjE=/",
+    "platform": "facebook"
   },
   {
     "id": 356,
@@ -5805,7 +6046,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:22:11",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 357,
@@ -5829,7 +6071,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:22:11",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 358,
@@ -5853,7 +6096,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:22:28",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 360,
@@ -5877,7 +6121,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:22:46",
-    "author_url": "https://www.facebook.com/stories/1905683049450777/UzpfSVNDOjExNDA1MjkxMjE3MjM3MzE=/"
+    "author_url": "https://www.facebook.com/stories/1905683049450777/UzpfSVNDOjExNDA1MjkxMjE3MjM3MzE=/",
+    "platform": "facebook"
   },
   {
     "id": 366,
@@ -5901,7 +6146,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:23:40",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 367,
@@ -5925,7 +6171,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:23:40",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 368,
@@ -5949,7 +6196,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:23:59",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 370,
@@ -5973,7 +6221,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:23:59",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 376,
@@ -5997,7 +6246,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-10T15:24:55.239256",
     "created_at": "2026-11-10 09:24:55",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 377,
@@ -6021,7 +6271,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:24:55",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 378,
@@ -6045,7 +6296,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:24:55",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 379,
@@ -6069,7 +6321,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:25:13",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 381,
@@ -6093,7 +6346,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:25:31",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 383,
@@ -6117,7 +6371,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:25:49",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 384,
@@ -6141,7 +6396,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:26:06",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 385,
@@ -6165,7 +6421,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:26:06",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 387,
@@ -6189,7 +6446,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:26:24",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 388,
@@ -6213,7 +6471,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:26:41",
-    "author_url": "https://www.facebook.com/stories/102473396036187/UzpfSVNDOjE0NDY2Mzg1NjQzNDQ1Nzc=/"
+    "author_url": "https://www.facebook.com/stories/102473396036187/UzpfSVNDOjE0NDY2Mzg1NjQzNDQ1Nzc=/",
+    "platform": "facebook"
   },
   {
     "id": 389,
@@ -6237,7 +6496,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:26:59",
-    "author_url": "https://www.facebook.com/stories/830355537831201/UzpfSVNDOjE4NjgyNjYzMDg2MzYyNDU=/"
+    "author_url": "https://www.facebook.com/stories/830355537831201/UzpfSVNDOjE4NjgyNjYzMDg2MzYyNDU=/",
+    "platform": "facebook"
   },
   {
     "id": 390,
@@ -6261,7 +6521,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:26:59",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 395,
@@ -6285,7 +6546,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:27:52",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 396,
@@ -6309,7 +6571,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:27:52",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 404,
@@ -6333,7 +6596,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:29:03",
-    "author_url": "https://www.facebook.com/stories/122106327014773406/UzpfSVNDOjE0NjA1MDIxODI2OTQzNDI=/"
+    "author_url": "https://www.facebook.com/stories/122106327014773406/UzpfSVNDOjE0NjA1MDIxODI2OTQzNDI=/",
+    "platform": "facebook"
   },
   {
     "id": 406,
@@ -6357,7 +6621,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:29:20",
-    "author_url": "https://www.facebook.com/stories/122098886415447317/UzpfSVNDOjE4MjQ1MjA5MTUyNjQ3MDg=/"
+    "author_url": "https://www.facebook.com/stories/122098886415447317/UzpfSVNDOjE4MjQ1MjA5MTUyNjQ3MDg=/",
+    "platform": "facebook"
   },
   {
     "id": 407,
@@ -6381,7 +6646,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:29:20",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 408,
@@ -6405,7 +6671,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:29:38",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 411,
@@ -6429,7 +6696,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:30:13",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 413,
@@ -6453,7 +6721,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:30:30",
-    "author_url": "https://www.facebook.com/stories/122106327014773406/UzpfSVNDOjE0NjA1MDIxODI2OTQzNDI=/"
+    "author_url": "https://www.facebook.com/stories/122106327014773406/UzpfSVNDOjE0NjA1MDIxODI2OTQzNDI=/",
+    "platform": "facebook"
   },
   {
     "id": 414,
@@ -6477,7 +6746,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:30:48",
-    "author_url": "https://www.facebook.com/stories/102473396036187/UzpfSVNDOjE0NDY2Mzg1NjQzNDQ1Nzc=/"
+    "author_url": "https://www.facebook.com/stories/102473396036187/UzpfSVNDOjE0NDY2Mzg1NjQzNDQ1Nzc=/",
+    "platform": "facebook"
   },
   {
     "id": 415,
@@ -6501,7 +6771,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:31:05",
-    "author_url": "https://www.facebook.com/stories/102473396036187/UzpfSVNDOjE0NDY2Mzg1NjQzNDQ1Nzc=/"
+    "author_url": "https://www.facebook.com/stories/102473396036187/UzpfSVNDOjE0NDY2Mzg1NjQzNDQ1Nzc=/",
+    "platform": "facebook"
   },
   {
     "id": 419,
@@ -6525,7 +6796,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:31:41",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 420,
@@ -6549,7 +6821,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:31:58",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 421,
@@ -6573,7 +6846,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:31:58",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 422,
@@ -6597,7 +6871,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:32:16",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 423,
@@ -6621,7 +6896,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:32:16",
-    "author_url": "https://www.facebook.com/hashtag/%E0%A4%B0%E0%A4%BE%E0%A4%AF%E0%A4%AA%E0%A5%81%E0%A4%B0"
+    "author_url": "https://www.facebook.com/hashtag/%E0%A4%B0%E0%A4%BE%E0%A4%AF%E0%A4%AA%E0%A5%81%E0%A4%B0",
+    "platform": "facebook"
   },
   {
     "id": 427,
@@ -6645,7 +6921,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:33:09",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 428,
@@ -6669,7 +6946,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:33:45",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 429,
@@ -6693,7 +6971,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:33:45",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 430,
@@ -6717,7 +6996,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:33:45",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 431,
@@ -6741,7 +7021,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:35:28",
-    "author_url": "https://www.facebook.com/stories/122094356481523403/UzpfSVNDOjE1MDU2MTU3ODgxNzgzNTA=/"
+    "author_url": "https://www.facebook.com/stories/122094356481523403/UzpfSVNDOjE1MDU2MTU3ODgxNzgzNTA=/",
+    "platform": "facebook"
   },
   {
     "id": 432,
@@ -6765,7 +7046,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:35:28",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 434,
@@ -6789,7 +7071,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:40:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 435,
@@ -6813,7 +7096,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:40:34",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 436,
@@ -6837,7 +7121,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:40:52",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 437,
@@ -6861,7 +7146,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:40:52",
-    "author_url": "https://www.facebook.com/hashtag/johnsummit"
+    "author_url": "https://www.facebook.com/hashtag/johnsummit",
+    "platform": "facebook"
   },
   {
     "id": 438,
@@ -6885,7 +7171,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:41:10",
-    "author_url": "https://www.facebook.com/stories/1321978361247587/UzpfSVNDOjk5NTM3MTQ4Njk0NzI5Nw==/"
+    "author_url": "https://www.facebook.com/stories/1321978361247587/UzpfSVNDOjk5NTM3MTQ4Njk0NzI5Nw==/",
+    "platform": "facebook"
   },
   {
     "id": 439,
@@ -6909,7 +7196,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:41:10",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 440,
@@ -6933,7 +7221,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:41:56",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 441,
@@ -6957,7 +7246,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:42:14",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 442,
@@ -6981,7 +7271,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:42:14",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 444,
@@ -7005,7 +7296,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:42:31",
-    "author_url": "https://www.facebook.com/ekla.pothik.3348/videos/1481647563858151/"
+    "author_url": "https://www.facebook.com/ekla.pothik.3348/videos/1481647563858151/",
+    "platform": "facebook"
   },
   {
     "id": 445,
@@ -7029,7 +7321,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:42:49",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 447,
@@ -7053,7 +7346,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:43:07",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 448,
@@ -7077,7 +7371,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:43:25",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 450,
@@ -7101,7 +7396,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:43:42",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 451,
@@ -7125,7 +7421,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:44:00",
-    "author_url": "https://l.facebook.com/l.php"
+    "author_url": "https://l.facebook.com/l.php",
+    "platform": "facebook"
   },
   {
     "id": 452,
@@ -7149,7 +7446,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:44:17",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 453,
@@ -7173,7 +7471,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:44:36",
-    "author_url": "https://www.facebook.com/61582947446955/videos/1834605271216417/"
+    "author_url": "https://www.facebook.com/61582947446955/videos/1834605271216417/",
+    "platform": "facebook"
   },
   {
     "id": 457,
@@ -7197,7 +7496,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:44:53",
-    "author_url": "https://www.facebook.com/reel/2219623355266635/"
+    "author_url": "https://www.facebook.com/reel/2219623355266635/",
+    "platform": "facebook"
   },
   {
     "id": 458,
@@ -7221,7 +7521,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:44:53",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 459,
@@ -7245,7 +7546,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:45:11",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 460,
@@ -7269,7 +7571,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:45:11",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 461,
@@ -7293,7 +7596,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:45:28",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 462,
@@ -7317,7 +7621,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-10T15:45:29.524827",
     "created_at": "2026-11-10 09:45:29",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 465,
@@ -7341,7 +7646,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:46:05",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 468,
@@ -7365,7 +7671,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:46:22",
-    "author_url": "https://l.facebook.com/l.php"
+    "author_url": "https://l.facebook.com/l.php",
+    "platform": "facebook"
   },
   {
     "id": 469,
@@ -7389,7 +7696,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:46:40",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 470,
@@ -7413,7 +7721,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:46:58",
-    "author_url": "https://www.facebook.com/reel/2219623355266635/"
+    "author_url": "https://www.facebook.com/reel/2219623355266635/",
+    "platform": "facebook"
   },
   {
     "id": 471,
@@ -7437,7 +7746,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:47:16",
-    "author_url": "https://www.facebook.com/toxic.rakeshhh.01/videos/1652219443239272/"
+    "author_url": "https://www.facebook.com/toxic.rakeshhh.01/videos/1652219443239272/",
+    "platform": "facebook"
   },
   {
     "id": 472,
@@ -7461,7 +7771,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:47:33",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 473,
@@ -7485,7 +7796,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:47:33",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 474,
@@ -7509,7 +7821,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:47:51",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 475,
@@ -7533,7 +7846,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:48:09",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 476,
@@ -7557,7 +7871,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:48:09",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 477,
@@ -7581,7 +7896,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:48:26",
-    "author_url": "https://www.facebook.com/100013782421384/videos/2119198632106632/"
+    "author_url": "https://www.facebook.com/100013782421384/videos/2119198632106632/",
+    "platform": "facebook"
   },
   {
     "id": 478,
@@ -7605,7 +7921,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:48:44",
-    "author_url": "https://www.facebook.com/reel/1094153223247342/"
+    "author_url": "https://www.facebook.com/reel/1094153223247342/",
+    "platform": "facebook"
   },
   {
     "id": 479,
@@ -7629,7 +7946,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:48:44",
-    "author_url": "https://l.facebook.com/l.php"
+    "author_url": "https://l.facebook.com/l.php",
+    "platform": "facebook"
   },
   {
     "id": 480,
@@ -7653,7 +7971,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:49:03",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 481,
@@ -7677,7 +7996,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:49:03",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 483,
@@ -7701,7 +8021,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:49:20",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 484,
@@ -7725,7 +8046,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:49:38",
-    "author_url": "https://www.facebook.com/61581972076889/videos/1173424445032114/"
+    "author_url": "https://www.facebook.com/61581972076889/videos/1173424445032114/",
+    "platform": "facebook"
   },
   {
     "id": 485,
@@ -7749,7 +8071,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:49:38",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 488,
@@ -7773,7 +8096,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:49:56",
-    "author_url": "https://www.facebook.com/shuvo.sarkar.935874/videos/1143274808169468/"
+    "author_url": "https://www.facebook.com/shuvo.sarkar.935874/videos/1143274808169468/",
+    "platform": "facebook"
   },
   {
     "id": 489,
@@ -7797,7 +8121,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:49:56",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 490,
@@ -7821,7 +8146,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:50:14",
-    "author_url": "https://www.facebook.com/reel/1007537731637524/"
+    "author_url": "https://www.facebook.com/reel/1007537731637524/",
+    "platform": "facebook"
   },
   {
     "id": 491,
@@ -7845,7 +8171,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:50:14",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 492,
@@ -7869,7 +8196,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-10T15:50:32.619789",
     "created_at": "2026-11-10 09:50:32",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 495,
@@ -7893,7 +8221,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:50:50",
-    "author_url": "https://www.facebook.com/reel/2826154414444918/"
+    "author_url": "https://www.facebook.com/reel/2826154414444918/",
+    "platform": "facebook"
   },
   {
     "id": 496,
@@ -7917,7 +8246,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:50:50",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 497,
@@ -7941,7 +8271,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:51:08",
-    "author_url": "https://www.facebook.com/reel/1468177925257543/"
+    "author_url": "https://www.facebook.com/reel/1468177925257543/",
+    "platform": "facebook"
   },
   {
     "id": 498,
@@ -7965,7 +8296,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:51:08",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 499,
@@ -7989,7 +8321,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:51:26",
-    "author_url": "https://www.facebook.com/mdraiansodrer/videos/1269933388669886/"
+    "author_url": "https://www.facebook.com/mdraiansodrer/videos/1269933388669886/",
+    "platform": "facebook"
   },
   {
     "id": 500,
@@ -8013,7 +8346,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:51:44",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 503,
@@ -8037,7 +8371,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:52:01",
-    "author_url": "https://www.facebook.com/reel/2563793074116320/"
+    "author_url": "https://www.facebook.com/reel/2563793074116320/",
+    "platform": "facebook"
   },
   {
     "id": 504,
@@ -8061,7 +8396,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:52:01",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 505,
@@ -8085,7 +8421,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-10T15:52:20.511764",
     "created_at": "2026-11-10 09:52:20",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 507,
@@ -8109,7 +8446,8 @@
     "telegram_sent": 1,
     "telegram_sent_at": "2026-11-10T15:52:39.242296",
     "created_at": "2026-11-10 09:52:39",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 508,
@@ -8133,7 +8471,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:52:56",
-    "author_url": "https://www.facebook.com/61592216086171/videos/1828333285172450/"
+    "author_url": "https://www.facebook.com/61592216086171/videos/1828333285172450/",
+    "platform": "facebook"
   },
   {
     "id": 509,
@@ -8157,7 +8496,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:53:15",
-    "author_url": "https://www.facebook.com/mohammad.ali.383618/videos/1657575002493496/"
+    "author_url": "https://www.facebook.com/mohammad.ali.383618/videos/1657575002493496/",
+    "platform": "facebook"
   },
   {
     "id": 510,
@@ -8181,7 +8521,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:53:15",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 512,
@@ -8205,7 +8546,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:53:33",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 514,
@@ -8229,7 +8571,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:53:50",
-    "author_url": "https://www.facebook.com/mohammadmamunyt/videos/1443303247232783/"
+    "author_url": "https://www.facebook.com/mohammadmamunyt/videos/1443303247232783/",
+    "platform": "facebook"
   },
   {
     "id": 515,
@@ -8253,7 +8596,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:54:09",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 517,
@@ -8277,7 +8621,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:54:28",
-    "author_url": "https://www.facebook.com/alisahab999/videos/2280185062543805/"
+    "author_url": "https://www.facebook.com/alisahab999/videos/2280185062543805/",
+    "platform": "facebook"
   },
   {
     "id": 518,
@@ -8301,7 +8646,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:54:28",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 521,
@@ -8325,7 +8671,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:54:46",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 522,
@@ -8349,7 +8696,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:54:46",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 523,
@@ -8373,7 +8721,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:55:03",
-    "author_url": "https://www.facebook.com/reel/1657641609401499/"
+    "author_url": "https://www.facebook.com/reel/1657641609401499/",
+    "platform": "facebook"
   },
   {
     "id": 524,
@@ -8397,7 +8746,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:55:03",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 525,
@@ -8421,7 +8771,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:55:22",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 527,
@@ -8445,7 +8796,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:55:42",
-    "author_url": "https://www.facebook.com/reel/1389798986325765/"
+    "author_url": "https://www.facebook.com/reel/1389798986325765/",
+    "platform": "facebook"
   },
   {
     "id": 529,
@@ -8469,7 +8821,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:56:00",
-    "author_url": "https://www.facebook.com/USA-326303010812292/"
+    "author_url": "https://www.facebook.com/USA-326303010812292/",
+    "platform": "facebook"
   },
   {
     "id": 530,
@@ -8493,7 +8846,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:56:00",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 531,
@@ -8517,7 +8871,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:56:18",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 532,
@@ -8541,7 +8896,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:56:18",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 533,
@@ -8565,7 +8921,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:56:18",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 534,
@@ -8589,7 +8946,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:56:36",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 536,
@@ -8613,7 +8971,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:56:54",
-    "author_url": "https://www.facebook.com/61595656787608/videos/1676183530730609/"
+    "author_url": "https://www.facebook.com/61595656787608/videos/1676183530730609/",
+    "platform": "facebook"
   },
   {
     "id": 537,
@@ -8637,7 +8996,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:56:54",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 538,
@@ -8661,7 +9021,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:57:12",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 539,
@@ -8685,7 +9046,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:57:12",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 541,
@@ -8709,7 +9071,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:57:30",
-    "author_url": "https://www.facebook.com/reel/1468177925257543/"
+    "author_url": "https://www.facebook.com/reel/1468177925257543/",
+    "platform": "facebook"
   },
   {
     "id": 542,
@@ -8733,7 +9096,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:57:48",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 543,
@@ -8757,7 +9121,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:57:48",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 544,
@@ -8781,7 +9146,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:58:05",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 545,
@@ -8805,7 +9171,8 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:58:23",
-    "author_url": ""
+    "author_url": "",
+    "platform": "facebook"
   },
   {
     "id": 547,
@@ -8829,6 +9196,557 @@
     "telegram_sent": 0,
     "telegram_sent_at": null,
     "created_at": "2026-11-10 09:58:41",
-    "author_url": "https://www.facebook.com/61595528773374/videos/1806186420428092/"
+    "author_url": "https://www.facebook.com/61595528773374/videos/1806186420428092/",
+    "platform": "facebook"
+  },
+  {
+    "id": 548,
+    "group_id": null,
+    "group_name": "r/CreatorServices",
+    "post_id": "fb_9351b4174ae2b9d2",
+    "author_name": "Remyartt",
+    "post_url": "https://www.reddit.com/r/CreatorServices/comments/1xsm7kl/hello_im_remy_ive_been_making_yt_thumbnail/",
+    "content": "Hello! I'm Remy, I've been making YT thumbnail illustrations for different Youtubers for quite some time, among other works, I can adapt to different styles, but always trying to add an original and fresh touch of human work (no AI here). I'm available for work. Thanks for reading!",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "Remyartt",
+    "job_type": "YouTube Long-form",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "Hello! I'm Remy, I've been making YT thumbnail illustrations for different Youtubers for quite some time, among other works, I can adapt to different styles, but always trying to add an original and fresh touch of human ...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/Remyartt",
+    "platform": "reddit"
+  },
+  {
+    "id": 549,
+    "group_id": null,
+    "group_name": "r/CreatorServices",
+    "post_id": "fb_72eaa333e148beca",
+    "author_name": "Fun_Ad_4126",
+    "post_url": "https://www.reddit.com/r/CreatorServices/comments/1xskeme/looking_for_a_ukbased_video_editor_for_shortform/",
+    "content": "Looking for a UK-based video editor for short-form content, primarily YouTube and Instagram",
+    "image_url": "",
+    "is_hiring": 1,
+    "client_name": "Fun_Ad_4126",
+    "job_type": "Shorts / Reels / TikTok",
+    "budget": "Negotiable",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 95,
+    "ai_summary": "Looking for a UK-based video editor for short-form content, primarily YouTube and Instagram...",
+    "telegram_sent": 1,
+    "telegram_sent_at": "2026-11-10T19:21:35.838773",
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/Fun_Ad_4126",
+    "platform": "reddit"
+  },
+  {
+    "id": 550,
+    "group_id": null,
+    "group_name": "r/CreatorServices",
+    "post_id": "fb_5aa778ee7b69ccbd",
+    "author_name": "Agitated_Ad619",
+    "post_url": "https://www.reddit.com/r/CreatorServices/comments/1xske7q/sound_engineer_offering_free_audio_cleanup_for_a/",
+    "content": "Sound engineer offering free audio cleanup for a few small YouTube channels\n\nHi ! I'm a professional sound engineer (10+ years in music and audio, mixing and post-production) and I'm building a portfolio for video audio work.",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "Agitated_Ad619",
+    "job_type": "YouTube Long-form",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "Sound engineer offering free audio cleanup for a few small YouTube channels\n\nHi ! I'm a professional sound engineer (10+ years in music and audio, mixing and post-production) and I'm building a portfolio for video audio ...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/Agitated_Ad619",
+    "platform": "reddit"
+  },
+  {
+    "id": 551,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_440b3d597af6a7c8",
+    "author_name": "rmxttmgg",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xsmpnb/for_hire_build_smart_scalable_secure_solutions/",
+    "content": "[for hire] Build Smart, Scalable, Secure Solutions with me. Web Developer available For Hire. Front-end/Back-end Development\n\nRemote Services Provider. (15+ Years Freelance Experience, 5 Years in /r). Custom solutions/all sorts of digital products for Websites, Shopping Carts, Web/Mobile Apps (IOS/Android), Desktop Apps, Web3, Web APIs, AI, Automations, Software/Power Tools. I've been hands-on since Web 1.5, I combine OG disciplines with modern software engineering to deliver solutions that bring the best of both worlds.",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "rmxttmgg",
+    "job_type": "Shorts / Reels / TikTok",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[for hire] Build Smart, Scalable, Secure Solutions with me. Web Developer available For Hire. Front-end/Back-end Development\n\nRemote Services Provider. (15+ Years Freelance Experience, 5 Years in /r). Custom solutions/al...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/rmxttmgg",
+    "platform": "reddit"
+  },
+  {
+    "id": 552,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_0931857b36b6f87a",
+    "author_name": "marshruto",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xslovx/for_hire_im_a_web_developer_wordpress_woocommerce/",
+    "content": "[FOR HIRE] I'm a Web Developer - WordPress, WooCommerce, Shopify - $20/hr\n\nHi, I’m a web developer with 7+ years of experience helping businesses build, improve, and maintain high-performing websites and eCommerce stores. I specialize in WordPress, WooCommerce, Shopify, and X-Cart development, helping businesses launch new websites, improve existing stores, and optimize their online presence.",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "marshruto",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[FOR HIRE] I'm a Web Developer - WordPress, WooCommerce, Shopify - $20/hr\n\nHi, I’m a web developer with 7+ years of experience helping businesses build, improve, and maintain high-performing websites and eCommerce stores...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/marshruto",
+    "platform": "reddit"
+  },
+  {
+    "id": 553,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_7028be322fed77dc",
+    "author_name": "Protocol-3000",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xsjl3o/for_hire_offering_mobile_app_development_services/",
+    "content": "[For Hire] Offering Mobile App Development Services – Fast & Reliable",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "Protocol-3000",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[For Hire] Offering Mobile App Development Services – Fast & Reliable...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/Protocol-3000",
+    "platform": "reddit"
+  },
+  {
+    "id": 554,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_cc7c00209796d963",
+    "author_name": "mavensank",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xsi508/for_hire_php_js_developer_experienced_in_laravel/",
+    "content": "[for hire] PHP / JS developer experienced in Laravel, React, Vue, Wordpress, Next.js, 35/h",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "mavensank",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[for hire] PHP / JS developer experienced in Laravel, React, Vue, Wordpress, Next.js, 35/h...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/mavensank",
+    "platform": "reddit"
+  },
+  {
+    "id": 555,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_c0e69d39cd5aec6d",
+    "author_name": "Organic_Badger6600",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xsfw4x/hiring_data_annotation_and_promptquality/",
+    "content": "[Hiring] Data annotation and prompt-quality contractors — Remote (US) — $35/hr\n\nWe're building annotation capacity for an ongoing AI training pipeline and adding",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "Organic_Badger6600",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[Hiring] Data annotation and prompt-quality contractors — Remote (US) — $35/hr\n\nWe're building annotation capacity for an ongoing AI training pipeline and adding...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/Organic_Badger6600",
+    "platform": "reddit"
+  },
+  {
+    "id": 556,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_6ecbaac125fd4e1d",
+    "author_name": "Dev_Monarch",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xsfpyp/hiring_thoughtworks_11_openings_india/",
+    "content": "[Hiring] Thoughtworks | 11 Openings | India 🇮🇳\n\nHi everyone! I'm a Senior Consultant at Thoughtworks and can refer suitable candidates.",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "Dev_Monarch",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[Hiring] Thoughtworks | 11 Openings | India 🇮🇳\n\nHi everyone! I'm a Senior Consultant at Thoughtworks and can refer suitable candidates....",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/Dev_Monarch",
+    "platform": "reddit"
+  },
+  {
+    "id": 557,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_9910294b96117c5f",
+    "author_name": "DimensionFit1218",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xsfb4p/for_hire_available_for_freelance_work_websites/",
+    "content": "[For Hire] Available for Freelance Work | Websites, Mobile Apps, Editing, Tech Projects & More!",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "DimensionFit1218",
+    "job_type": "Shorts / Reels / TikTok",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[For Hire] Available for Freelance Work | Websites, Mobile Apps, Editing, Tech Projects & More!...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/DimensionFit1218",
+    "platform": "reddit"
+  },
+  {
+    "id": 558,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_0d83ff7fb68f9289",
+    "author_name": "Present_Excitement54",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xscdzn/for_hire_shopify_product_listing_specialist_10/",
+    "content": "[For Hire] Shopify Product Listing Specialist | 10 Listings for $35 | 24-Hour Delivery",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "Present_Excitement54",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[For Hire] Shopify Product Listing Specialist | 10 Listings for $35 | 24-Hour Delivery...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/Present_Excitement54",
+    "platform": "reddit"
+  },
+  {
+    "id": 559,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_f1e35c4ad130752c",
+    "author_name": "4procrast1nator",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xsbeeu/for_hire_experienced_godot_gamedev_codinggame/",
+    "content": "[For Hire] Experienced Godot Gamedev (Coding/Game Design/Tech Art)",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "4procrast1nator",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[For Hire] Experienced Godot Gamedev (Coding/Game Design/Tech Art)...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/4procrast1nator",
+    "platform": "reddit"
+  },
+  {
+    "id": 560,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_9a4d6168a7a17594",
+    "author_name": "Purple-Ferret1152",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xsafzp/hiring_200usdmonth_remote_content_board_designer/",
+    "content": "[HIRING] $200USD/month, remote Content Board Designer for health + biology YT Channel",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "Purple-Ferret1152",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[HIRING] $200USD/month, remote Content Board Designer for health + biology YT Channel...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/Purple-Ferret1152",
+    "platform": "reddit"
+  },
+  {
+    "id": 561,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_ea68117cbc507883",
+    "author_name": "skronch_",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xs9y7e/for_hire_stylized_3d_character_artist_modeling/",
+    "content": "[FOR HIRE] Stylized 3D Character Artist | Modeling, Rigging, and Texturing\n\nI specialize in stylized 3D characters and can help with projects ranging from custom sculpts to game-ready assets.",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "skronch_",
+    "job_type": "Video Editor",
+    "budget": "Negotiable (USD)",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[FOR HIRE] Stylized 3D Character Artist | Modeling, Rigging, and Texturing\n\nI specialize in stylized 3D characters and can help with projects ranging from custom sculpts to game-ready assets....",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/skronch_",
+    "platform": "reddit"
+  },
+  {
+    "id": 562,
+    "group_id": null,
+    "group_name": "r/forhire",
+    "post_id": "fb_be9b0444fa80d9b3",
+    "author_name": "Salt_Run7996",
+    "post_url": "https://www.reddit.com/r/forhire/comments/1xs907c/for_hire_senior_flutter_fullstack_architect/",
+    "content": "[For Hire] Senior Flutter & Full-Stack Architect | Mobile Apps Engineer, Backend Systems & AI Integrations (shoua.dev)\n\nAre you looking for a reliable technical partner to build your mobile application from the ground up, or need a senior hand to scale your current product?",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "Salt_Run7996",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[For Hire] Senior Flutter & Full-Stack Architect | Mobile Apps Engineer, Backend Systems & AI Integrations (shoua.dev)\n\nAre you looking for a reliable technical partner to build your mobile application from the ground up...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/Salt_Run7996",
+    "platform": "reddit"
+  },
+  {
+    "id": 563,
+    "group_id": null,
+    "group_name": "r/VideoEditing",
+    "post_id": "fb_eece038087fd4921",
+    "author_name": "greenysmac",
+    "post_url": "https://www.reddit.com/r/VideoEditing/comments/1usr573/welcome_to_rvideoediting/",
+    "content": "Welcome to r/VideoEditing",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "greenysmac",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "Welcome to r/VideoEditing...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/greenysmac",
+    "platform": "reddit"
+  },
+  {
+    "id": 564,
+    "group_id": null,
+    "group_name": "r/VideoEditing",
+    "post_id": "fb_c973f552d63339c7",
+    "author_name": "RedNode_Studio",
+    "post_url": "https://www.reddit.com/r/VideoEditing/comments/1xsexmq/tutorial_davinci_resolve_turn_any_image_into_a_3d/",
+    "content": "[Tutorial - DaVinci Resolve] Turn Any Image into a 3D Model and How to Use It in DaVinci Resolve",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "RedNode_Studio",
+    "job_type": "Video Editor",
+    "budget": "Negotiable (USD)",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "[Tutorial - DaVinci Resolve] Turn Any Image into a 3D Model and How to Use It in DaVinci Resolve...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/RedNode_Studio",
+    "platform": "reddit"
+  },
+  {
+    "id": 565,
+    "group_id": null,
+    "group_name": "r/VideoEditing",
+    "post_id": "fb_8fdc454f695c4f42",
+    "author_name": "boi_was_taken",
+    "post_url": "https://www.reddit.com/r/VideoEditing/comments/1xqn60p/how_to_make_it_look_like_im_in_a_video_game/",
+    "content": "How to make it look like im in a video game through colour correction?",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "boi_was_taken",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "How to make it look like im in a video game through colour correction?...",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/boi_was_taken",
+    "platform": "reddit"
+  },
+  {
+    "id": 566,
+    "group_id": null,
+    "group_name": "r/VideoEditing",
+    "post_id": "fb_af65baeba77c165c",
+    "author_name": "greenysmac",
+    "post_url": "https://www.reddit.com/r/VideoEditing/comments/1xqfg0t/did_you_know_you_can_help_this_community_directly/",
+    "content": "Did you know you can help this community directly? A cool tip\n\nWe've seen an uptick in people gatekeeping in this community, often being not decent humans.",
+    "image_url": "",
+    "is_hiring": 0,
+    "client_name": "greenysmac",
+    "job_type": "General Video Editing",
+    "budget": "Not specified",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 20,
+    "ai_summary": "Did you know you can help this community directly? A cool tip\n\nWe've seen an uptick in people gatekeeping in this community, often being not decent humans....",
+    "telegram_sent": 0,
+    "telegram_sent_at": null,
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://www.reddit.com/user/greenysmac",
+    "platform": "reddit"
+  },
+  {
+    "id": 567,
+    "group_id": null,
+    "group_name": "RemoteOK: Benzinga",
+    "post_id": "fb_9fbb837e1d0e41b0",
+    "author_name": "Benzinga",
+    "post_url": "https://remoteOK.com/remote-jobs/remote-ai-engineer-data-apis-benzinga-1137224",
+    "content": "AI Engineer Data APIs at Benzinga\nTags: golang, video, engineer\n\nRemote - Before you read further: applying to this role requires a Loom video walkthrough under 5 minutes of the best thing you have built, plus a repo or live link. Tell us the hardest problem you hit and how you solved it. Focus on architecture decisions and tradeoffs, not a f...  Please mention the word **CHARMINGLY** and tag RMTAzLjIxNC4yMDEuMTY4 when applying to show you read the job post completely (#RMTAzLjIxNC4yMDEuMTY4). This is a beta feature to avoid spam applicants. Companies can search these words to find applicants that read this and see they're human.",
+    "image_url": "",
+    "is_hiring": 1,
+    "client_name": "Benzinga",
+    "job_type": "General Video Editing",
+    "budget": "Negotiable (USD)",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 95,
+    "ai_summary": "AI Engineer Data APIs at Benzinga\nTags: golang, video, engineer\n\nRemote - Before you read further: applying to this role requires a Loom video walkthrough under 5 minutes of the best thing you have built, plus a repo or ...",
+    "telegram_sent": 1,
+    "telegram_sent_at": "2026-11-10T19:21:36.757457",
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://remoteok.com/company/benzinga",
+    "platform": "remoteok"
+  },
+  {
+    "id": 568,
+    "group_id": null,
+    "group_name": "RemoteOK: Control Shift Video",
+    "post_id": "fb_0b0c6c442c1d3c57",
+    "author_name": "Control Shift Video",
+    "post_url": "https://remoteOK.com/remote-jobs/remote-freelance-designer-control-shift-video-1136213",
+    "content": "Freelance Designer at Control Shift Video\nTags: exec, design, architecture, recruiter, customer support, marketing, content writing, ops, golang, full time, digital nomad, dev, senior, medical, engineer, infosec, react, embedded, technical, finance, cloud, postgres, typescript, ruby, stats, accounting, designer, web dev, video, ads\n\nJob Description And Requirements    Project-based | Remote | United States | Contract  Pay based on freelancer's rate   Control Shift Video is looking for a  freelance designer  to collaborate with our creative team on project-based work across video, motion graphics, web visuals, and brand content. Our projects span technology, healthcare, energy, consumer brands, nonprofits, and passion projects.     What Youâll Do     Design visual systems, frames, and assets for video and motion projects  Support branding, layout, and visual storytelling needs  Translate concepts into clean, purposeful",
+    "image_url": "",
+    "is_hiring": 1,
+    "client_name": "Control Shift Video",
+    "job_type": "Shorts / Reels / TikTok",
+    "budget": "Negotiable (USD)",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 95,
+    "ai_summary": "Freelance Designer at Control Shift Video\nTags: exec, design, architecture, recruiter, customer support, marketing, content writing, ops, golang, full time, digital nomad, dev, senior, medical, engineer, infosec, react, ...",
+    "telegram_sent": 1,
+    "telegram_sent_at": "2026-11-10T19:21:37.582143",
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://remoteok.com/company/control-shift-video",
+    "platform": "remoteok"
+  },
+  {
+    "id": 569,
+    "group_id": null,
+    "group_name": "RemoteOK: Bored Panda",
+    "post_id": "fb_9f49e4bd79ef65ad",
+    "author_name": "Bored Panda",
+    "post_url": "https://remoteOK.com/remote-jobs/remote-voice-over-artist-bored-panda-1135765",
+    "content": "Voice Over Artist at Bored Panda\nTags: dev, speech, finance, exec, ops, golang, digital nomad, illustrator, customer support, video, content writing\n\nWe are one of the leading tech-driven media and entertainment companies, producing uplifting content in 17 languages for audiences of all ages. Known for the award-winning digital publisher boredpanda.com and the Crafty Panda DIY channel, we fight the worldâs boredom at scale - reaching 160 million site views per month and 62 billion video views per year. Our team consists of around 350 creative professionals from 36 countries, with 2 offices in Vilnius, Lithuania.  Spike, the global animated series, is searching for talented voice actors to bring its characters to life! Our YouTube channel",
+    "image_url": "",
+    "is_hiring": 1,
+    "client_name": "Bored Panda",
+    "job_type": "YouTube Long-form",
+    "budget": "Negotiable (USD)",
+    "contact_phone": "",
+    "contact_email": "",
+    "contact_whatsapp": "",
+    "contact_telegram": "",
+    "confidence_score": 95,
+    "ai_summary": "Voice Over Artist at Bored Panda\nTags: dev, speech, finance, exec, ops, golang, digital nomad, illustrator, customer support, video, content writing\n\nWe are one of the leading tech-driven media and entertainment companie...",
+    "telegram_sent": 1,
+    "telegram_sent_at": "2026-11-10T19:21:38.413851",
+    "created_at": "2026-11-10 13:22:38",
+    "author_url": "https://remoteok.com/company/bored-panda",
+    "platform": "remoteok"
   }
 ]

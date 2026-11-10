@@ -1657,6 +1657,7 @@ let FB_ALERTS_STATE = [];
 let SELECTED_FB_GROUP_ID = null;
 let SELECTED_FB_GROUP_NAME = '';
 let FB_POST_TYPE_FILTER = 'all'; // 'all' (All Posts), 'hiring' (Hiring Only)
+let FB_PLATFORM_FILTER = 'all';   // 'all', 'facebook', 'reddit', 'remoteok'
 let FB_TIME_FILTER = 'all';      // 'all', '15m', '1h', '3h', '24h'
 let FB_SORT_ORDER = 'newest';    // 'newest' (1m -> 2m -> 1h), 'oldest'
 
@@ -1734,9 +1735,11 @@ function clearSelectedFbGroup() {
 
 function onFbFilterChange() {
   const typeSelect = document.getElementById('fbPostTypeFilter');
+  const platSelect = document.getElementById('fbPlatformFilterSelect');
   const timeSelect = document.getElementById('fbTimeFilterSelect');
   const sortSelect = document.getElementById('fbSortSelect');
   if (typeSelect) FB_POST_TYPE_FILTER = typeSelect.value;
+  if (platSelect) FB_PLATFORM_FILTER = platSelect.value;
   if (timeSelect) FB_TIME_FILTER = timeSelect.value;
   if (sortSelect) FB_SORT_ORDER = sortSelect.value;
   renderFbAlertsList();
@@ -1936,6 +1939,11 @@ function renderFbAlertsList() {
     if (banner) banner.style.display = 'none';
   }
 
+  // 1b. Filter by Platform (Facebook vs Reddit vs RemoteOK)
+  if (FB_PLATFORM_FILTER !== 'all') {
+    filtered = filtered.filter(a => (a.platform || 'facebook') === FB_PLATFORM_FILTER);
+  }
+
   // 2. Filter by Post Type (All Posts vs Hiring Only)
   if (FB_POST_TYPE_FILTER === 'hiring') {
     filtered = filtered.filter(a => a.is_hiring === 1);
@@ -1982,9 +1990,17 @@ function renderFbAlertsList() {
     const ageMins = getPostAgeInMinutes(a);
     const ageLabel = formatPostAgeLabel(ageMins);
     const isHiring = a.is_hiring === 1;
+    const plat = (a.platform || 'facebook').toLowerCase();
+    let platBadge = `<span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">🔵 FB</span>`;
+    if (plat === 'reddit') {
+      platBadge = `<span style="background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">🔴 REDDIT</span>`;
+    } else if (plat === 'remoteok') {
+      platBadge = `<span style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">🟢 REMOTEOK</span>`;
+    }
+
     const hiringBadge = isHiring
       ? `<span style="background:#dcfce7;color:#166534;border:1px solid #86efac;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:900;">🎯 HIRING LEAD</span>`
-      : `<span style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">💬 Group Post</span>`;
+      : `<span style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">💬 Community Post</span>`;
 
     return `
       <div style="padding:14px 16px;background:#fff;border-radius:8px;border:${isHiring ? '2px solid #86efac' : '1px solid var(--border-color)'};box-shadow:0 1px 3px rgba(0,0,0,0.04);display:flex;gap:14px;align-items:flex-start;">
@@ -1992,10 +2008,11 @@ function renderFbAlertsList() {
         <div style="flex:1;">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;flex-wrap:wrap;gap:6px;">
             <div>
-              <span style="font-weight:800;font-size:13.5px;color:var(--text-main);">${escapeHtml(a.client_name || a.author_name || 'Facebook User')}</span>
-              <span style="font-size:11px;color:var(--text-muted);margin-left:6px;">in <b>${escapeHtml(a.group_name || 'Group')}</b></span>
+              <span style="font-weight:800;font-size:13.5px;color:var(--text-main);">${escapeHtml(a.client_name || a.author_name || 'Client')}</span>
+              <span style="font-size:11px;color:var(--text-muted);margin-left:6px;">in <b>${escapeHtml(a.group_name || 'Community')}</b></span>
             </div>
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              ${platBadge}
               <span style="background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">${ageLabel}</span>
               ${hiringBadge}
               ${isHiring ? `<span style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">${escapeHtml(a.job_type || 'Video Editor')}</span>` : ''}
@@ -2014,9 +2031,10 @@ ${escapeHtml(a.content || a.ai_summary || '')}
               <span style="color:var(--text-light);">${(a.created_at || '').substring(0, 16)}</span>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              ${a.author_url ? `<a href="${escapeHtml(a.author_url)}" target="_blank" class="btn-primary" style="background:#1877F2;border-color:#1877F2;padding:4px 10px;font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">👤 Message FB ID</a>` : ''}
+              <button onclick="openAiPitchModal(${a.id})" class="btn-secondary" style="font-size:11px;padding:4px 10px;border-color:#8b5cf6;color:#7c3aed;background:#f5f3ff;font-weight:700;display:inline-flex;align-items:center;gap:4px;cursor:pointer;">⚡ AI Pitch</button>
+              ${a.author_url ? `<a href="${escapeHtml(a.author_url)}" target="_blank" class="btn-primary" style="background:#1877F2;border-color:#1877F2;padding:4px 10px;font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">👤 ${plat === 'reddit' ? 'DM on Reddit' : 'Message Profile'}</a>` : ''}
               ${waLink ? `<a href="${waLink}" target="_blank" class="btn-primary" style="background:#25D366;border-color:#25D366;padding:4px 10px;font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">💬 WhatsApp</a>` : ''}
-              ${a.post_url ? `<a href="${escapeHtml(a.post_url)}" target="_blank" class="btn-secondary" style="padding:4px 10px;font-size:11px;text-decoration:none;">🔗 Open Post</a>` : ''}
+              ${a.post_url ? `<a href="${escapeHtml(a.post_url)}" target="_blank" class="btn-secondary" style="padding:4px 10px;font-size:11px;text-decoration:none;">🔗 Open ${plat === 'reddit' ? 'Reddit' : 'Job'}</a>` : ''}
             </div>
           </div>
         </div>
@@ -2169,4 +2187,96 @@ setInterval(() => {
     loadFbAlerts();
   }
 }, 20000);
+
+// -------------------------------------------------------------
+// GLOBAL HUNTER & 1-CLICK AI PITCH ENGINE
+// -------------------------------------------------------------
+let CURRENT_PITCH_ALERT = null;
+
+async function huntGlobalJobsNow() {
+  showToast('🌍 Triggering Global Hunt across Reddit, RemoteOK & Creator job boards...', 'info');
+  try {
+    const res = await fetch('/api/hunter/scan-global', { method: 'POST' });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(data.message || 'Global hunting started in background!', 'success');
+      setTimeout(loadFbAlerts, 5000);
+    }
+  } catch (err) {
+    showToast('Failed to trigger global hunt', 'warning');
+  }
+}
+
+async function openAiPitchModal(alertId) {
+  const alert = FB_ALERTS_STATE.find(a => a.id === alertId);
+  if (!alert) return;
+
+  CURRENT_PITCH_ALERT = alert;
+  const modal = document.getElementById('aiPitchModal');
+  const output = document.getElementById('aiPitchOutput');
+  const portInput = document.getElementById('aiPitchPortfolioInput');
+  const copyStatus = document.getElementById('aiPitchCopyStatus');
+
+  if (copyStatus) copyStatus.style.display = 'none';
+  if (output) output.value = '⚡ Analyzing client requirement & crafting tailored proposal with AI...';
+  if (modal) modal.style.display = 'flex';
+
+  await generatePitchForCurrentAlert();
+}
+
+function closeAiPitchModal() {
+  const modal = document.getElementById('aiPitchModal');
+  if (modal) modal.style.display = 'none';
+  CURRENT_PITCH_ALERT = null;
+}
+
+async function generatePitchForCurrentAlert() {
+  if (!CURRENT_PITCH_ALERT) return;
+  const output = document.getElementById('aiPitchOutput');
+  const portInput = document.getElementById('aiPitchPortfolioInput');
+  const portUrl = (portInput?.value || '').trim();
+
+  try {
+    const res = await fetch('/api/jobs/generate-pitch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: CURRENT_PITCH_ALERT.content || CURRENT_PITCH_ALERT.ai_summary || '',
+        client_name: CURRENT_PITCH_ALERT.client_name || CURRENT_PITCH_ALERT.author_name || 'Client',
+        job_type: CURRENT_PITCH_ALERT.job_type || 'Video Editor',
+        portfolio_url: portUrl
+      })
+    });
+    const data = await res.json();
+    if (data.ok && output) {
+      output.value = data.pitch;
+    }
+  } catch (err) {
+    if (output) output.value = 'Failed to generate proposal. Please try again.';
+  }
+}
+
+async function regeneratePitch() {
+  const output = document.getElementById('aiPitchOutput');
+  if (output) output.value = '🔄 Regenerating personalized proposal...';
+  await generatePitchForCurrentAlert();
+}
+
+function copyAiPitch() {
+  const output = document.getElementById('aiPitchOutput');
+  const copyStatus = document.getElementById('aiPitchCopyStatus');
+  if (!output || !output.value) return;
+
+  navigator.clipboard.writeText(output.value).then(() => {
+    if (copyStatus) copyStatus.style.display = 'inline';
+    showToast('📋 AI Pitch copied to clipboard! Paste directly into client chat.', 'success');
+    setTimeout(() => {
+      if (copyStatus) copyStatus.style.display = 'none';
+    }, 3000);
+  }).catch(() => {
+    output.select();
+    document.execCommand('copy');
+    showToast('📋 Copied to clipboard!', 'success');
+  });
+}
 

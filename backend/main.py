@@ -689,9 +689,27 @@ def api_toggle_fb_group(group_id: int):
     return {"ok": True, "active": active}
 
 @app.get("/api/fb/alerts")
-def api_get_fb_alerts(limit: int = 1000):
-    alerts = get_fb_alerts(limit)
+def api_get_fb_alerts(limit: int = 1000, platform: Optional[str] = None, is_hiring: Optional[int] = None):
+    alerts = get_fb_alerts(limit, platform, is_hiring)
     return {"ok": True, "alerts": alerts}
+
+class PitchRequest(BaseModel):
+    content: str
+    client_name: Optional[str] = "Client"
+    job_type: Optional[str] = "Video Editor"
+    portfolio_url: Optional[str] = ""
+
+@app.post("/api/jobs/generate-pitch")
+def api_generate_pitch(req: PitchRequest):
+    from multi_platform_hunter import generate_ai_pitch
+    pitch = generate_ai_pitch(req.content, req.client_name, req.job_type, req.portfolio_url)
+    return {"ok": True, "pitch": pitch}
+
+@app.post("/api/hunter/scan-global")
+def api_scan_global(background_tasks: BackgroundTasks):
+    from multi_platform_hunter import run_multi_platform_hunter
+    background_tasks.add_task(run_multi_platform_hunter)
+    return {"ok": True, "message": "Global client hunting started across Reddit, RemoteOK & creator job boards in background!"}
 
 @app.post("/api/fb/test-alert")
 def api_test_fb_alert():
