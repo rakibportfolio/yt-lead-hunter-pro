@@ -306,6 +306,31 @@ def alert_fb_hiring_post(job: dict) -> bool:
     post_url = job.get("post_url", "")
     image_url = job.get("image_url", "")
     summary = job.get("ai_summary", job.get("content", ""))[:350]
+    content_txt = job.get("content", "")
+
+    # Telegram Anti-Duplicate Guard
+    try:
+        from database import get_db
+        conn = get_db()
+        c = conn.cursor()
+        clean_purl = (post_url or "").split("?")[0].rstrip("/")
+        if clean_purl and any(k in clean_purl for k in ["/posts/", "/permalink/", "story_fbid="]):
+            already_sent = c.execute("SELECT id FROM fb_job_alerts WHERE post_url LIKE ? AND telegram_sent = 1", (f"{clean_purl}%",)).fetchone()
+            if already_sent:
+                conn.close()
+                print(f"[Telegram Guard] Duplicate alert prevented for {client_name} (URL already alerted).")
+                return True
+
+        if content_txt and len(content_txt.strip()) > 30:
+            prefix = " ".join(content_txt.strip().split())[:80]
+            already_sent = c.execute("SELECT id FROM fb_job_alerts WHERE content LIKE ? AND telegram_sent = 1", (f"%{prefix}%",)).fetchone()
+            if already_sent:
+                conn.close()
+                print(f"[Telegram Guard] Duplicate alert prevented for {client_name} (Content already alerted).")
+                return True
+        conn.close()
+    except Exception:
+        pass
     
     phone = job.get("contact_phone", "")
     whatsapp = job.get("contact_whatsapp", "") or phone

@@ -785,17 +785,107 @@ def get_fb_alerts(limit: int = 1000) -> list:
     conn.close()
     return [dict(r) for r in rows]
 
-def is_fb_post_seen(post_id: str) -> bool:
+def generate_fb_post_id(post_url: str = "", content: str = "") -> str:
+    """
+    Generates a 100% deterministic, permanent post ID.
+    Never uses Python's non-deterministic hash().
+    """
+    import hashlib, re
+    # 1. If direct post URL has numeric FB ID, use that
+    if post_url:
+        m = re.search(r'/(?:posts|permalink|videos)/(\d+)', post_url)
+        if m:
+            return f"fb_num_{m.group(1)}"
+        m2 = re.search(r'story_fbid=(\d+)', post_url)
+        if m2:
+            return f"fb_num_{m2.group(1)}"
+
+    # 2. Deterministic hash of normalized content
+    norm_txt = " ".join((content or "").strip().lower().split())
+    if len(norm_txt) > 20:
+        md5_sig = hashlib.md5(norm_txt.encode('utf-8')).hexdigest()[:16]
+        return f"fb_{md5_sig}"
+
+    # 3. Fallback to clean URL hash
+    clean_u = (post_url or "").split("?")[0].rstrip("/").lower()
+    return f"fb_url_{hashlib.md5(clean_u.encode('utf-8')).hexdigest()[:16]}"
+
+
+def is_fb_post_seen(post_id: str = "", content: str = "", post_url: str = "") -> bool:
+    """
+    Multi-layer check to ensure identical posts or comments are NEVER considered new:
+    1. By deterministic post_id
+    2. By clean direct post URL (/posts/123/ or /permalink/123/)
+    3. By normalized content prefix
+    """
     conn = get_db()
-    row = conn.execute("SELECT id FROM fb_job_alerts WHERE post_id = ?", (post_id,)).fetchone()
+    c = conn.cursor()
+
+    # Check 1: Exact post_id
+    if post_id:
+        row = c.execute("SELECT id FROM fb_job_alerts WHERE post_id = ?", (post_id,)).fetchone()
+        if row:
+            conn.close()
+            return True
+
+    # Check 2: Direct Post URL (without query params)
+    clean_purl = (post_url or "").split("?")[0].rstrip("/")
+    if clean_purl and any(x in clean_purl for x in ["/posts/", "/permalink/", "story_fbid="]):
+        row = c.execute("SELECT id FROM fb_job_alerts WHERE post_url LIKE ?", (f"{clean_purl}%",)).fetchone()
+        if row:
+            conn.close()
+            return True
+
+    # Check 3: Content exact or high-similarity match
+    if content and len(content.strip()) > 25:
+        norm_txt = " ".join(content.strip().split())
+        prefix = norm_txt[:80]
+        row = c.execute("SELECT id FROM fb_job_alerts WHERE content LIKE ?", (f"%{prefix}%",)).fetchone()
+        if row:
+            conn.close()
+            return True
+
     conn.close()
-    return bool(row)
+    return False
+
 
 def insert_fb_alert(data: dict) -> int:
     conn = get_db()
     c = conn.cursor()
     if "author_url" not in data:
         data["author_url"] = ""
+
+    # Generate deterministic post_id if missing or non-deterministic
+    pid = data.get("post_id", "")
+    content = data.get("content", "")
+    post_url = data.get("post_url", "")
+    if not pid or (len(pid) < 5 or not any(pid.startswith(p) for p in ["fb_num_", "fb_url_", "fb_"])):
+        pid = generate_fb_post_id(post_url, content)
+        data["post_id"] = pid
+
+    # Hard de-duplication guard: if seen, return existing ID without duplicate insert
+    clean_purl = (post_url or "").split("?")[0].rstrip("/")
+    is_direct = bool(clean_purl and any(x in clean_purl for x in ["/posts/", "/permalink/", "story_fbid="]))
+
+    if is_direct:
+        existing = c.execute("SELECT id FROM fb_job_alerts WHERE post_url LIKE ?", (f"{clean_purl}%",)).fetchone()
+        if existing:
+            conn.close()
+            return existing[0]
+
+    if content and len(content.strip()) > 30:
+        prefix = " ".join(content.strip().split())[:80]
+        existing = c.execute("SELECT id FROM fb_job_alerts WHERE content LIKE ?", (f"%{prefix}%",)).fetchone()
+        if existing:
+            conn.close()
+            return existing[0]
+
+    if pid:
+        existing = c.execute("SELECT id FROM fb_job_alerts WHERE post_id = ?", (pid,)).fetchone()
+        if existing:
+            conn.close()
+            return existing[0]
+
     c.execute("""
         INSERT INTO fb_job_alerts (
             group_id, group_name, post_id, author_name, author_url, post_url, content, image_url,

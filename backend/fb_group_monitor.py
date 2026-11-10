@@ -481,6 +481,7 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
             except Exception as ge:
                 print(f"[FB Playwright] Note loading {clean_url}: {ge}")
 
+            seen_post_urls = set()
             # Incremental scrolls: grab posts as they appear in the feed
             for scroll_round in range(4):
                 if len(posts) >= limit:
@@ -496,12 +497,20 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                         continue
 
                     if len(txt) > 25 and txt not in seen_texts:
-                        seen_texts.add(txt)
                         img_tag = f_post.query_selector('img[src*="scontent"], img')
                         img_src = img_tag.get_attribute("src") if img_tag else ""
                         p_href, author_url, author = extract_post_and_author_urls(f_post, clean_url)
 
-                        pid = f"fb_{abs(hash(txt[:80]))}"
+                        # Skip comments and duplicate post elements under same post URL
+                        clean_purl = (p_href or "").split("?")[0].rstrip("/")
+                        if clean_purl and any(x in clean_purl for x in ["/posts/", "/permalink/", "story_fbid="]):
+                            if clean_purl in seen_post_urls:
+                                continue
+                            seen_post_urls.add(clean_purl)
+
+                        seen_texts.add(txt)
+                        from database import generate_fb_post_id
+                        pid = generate_fb_post_id(p_href, txt)
                         posts.append({
                             "post_id": pid,
                             "author_name": author or "Facebook User",
@@ -530,12 +539,20 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                         except Exception:
                             continue
                         if len(txt) > 25 and txt not in seen_texts:
-                            seen_texts.add(txt)
                             img_tag = f_post.query_selector('img[src*="scontent"], img')
                             img_src = img_tag.get_attribute("src") if img_tag else ""
                             p_href, author_url, author = extract_post_and_author_urls(f_post, clean_url)
 
-                            pid = f"fb_{abs(hash(txt[:80]))}"
+                            # Skip comments and duplicate post elements under same post URL
+                            clean_purl = (p_href or "").split("?")[0].rstrip("/")
+                            if clean_purl and any(x in clean_purl for x in ["/posts/", "/permalink/", "story_fbid="]):
+                                if clean_purl in seen_post_urls:
+                                    continue
+                                seen_post_urls.add(clean_purl)
+
+                            seen_texts.add(txt)
+                            from database import generate_fb_post_id
+                            pid = generate_fb_post_id(p_href, txt)
                             posts.append({
                                 "post_id": pid,
                                 "author_name": author or "Facebook User",
@@ -578,7 +595,8 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                         img_el = art.find("img")
                         img_url = img_el.get("src", "") if img_el else ""
 
-                        pid = f"fb_{abs(hash(text[:80]))}"
+                        from database import generate_fb_post_id
+                        pid = generate_fb_post_id(p_url, text)
                         posts.append({
                             "post_id": pid,
                             "author_name": author,
@@ -605,8 +623,8 @@ def process_single_fb_group(group: Dict[str, Any]) -> int:
     new_jobs_count = 0
     for p in posts:
         pid = p["post_id"]
-        # Skip seen posts
-        if is_fb_post_seen(pid):
+        # Skip seen posts (checks ID, direct URL, and normalized content)
+        if is_fb_post_seen(pid, p["content"], p["post_url"]):
             continue
 
         # Classify with AI / Heuristics

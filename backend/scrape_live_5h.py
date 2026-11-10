@@ -69,8 +69,8 @@ def run_live_scrape(max_groups=15):
                 ai_res = classify_fb_post_with_ai(txt, p["author_name"], gname)
                 is_hiring = 1 if (fresh_5h and ai_res.get("is_hiring")) else 0
 
-                # Check if seen
-                if is_fb_post_seen(pid):
+                # Check if seen (checks deterministic ID, clean direct URL, and normalized content)
+                if is_fb_post_seen(pid, txt, p["post_url"]):
                     if is_hiring:
                         conn = get_db()
                         row = conn.execute("SELECT id, telegram_sent FROM fb_job_alerts WHERE post_id = ?", (pid,)).fetchone()

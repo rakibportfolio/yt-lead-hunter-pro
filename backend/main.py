@@ -743,7 +743,7 @@ def api_ingest_fb_posts(batch: IngestBatch):
     Applies STRICT 3-hour freshness filter + AI intent classification.
     Sends INSTANT Telegram alerts for qualified hiring posts!
     """
-    from database import is_fb_post_seen, insert_fb_alert
+    from database import is_fb_post_seen, insert_fb_alert, generate_fb_post_id
     from telegram_bot import alert_fb_hiring_post
     from datetime import datetime
 
@@ -762,8 +762,8 @@ def api_ingest_fb_posts(batch: IngestBatch):
         if not fresh:
             skipped_old += 1
 
-        pid = f"fb_{abs(hash(content[:80]))}"
-        if is_fb_post_seen(pid):
+        pid = generate_fb_post_id(item.post_url or "", content)
+        if is_fb_post_seen(pid, content, item.post_url or ""):
             continue
 
         ai_res = classify_fb_post_with_ai(content, item.author_name or "Client", item.group_name or "Facebook Group")
