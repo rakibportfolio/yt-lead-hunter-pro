@@ -665,8 +665,24 @@ def export_outreach_csv():
         email = l.get("email") or ""
         subs = l.get("subscribers") or ""
         # Auto draft pitch subject & body if not already contacted
-        subject = f"Quick question regarding your channel, {ch_name}"
-        body = f"Hey {ch_name},\n\nLoved your recent videos! I noticed potential to 2x-3x your retention with tighter pacing, dynamic hooks, and sound design.\n\nWe would love to edit a 20-30s demo hook for your next video 100% free with zero risk.\n\nLet me know if you are dropping a video this week!\n\nBest,\nZentic Media Team"
+        subject = f"Quick thought on your content ({ch_name})"
+        body = f"""Hey {ch_name},
+
+Loved your recent videos and congratulations on building {ch_name} to {subs} subscribers!
+
+I noticed great potential to keep viewer watch-time above 60% through tighter pacing, dynamic pattern interrupts, and sound design. 
+
+At Zentic Media, we specialize in high-retention video editing engineered specifically for YouTube growth. You can see our recent creator edits here: https://zenticmedia.com/portfolio
+
+I'd love to edit a 20-second demo hook for your upcoming video 100% free with zero risk or obligation. If you like the retention bump, we can chat; if not, you keep the edit completely free.
+
+Are you dropping a video this week? Reply 'yes' and I'll send over the workflow!
+
+Best regards,
+Rakibul Hasan (Rakib)
+Founder & Lead Video Editor | Zentic Media
+Portfolio: https://zenticmedia.com/portfolio
+Website: https://zenticmedia.com"""
         status = "" if email else "NO EMAIL"
         writer.writerow([ch_name, email, subs, subject, body, status])
 

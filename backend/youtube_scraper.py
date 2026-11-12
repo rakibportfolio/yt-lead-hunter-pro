@@ -1192,6 +1192,9 @@ def generate_channel_pitch(lead: dict) -> dict:
     best_views = audit.get("best_video", {}).get("views_text", "thousands of views")
     recent_v = audit.get("videos", [{}])[0].get("title", "your latest upload")
     recent_date = audit.get("videos", [{}])[0].get("published", "recently")
+    total_views = lead.get("total_views") or "100K+"
+    channel_created = lead.get("created") or "your channel launch"
+    videos_count = lead.get("videos") or 50
     portfolio_url = cfg.PORTFOLIO_LINK or "https://zenticmedia.com/portfolio"
     website_url = "https://zenticmedia.com"
     calendly_url = cfg.CALENDLY_LINK or "https://calendly.com/zenticmedia"
@@ -1199,25 +1202,29 @@ def generate_channel_pitch(lead: dict) -> dict:
     # Option A: Gemini AI Generation (if API key available)
     if cfg.GEMINI_API_KEY:
         prompt = f"""
-You are an elite YouTube growth strategist and retention editor writing a direct, hyper-personalized email to YouTuber: {ch_name}.
-Data on their channel:
+You are Rakibul Hasan (Rakib), Founder & Lead Video Editor at Zentic Media (portfolio: {portfolio_url}).
+Write a direct, 100% human-written, conversational cold email to YouTuber: {ch_name}.
+
+Channel Intelligence:
 - Subscribers: {subs}
-- Recent video uploaded {recent_date}: "{recent_v}"
-- Highest-performing recent video: "{best_v}" with {best_views}
-- Channel handle: {handle}
+- Total Views: {total_views}
+- Creating since: {channel_created} ({videos_count} videos published)
+- Standout best video: "{best_v}" with {best_views}
+- Recent upload: "{recent_v}" ({recent_date})
 
-Write a high-converting, friendly, non-templated cold email following this exact structure:
-1. Hook: Compliment them on "{recent_v}" and mention you noticed their channel ({subs} subs).
-2. The Problem: Point out that while "{best_v}" did well ({best_views}), their average views fluctuate because of early viewer drop-off. Explain the YouTube Algorithm trigger: when viewers drop before 50%, the algorithm stops pushing the video to Suggested & Browse feeds. The issue is pacing, slow hooks, and lack of visual resets/sound design.
-3. Solution: Zentic Media edits for retention (pattern interrupts, sound design, tight pacing) to keep viewers watching past 65%, signaling YouTube to 3x their impressions. Include portfolio: {portfolio_url}.
-4. Risk-Free Offer: Offer to edit a 20-30 second demo hook or edit 1 full video 100% free with zero obligation. If it boosts retention, great; if not, they keep it free.
-5. CTA: Short, easy reply ask ("Are you dropping a video this week? Reply 'yes' or book 5 mins here: {calendly_url}").
+Strict Structure (Keep under 130 words total):
+1. Genuine Compliment & Real Proof of Work: Mention their consistency since {channel_created}, growing to {subs} subs and {total_views} views. Praise their best video "{best_v}" ({best_views}).
+2. The Retention Problem: Explain that views fluctuate across uploads because YouTube's recommendation system throttles distribution if viewers drop off during the first 30-45 seconds (pacing, slow intro hooks, lack of micro-resets).
+3. Zentic Media Solution & Social Proof: You specialize in retention editing (pattern interrupts, sound design, tight pacing) that keeps watch-time above 60%. Mention you've helped creators scale watch-time, and link portfolio: {portfolio_url}.
+4. Irresistible Risk-Free Offer: Offer to edit a 20-second demo hook for their upcoming video 100% free with zero obligation. If they love the retention boost, great; if not, they keep it free.
+5. Short CTA: Ask if they are dropping a video this week ("Reply 'yes' and I'll send over a quick sample").
 
-Rules:
-- DO NOT sound like generic agency spam.
-- Keep total word count under 170 words.
-- Format output as:
-Subject: <subject line>
+CRITICAL ANTI-SPAM & HUMAN RULES:
+- Write in natural, warm, founder-to-creator tone.
+- NO robotic AI buzzwords (NEVER use: delve, testament, revolutionize, supercharge, tapestry, esteemed, elevate).
+- NO spam triggers (no $$$$, no ALL CAPS, no 'ACT NOW').
+- Format:
+Subject: <clean curiosity subject line mentioning their video or channel>
 
 <email body>
 """
@@ -1233,27 +1240,19 @@ Subject: <subject line>
                 "mode": "gemini_ai"
             }
 
-    # Option B: Calibrated High-Retention Copywriting Engine
-    subject = f"Quick question about '{recent_v[:35]}...' ({ch_name})"
+    # Option B: Calibrated Ultra-Human Copywriting Engine (Anti-Spam & Primary Inbox Optimized)
+    subject = f"Quick thought on '{recent_v[:32]}...' ({ch_name})"
     body = f"""Hey {ch_name},
 
-Loved your recent upload on "{recent_v}" ({recent_date})—the content quality and your delivery are super solid, and congratulations on growing {ch_name} to {subs} subscribers!
+Huge congrats on building {ch_name} to {subs} subscribers and over {total_views} views since {channel_created}! Your standout video "{best_v}" ({best_views}) proves your audience loves your expertise when the hook lands right.
 
-While checking out your last few uploads, I noticed your top video "{best_v}" pulled {best_views}, but views tend to vary across your other videos. 
+While reviewing your recent uploads, I noticed views tend to fluctuate across your {videos_count} videos. From an editing perspective, YouTube's algorithm only pushes videos to Browse & Suggested when viewer retention holds above 60% in the first 45 seconds. The drop-off is usually just intro pacing and missing sound cues.
 
-Here is why that happens from an editing & algorithm perspective:
-When viewers drop off during the first 30–60 seconds, YouTube’s recommendation algorithm immediately slows down pushing your video to Browse Features and Suggested Feeds. The YouTube algorithm only pushes videos when retention holds above 60%.
+At Zentic Media, we specialize in high-retention video editing (pattern interrupts, sound design, dynamic hooks) designed specifically to maximize watch-time. We've helped multiple creators scale their retention—you can see our creator edits here: {portfolio_url}
 
-The issue isn't your expertise—it's pacing: slow intro hooks, lack of micro-pattern interrupts, and missing sound design that keeps viewers glued to the screen.
+To prove the value on your actual footage, I'd love to edit a 20-second demo hook for your upcoming video 100% free with zero obligation. If it boosts your watch-time, we can discuss working together; if not, you keep the edit completely free.
 
-At Zentic Media, we specialize in high-retention video editing engineered specifically to beat YouTube's retention drop-off. You can take a quick look at our recent creator edits here: {portfolio_url}
-
-Talk is cheap, so here is a completely risk-free proposal:
-Let us edit a free 20–30 second retention hook for your next video, or fully edit 1 test video 100% free of charge. Zero cost, zero commitment.
-
-If it blows you away and spikes your average view duration, we can talk about partnering. If not, the edit is yours to keep and upload anyway.
-
-Are you planning an upload this week? Just reply "Yes" to this email or grab 5 mins on my calendar ({calendly_url}) and I'll send the sample over!
+Are you dropping a new video this week? Just reply "yes" and I'll send over the workflow!
 
 Best regards,
 Rakibul Hasan (Rakib)
