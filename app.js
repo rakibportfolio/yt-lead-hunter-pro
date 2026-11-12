@@ -2190,10 +2190,6 @@ async function simulateOpenTracking(trackingId, leadId) {
   }
 }
 
-  const p = document.getElementById('crmPanel');
-  if (p) p.style.display = 'block';
-}
-
 function closeCrmPanel() {
   const p = document.getElementById('crmPanel');
   if (p) p.style.display = 'none';
