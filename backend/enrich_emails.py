@@ -20,7 +20,9 @@ OBFUSCATED_RE = re.compile(
 BLOCKED_DOMAINS = {
     "youtube.com", "google.com", "sentry.io", "wixpress.com",
     "doubleclick.net", "googletagmanager.com", "example.com",
-    "schema.org", "w3.org", "gstatic.com", "ytimg.com"
+    "schema.org", "w3.org", "gstatic.com", "ytimg.com",
+    "googleapis.com", "ggpht.com", "g.page", "googlevideo.com",
+    "googleusercontent.com"
 }
 BLOCKED_EXTS = (".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".css", ".js")
 
@@ -64,7 +66,13 @@ def extract_all_emails_from_text(text: str) -> list:
         if verified and verified not in found:
             found.append(verified)
 
-    # 2. Obfuscated emails (e.g. name [at] gmail [dot] com)
+    # 2. Mailto: links
+    for m in re.findall(r"mailto:([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)", text, re.I):
+        verified = clean_and_verify_email(m)
+        if verified and verified not in found:
+            found.append(verified)
+
+    # 3. Obfuscated emails (e.g. name [at] gmail [dot] com)
     for m in OBFUSCATED_RE.findall(text):
         cand = f"{m[0]}@{m[1]}.{m[2]}"
         verified = clean_and_verify_email(cand)
@@ -82,7 +90,7 @@ def extract_website_from_channel_page(html_text: str) -> list:
             if not decoded.startswith("http"):
                 decoded = "https://" + decoded
             dom = decoded.split("/")[2].lower()
-            if not any(b in dom for b in BLOCKED_DOMAINS) and "accounts.google.com" not in decoded:
+            if not any(b in dom for b in BLOCKED_DOMAINS) and "accounts.google.com" not in decoded and "support.google.com" not in decoded:
                 if decoded not in urls:
                     urls.append(decoded)
         except Exception:
@@ -103,7 +111,7 @@ def extract_website_from_channel_page(html_text: str) -> list:
 
 def scrape_email_from_external_site(url: str) -> str:
     try:
-        r = requests.get(url, headers=HEADERS, timeout=3.5)
+        r = requests.get(url, headers=HEADERS, timeout=7.0)
         if r.status_code == 200:
             emails = extract_all_emails_from_text(r.text)
             if emails:
@@ -113,7 +121,7 @@ def scrape_email_from_external_site(url: str) -> str:
                 base_site = "/".join(url.split("/")[:3])
                 for sub in ["/contact", "/about", "/contact-us"]:
                     try:
-                        rc = requests.get(f"{base_site}{sub}", headers=HEADERS, timeout=3.0)
+                        rc = requests.get(f"{base_site}{sub}", headers=HEADERS, timeout=5.0)
                         if rc.status_code == 200:
                             sub_emails = extract_all_emails_from_text(rc.text)
                             if sub_emails:
@@ -157,7 +165,7 @@ def deep_extract_channel_email(channel_url: str, handle: str = "", description: 
             ext_sites = extract_website_from_channel_page(r.text)
             if ext_sites:
                 res["website"] = ext_sites[0]
-                for site in ext_sites[:2]:
+                for site in ext_sites[:3]:
                     site_email = scrape_email_from_external_site(site)
                     if site_email:
                         res["email"] = site_email

@@ -220,6 +220,71 @@ class SafeDict(dict):
         return f"{{{key}}}"
 
 
+# ── Clean Creator Name & Greeting Helper ───────────────────────
+def clean_creator_display_name(raw_title: str) -> tuple:
+    """
+    Cleans raw YouTube channel titles into natural, human-sounding greetings and channel names.
+    Removes domains (.com, .ca), pipes (|), dashes (-), and redundant words.
+    Returns: (greeting_name, clean_channel_name)
+    """
+    if not raw_title:
+        return "Creator", "your channel"
+
+    t = raw_title.strip()
+
+    # 1. Split pipes (|) and pick most personal/brand side
+    if "|" in t:
+        parts = [p.strip() for p in t.split("|") if p.strip()]
+        if any("team" in p.lower() for p in parts):
+            t = next(p for p in parts if "team" in p.lower())
+        else:
+            t = parts[-1] if len(parts[-1]) < len(parts[0]) else parts[0]
+    elif " - " in t:
+        parts = [p.strip() for p in t.split(" - ") if p.strip()]
+        t = parts[0]
+
+    # 2. Strip domain extensions (.com.au, .ca, .com, .org, .tv)
+    t = re.sub(r"\.(?:com\.au|co\.uk|com|ca|org|net|tv|io)\b", "", t, flags=re.I)
+
+    # 3. Handle birdhousemediatv -> Birdhouse Media
+    if t.lower().endswith("tv") and len(t) > 5 and not t.isupper():
+        t = t[:-2]
+
+    # Split conjoined words only if NO space before it (e.g. birdhousemedia -> birdhouse media)
+    t = re.sub(r"(?i)(?<=[a-zA-Z0-9])(media|properties|films|estate|studios|group|realty|podcast|homes)$", r" \1", t)
+
+    # 4. Strip trailing redundant video/channel words
+    t = re.sub(r"\s+(?:Videos|Channel|Films)$", "", t, flags=re.I)
+    t = re.sub(r"^(?:The\s+)", "", t, flags=re.I)
+    t = re.sub(r"\s+", " ", t).strip()
+    if t.islower():
+        t = t.title()
+
+    words = t.split()
+    non_person = {
+        "real", "estate", "media", "proper", "homes", "team", "show", "hub", "tv", 
+        "living", "films", "studios", "group", "podcast", "channel", "realtor", 
+        "property", "legal", "commercial", "ontario", "toronto", "canada", 
+        "vancouver", "housing", "market", "investing", "daily", "guide", "solutions"
+    }
+
+    # Pattern: Person Name + Brand (e.g. 'Wendy Berke Real Estate' -> 'Wendy')
+    if len(words) >= 3 and words[0].lower() not in non_person and words[1].lower() not in non_person and any(w.lower() in {"real", "estate", "realtor", "homes"} for w in words[2:]):
+        greeting = words[0]
+        channel_name = t
+    elif len(words) == 2 and not any(w.lower() in non_person for w in words):
+        greeting = words[0]
+        channel_name = t
+    elif any(w.lower() == "team" for w in words):
+        greeting = t
+        channel_name = t
+    else:
+        greeting = f"{t} team"
+        channel_name = t
+
+    return greeting, channel_name
+
+
 # ── Tracking Pixel & Link Wrapper ─────────────────────────────
 def build_tracking_pixel(tracking_id: str) -> str:
     url = f"{cfg.TRACKING_BASE_URL}/track/open/{tracking_id}"
@@ -240,72 +305,52 @@ def build_unsubscribe_link(tracking_id: str) -> str:
 
 
 def text_to_html(text: str, tracking_id: str) -> str:
-    """Convert plain text email to styled HTML with tracking pixel."""
+    """
+    Convert plain text email to authentic, personal 1-to-1 HTML email.
+    Includes a hidden preheader to ensure the Gmail subtitle/preview is 100% natural,
+    with NO bot-like '⚡ ZENTIC MEDIA' prefixes.
+    """
     lines = text.strip().split("\n")
     html_lines = []
+    preview_snippet = ""
+
     for line in lines:
-        line = line.strip()
-        if not line:
+        stripped = line.strip()
+        if not stripped:
             html_lines.append("<br/>")
-        elif line.startswith("•") or line.startswith("✅") or line.startswith("📊"):
-            html_lines.append(f'<div style="margin: 4px 0; padding-left: 8px;">{line}</div>')
         else:
-            html_lines.append(f'<p style="margin: 6px 0;">{line}</p>')
+            if not preview_snippet and not stripped.lower().startswith("hey") and not stripped.lower().startswith("hi"):
+                preview_snippet = stripped
+            elif not preview_snippet:
+                preview_snippet = stripped
+
+            if stripped.startswith("•") or stripped.startswith("✅") or stripped.startswith("📊"):
+                html_lines.append(f'<div style="margin: 4px 0; padding-left: 8px;">{stripped}</div>')
+            else:
+                html_lines.append(f'<p style="margin: 8px 0; line-height: 1.6;">{stripped}</p>')
 
     pixel = build_tracking_pixel(tracking_id)
     html_body = "\n".join(html_lines)
+    clean_preview = preview_snippet[:130] if preview_snippet else "Quick thought on your recent video"
 
     return f"""<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8"/>
-  <style>
-    body {{
-      font-family: 'Inter', Arial, sans-serif;
-      font-size: 15px;
-      color: #1a1a1a;
-      line-height: 1.7;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: #f9f9f9;
-    }}
-    .email-wrap {{
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 32px 36px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }}
-    .email-header {{
-      border-bottom: 3px solid #7c3aed;
-      padding-bottom: 16px;
-      margin-bottom: 24px;
-    }}
-    .brand {{
-      font-size: 20px;
-      font-weight: 800;
-      color: #7c3aed;
-      letter-spacing: -0.5px;
-    }}
-    .footer {{
-      margin-top: 32px;
-      padding-top: 16px;
-      border-top: 1px solid #eee;
-      font-size: 12px;
-      color: #888;
-    }}
-    a {{ color: #7c3aed; }}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title></title>
 </head>
-<body>
-  <div class="email-wrap">
-    <div class="email-header">
-      <div class="brand">⚡ ZENTIC MEDIA</div>
-    </div>
+<body style="margin: 0; padding: 18px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #1e293b; background-color: #ffffff; line-height: 1.6;">
+  <!-- Clean Hidden Preheader (Sets the exact subtitle/preview text in Gmail & Outlook) -->
+  <div style="display:none!important;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;">
+    {clean_preview} &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847;
+  </div>
+  <div style="max-width: 580px; margin: 0; color: #1e293b;">
     {html_body}
-    <div class="footer">
-      <p>Zentic Media | Professional Video Editing Agency</p>
-      <p>🌐 <a href="https://zenticmedia.com/portfolio" style="color:#666;">zenticmedia.com/portfolio</a> | 📧 {cfg.GMAIL_ADDRESS}</p>
+    <div style="margin-top: 26px; padding-top: 14px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; line-height: 1.5;">
+      <p style="margin: 2px 0; font-weight: 700; color: #0f172a;">Rakibul Hasan (Rakib)</p>
+      <p style="margin: 2px 0;">Founder & Lead Video Editor, <b>Zentic Media</b></p>
+      <p style="margin: 2px 0;">🌐 <a href="https://zenticmedia.com/portfolio" style="color: #6366f1; text-decoration: none;">zenticmedia.com/portfolio</a> | 📧 {cfg.GMAIL_ADDRESS}</p>
     </div>
   </div>
   {pixel}
@@ -454,16 +499,17 @@ def send_bulk_emails(leads: list, template_name: str = "var1",
             results["skipped"] += 1
             continue
 
-        ch_title = lead.get("channel") or lead.get("name") or "Creator"
+        raw_title = lead.get("channel") or lead.get("name") or "Creator"
+        greeting_name, clean_channel = clean_creator_display_name(raw_title)
         subs_val = str(lead.get("subscribers") or "1.5K")
         views_val = str(lead.get("total_views") or "45.2K")
         vids_val = str(lead.get("videos") or 85)
         created_val = str(lead.get("created") or "Oct 2022")
 
-        # Personalize template
+        # Personalize template with clean human names
         variables = {
-            "name":          ch_title,
-            "channel":       ch_title,
+            "name":          greeting_name,
+            "channel":       clean_channel,
             "subscribers":   subs_val,
             "total_views":   views_val,
             "videos":        vids_val,

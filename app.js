@@ -1113,13 +1113,68 @@ function closeBulkEmailModal() {
   if (modal) modal.style.display = 'none';
 }
 
+function cleanCreatorDisplayName(rawTitle) {
+  if (!rawTitle) return { greeting: 'Creator', channel: 'your channel' };
+  let t = rawTitle.trim();
+  if (t.includes('|')) {
+    const parts = t.split('|').map(p => p.trim()).filter(Boolean);
+    const teamPart = parts.find(p => p.toLowerCase().includes('team'));
+    t = teamPart || (parts[parts.length - 1].length < parts[0].length ? parts[parts.length - 1] : parts[0]);
+  } else if (t.includes(' - ')) {
+    t = t.split(' - ')[0].trim();
+  }
+  t = t.replace(/\.(com\.au|co\.uk|com|ca|org|net|tv|io)\b/gi, '');
+  if (t.toLowerCase().endsWith('tv') && t.length > 5) t = t.slice(0, -2);
+  t = t.replace(/(?<=[a-zA-Z0-9])(media|properties|films|estate|studios|group|realty|podcast|homes)$/gi, ' $1');
+  t = t.replace(/\s+(Videos|Channel|Films)$/gi, '');
+  t = t.replace(/^The\s+/gi, '').replace(/\s+/g, ' ').trim();
+  if (t === t.toLowerCase()) {
+    t = t.replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  const words = t.split(' ');
+  const nonPerson = new Set([
+    'real', 'estate', 'media', 'proper', 'homes', 'team', 'show', 'hub', 'tv',
+    'living', 'films', 'studios', 'group', 'podcast', 'channel', 'realtor',
+    'property', 'legal', 'commercial', 'ontario', 'toronto', 'canada',
+    'vancouver', 'housing', 'market', 'investing', 'daily', 'guide', 'solutions'
+  ]);
+
+  let greeting = `${t} team`;
+  if (words.length >= 3 && !nonPerson.has(words[0].toLowerCase()) && !nonPerson.has(words[1].toLowerCase()) && words.slice(2).some(w => ['real', 'estate', 'realtor', 'homes'].includes(w.toLowerCase()))) {
+    greeting = words[0];
+  } else if (words.length === 2 && !words.some(w => nonPerson.has(w.toLowerCase()))) {
+    greeting = words[0];
+  } else if (words.some(w => w.toLowerCase() === 'team')) {
+    greeting = t;
+  }
+  return { greeting, channel: t };
+}
+
 function onBulkTemplateChange() {
   const sel = document.getElementById('bulkTemplateSelect')?.value || 'var1';
   const tmpl = BULK_EMAIL_TEMPLATES[sel] || BULK_EMAIL_TEMPLATES.var1;
   const subjInput = document.getElementById('bulkEmailSubject');
   const bodyInput = document.getElementById('bulkEmailBody');
-  if (subjInput) subjInput.value = tmpl.subject;
-  if (bodyInput) bodyInput.value = tmpl.body;
+
+  // If exactly 1 lead is selected, preview with personalized values
+  const selected = (APP_STATE.leads || []).filter(l => APP_STATE.selectedLeadIds && APP_STATE.selectedLeadIds.has(l.id));
+  if (selected.length === 1) {
+    const l = selected[0];
+    const cleaned = cleanCreatorDisplayName(l.channel || l.name);
+    const subStr = l.subscribers || '10K';
+    const subj = tmpl.subject.replace(/\{channel\}/g, cleaned.channel);
+    const body = tmpl.body
+      .replace(/\{name\}/g, cleaned.greeting)
+      .replace(/\{channel\}/g, cleaned.channel)
+      .replace(/\{subscribers\}/g, subStr)
+      .replace(/\{total_views\}/g, l.total_views || '50K');
+    if (subjInput) subjInput.value = subj;
+    if (bodyInput) bodyInput.value = body;
+  } else {
+    if (subjInput) subjInput.value = tmpl.subject;
+    if (bodyInput) bodyInput.value = tmpl.body;
+  }
 }
 
 async function startBulkEmailSend() {
