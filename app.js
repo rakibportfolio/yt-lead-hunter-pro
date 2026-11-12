@@ -982,20 +982,24 @@ function updateSelectedCount() {
 
 const BULK_EMAIL_TEMPLATES = {
   var1: {
-    name: 'Variation 1: Finished 20s Sample (95% Reply Rate)',
-    subject: 're: 20-second edit for {channel}',
+    name: 'Variation 1: High-Retention 20s Demo Pitch (Default & Recommended)',
+    subject: 'quick question about {channel} 🎬',
     body: `Hey {name},
 
-Loved your recent video! Congrats on growing {channel} to {subscribers} subscribers.
+I was watching your content on {channel} today — genuinely impressed by the consistency. Building to {subscribers} subs and over {total_views} views takes serious dedication that 95% of creators quit before reaching.
 
-I actually took a quick 20-second clip from your intro and re-edited the hook with dynamic pacing, sound design, and pattern interrupts just to see how much tighter it feels.
+Looking at current retention trends, the biggest bottleneck creators face isn't their content quality, but viewer drop-off in the first 30 seconds before the algorithm kicks in.
 
-Mind if I drop the Google Drive link over? Zero sales pitch—if you like the retention style, you can use it 100% free.
+We run Zentic Media (https://zenticmedia.com/portfolio), where we specialize in retention editing that keeps viewers hooked through dynamic pacing, sound design, and pattern interrupts.
+
+Talk is cheap, so here's a risk-free idea:
+I'd love to take 20–30 seconds of raw footage from your upcoming video and edit a high-retention demo hook for you — completely free. If you like the retention boost, you can use it in your video 100% on the house; if not, no hard feelings at all.
+
+Dropping an upload this week? Mind if I send a quick 20-second sample over?
 
 Best,
 Rakibul Hasan (Rakib)
-Founder & Lead Editor | Zentic Media
-Portfolio: https://zenticmedia.com/portfolio`
+Founder & Lead Editor | Zentic Media`
   },
   var2: {
     name: 'Variation 2: Retention Metric & Algorithm',
