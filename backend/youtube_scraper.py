@@ -429,7 +429,7 @@ def generate_keyword_leads(keyword: str, min_subs: int, max_subs: int, count: in
         subs = random.randint(max(min_subs, 1200), min(max_subs if max_subs > 0 else 500000, 350000))
         subs_str = f"{subs/1000:.1f}K" if subs < 1_000_000 else f"{subs/1_000_000:.1f}M"
         
-        email = f"contact@{slug}.{tld}"
+        email = ""
         social = {
             "instagram": slug,
             "twitter": slug,
@@ -908,13 +908,9 @@ def scan_youtube(keyword: str,
             if about_data.get("social"):
                 social.update(about_data["social"])
 
-        # If still no email, construct actionable contact email for the creator
+        # Only use real extracted email — never guess non-existent domains to prevent bounces
         if not email:
-            slug = re.sub(r"[^a-zA-Z0-9]", "", ch_name).lower()
-            if ch.get("handle"):
-                slug = ch["handle"].replace("@", "").lower()
-            tld = "ca" if (country.upper() == "CA") else ("co.uk" if country.upper() == "GB" else "com")
-            email = f"contact@{slug}.{tld}"
+            email = ""
 
         subs_str = f"{subs/1000:.1f}K" if subs < 1_000_000 else f"{subs/1_000_000:.1f}M"
         
@@ -1037,7 +1033,7 @@ def scan_youtube(keyword: str,
                 "upload_freq": "2x/week",
                 "created":     "Oct 2022",
                 "description": ch.get("description", "") or f"Official YouTube channel for {ch_name}.",
-                "email":       f"contact@{slug}.{tld}",
+                "email":       extract_email_from_text(ch.get("description", "")) or "",
                 "website":     ch_url,
                 "social":      {"instagram": slug, "twitter": slug},
                 "ai_score":    random.randint(65, 88),

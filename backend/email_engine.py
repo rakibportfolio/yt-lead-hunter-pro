@@ -313,6 +313,26 @@ def text_to_html(text: str, tracking_id: str) -> str:
 </html>"""
 
 
+# ── Domain Deliverability & Bounce Guard ──────────────────────
+import socket
+
+def is_domain_deliverable(email: str) -> bool:
+    """
+    Validates whether the domain in an email exists via DNS lookup.
+    Prevents hard bounces (NXDOMAIN) and protects the sender's reputation.
+    """
+    if not email or "@" not in email:
+        return False
+    domain = email.split("@")[-1].strip().lower()
+    if not domain or "." not in domain:
+        return False
+    try:
+        socket.gethostbyname(domain)
+        return True
+    except Exception:
+        return False
+
+
 # ── Core Email Sender ─────────────────────────────────────────
 def send_email(
     to_address: str,
@@ -327,6 +347,18 @@ def send_email(
     Send a single email with tracking.
     Returns: { success, tracking_id, email_id, error }
     """
+    # Pre-send Deliverability Guard (Bounce Prevention)
+    if not is_domain_deliverable(to_address):
+        domain = to_address.split("@")[-1] if "@" in to_address else to_address
+        error_msg = f"Domain '{domain}' does not exist (DNS NXDOMAIN). Send blocked to prevent bounce."
+        print(f"[Email] ⚠️ Blocked sending to {to_address}: {error_msg}")
+        return {
+            "success": False,
+            "tracking_id": None,
+            "email_id": None,
+            "error": error_msg
+        }
+
     if not cfg.GMAIL_ADDRESS or not cfg.GMAIL_PASSWORD:
         print("[Email] Warning: No Gmail credentials. Running in DEMO mode.")
         tracking_id = str(uuid.uuid4())
@@ -411,8 +443,14 @@ def send_bulk_emails(leads: list, template_name: str = "var1",
     results = {"sent": 0, "failed": 0, "skipped": 0, "details": []}
 
     for lead in leads:
-        if not lead.get("email"):
+        lead_email = (lead.get("email") or "").strip()
+        if not lead_email:
             print(f"[Bulk] ⚠️ No email for {lead.get('name')} — skipping")
+            results["skipped"] += 1
+            continue
+
+        if not is_domain_deliverable(lead_email):
+            print(f"[Bulk] ⚠️ Invalid/non-existent domain for {lead.get('name')} ({lead_email}) — skipping to prevent bounce")
             results["skipped"] += 1
             continue
 
