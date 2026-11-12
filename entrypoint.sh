@@ -24,3 +24,4 @@ echo "🌐 Starting FastAPI Web Server on port 8000..."
 
 # Start FastAPI server in foreground (keeps Docker container running)
 exec python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+
