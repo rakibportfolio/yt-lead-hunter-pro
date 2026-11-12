@@ -488,8 +488,16 @@ async function startDiscoveryScan() {
       throw new Error('Could not initiate scan');
     }
   } catch (err) {
-    console.warn('Backend scan failed, running simulated discovery fallback:', err);
-    runSimulatedDiscovery(keyword, maxResults, country);
+    console.error('Backend scan failed:', err);
+    APP_STATE.isScanning = false;
+    const btn = document.getElementById('btnStartDiscovery');
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '🚀 Start Lead Discovery';
+    }
+    const pBox = document.getElementById('liveScanProgressBox');
+    if (pBox) pBox.style.display = 'none';
+    showToast('Failed to connect to backend scanner. Please verify server is online.', 'error');
   }
 }
 
@@ -497,11 +505,13 @@ function pollScanProgress(scanId, keyword, country = '') {
   const pMsg = document.getElementById('scanStatusMsg');
   const pPct = document.getElementById('scanProgressPct');
   const pBar = document.getElementById('scanProgressBarFill');
+  let errCount = 0;
 
   const timer = setInterval(async () => {
     try {
       const res = await fetch(`${API_BASE}/api/scan/progress/${scanId}`);
       const data = await res.json();
+      errCount = 0;
 
       if (pMsg && data.step) pMsg.textContent = data.step;
       if (pPct) pPct.textContent = `${data.progress || 0}%`;
@@ -512,8 +522,19 @@ function pollScanProgress(scanId, keyword, country = '') {
         finishScan(data.leads || [], keyword);
       }
     } catch (e) {
-      clearInterval(timer);
-      runSimulatedDiscovery(keyword, 50, country);
+      errCount++;
+      if (errCount >= 6) {
+        clearInterval(timer);
+        APP_STATE.isScanning = false;
+        const btn = document.getElementById('btnStartDiscovery');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '🚀 Start Lead Discovery';
+        }
+        const pBox = document.getElementById('liveScanProgressBox');
+        if (pBox) pBox.style.display = 'none';
+        showToast('Lost connection to backend scan progress.', 'error');
+      }
     }
   }, 1000);
 }
@@ -716,13 +737,13 @@ async function loadLeadsFromDatabase() {
         }
       }));
     } else {
-      // Seed with initial realistic demonstration leads
-      APP_STATE.leads = generateSampleLeads('Video Editing Agency', 10);
+      APP_STATE.leads = [];
     }
   } catch (err) {
-    APP_STATE.leads = generateSampleLeads('Video Editing Agency', 10);
+    APP_STATE.leads = [];
   }
   updateDashboardMetrics();
+  renderResultsTable();
 }
 
 // ------------------------------------------------------------
