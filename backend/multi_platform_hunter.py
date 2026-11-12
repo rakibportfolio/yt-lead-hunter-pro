@@ -327,7 +327,8 @@ def generate_ai_pitch(job_content: str, client_name: str = "Client", job_type: s
     """
     Generates a personalized, high-converting cold pitch tailored to the specific client's job.
     """
-    port_text = f"\n\nHere is a quick link to my portfolio & recent projects: {portfolio_url}" if portfolio_url else "\n\nI have attached my portfolio with samples matching your exact style."
+    p_url = portfolio_url or "https://zenticmedia.com/portfolio"
+    port_text = f"\n\nHere is a quick link to my portfolio & recent projects: {p_url}"
 
     # Analyze style
     style = "dynamic short-form reels / TikToks" if "short" in job_content.lower() or "reel" in job_content.lower() else "high-retention YouTube long-form video editing"
@@ -344,7 +345,10 @@ What I bring to your project:
 Would you be open to a quick 2-minute test edit or chatting over a few sample clips to see if my style matches your vision?
 
 Best regards,
-Video Editor & Creative Partner"""
+Rakibul Hasan (Rakib)
+Founder & Lead Video Editor | Zentic Media
+Portfolio: {p_url}
+Website: https://zenticmedia.com"""
 
     return pitch.strip()
 

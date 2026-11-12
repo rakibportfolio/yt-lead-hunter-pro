@@ -1192,7 +1192,8 @@ def generate_channel_pitch(lead: dict) -> dict:
     best_views = audit.get("best_video", {}).get("views_text", "thousands of views")
     recent_v = audit.get("videos", [{}])[0].get("title", "your latest upload")
     recent_date = audit.get("videos", [{}])[0].get("published", "recently")
-    portfolio_url = cfg.PORTFOLIO_LINK or "https://zentic.media/portfolio"
+    portfolio_url = cfg.PORTFOLIO_LINK or "https://zenticmedia.com/portfolio"
+    website_url = "https://zenticmedia.com"
     calendly_url = cfg.CALENDLY_LINK or "https://calendly.com/zenticmedia"
 
     # Option A: Gemini AI Generation (if API key available)
@@ -1257,7 +1258,8 @@ Are you planning an upload this week? Just reply "Yes" to this email or grab 5 m
 Best regards,
 Rakibul Hasan (Rakib)
 Founder & Lead Video Editor | Zentic Media
-Website: {portfolio_url}"""
+Portfolio: {portfolio_url}
+Website: {website_url}"""
 
     return {
         "subject": subject,

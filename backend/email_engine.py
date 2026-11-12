@@ -47,7 +47,7 @@ Would you be open to a quick 15-minute call this week? No pressure — just a co
 Best regards,
 {sender_name}
 Zentic Media
-🌐 zentic.media | 📧 {sender_email}
+🌐 zenticmedia.com/portfolio | 📧 {sender_email}
 
 {unsubscribe_link}
 """
@@ -222,7 +222,7 @@ def text_to_html(text: str, tracking_id: str) -> str:
     {html_body}
     <div class="footer">
       <p>Zentic Media | Professional Video Editing Agency</p>
-      <p>🌐 zentic.media | 📧 {cfg.GMAIL_ADDRESS}</p>
+      <p>🌐 <a href="https://zenticmedia.com/portfolio" style="color:#666;">zenticmedia.com/portfolio</a> | 📧 {cfg.GMAIL_ADDRESS}</p>
     </div>
   </div>
   {pixel}

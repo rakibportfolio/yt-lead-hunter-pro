@@ -2452,6 +2452,10 @@ async function openAiPitchModal(alertId) {
   const portInput = document.getElementById('aiPitchPortfolioInput');
   const copyStatus = document.getElementById('aiPitchCopyStatus');
 
+  if (portInput && !portInput.value.trim()) {
+    portInput.value = 'https://zenticmedia.com/portfolio';
+  }
+
   if (copyStatus) copyStatus.style.display = 'none';
   if (output) output.value = '⚡ Analyzing client requirement & crafting tailored proposal with AI...';
   if (modal) modal.style.display = 'flex';

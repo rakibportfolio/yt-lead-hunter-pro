@@ -282,6 +282,7 @@ def init_db():
             agency_name         TEXT DEFAULT 'Zentic Media',
             agency_former_name  TEXT DEFAULT 'Max Grow Up',
             website             TEXT DEFAULT 'https://zenticmedia.com',
+            portfolio_link      TEXT DEFAULT 'https://zenticmedia.com/portfolio',
             team_members        TEXT,
             services            TEXT,
             tools_stack         TEXT,
@@ -291,6 +292,11 @@ def init_db():
             updated_at          TEXT DEFAULT (datetime('now'))
         )
     """)
+
+    try:
+        c.execute("ALTER TABLE user_profile ADD COLUMN portfolio_link TEXT DEFAULT 'https://zenticmedia.com/portfolio'")
+    except Exception:
+        pass
 
     # Seed or update user profile with Rakibul Hasan's official details
     c.execute("SELECT COUNT(*) FROM user_profile")

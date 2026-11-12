@@ -64,9 +64,10 @@ class Config:
     WHATSAPP_PHONE_ID    = _clean_val(os.getenv("WHATSAPP_PHONE_ID", ""))
 
     # ── Links ─────────────────────────────────────────────────
-    PORTFOLIO_LINK       = os.getenv("PORTFOLIO_LINK", "https://zenticmedia.com")
+    PORTFOLIO_LINK       = os.getenv("PORTFOLIO_LINK", "https://zenticmedia.com/portfolio")
     CALENDLY_LINK        = os.getenv("CALENDLY_LINK", "https://calendly.com/zenticmedia")
     AGENCY_NAME          = "Zentic Media"
+    WEBSITE_LINK         = "https://zenticmedia.com"
     FOUNDER_NAME         = "Rakibul Hasan (Rakib)"
     FOUNDER_TITLE        = "Founder, CEO & Lead Video Editor"
 
