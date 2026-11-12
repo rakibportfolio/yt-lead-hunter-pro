@@ -982,8 +982,8 @@ function updateSelectedCount() {
 
 const BULK_EMAIL_TEMPLATES = {
   var1: {
-    name: 'Variation 1: High-Retention 20s Demo Pitch (Default & Recommended)',
-    subject: 'quick question about {channel} 🎬',
+    name: 'Variation 1: High-Retention 30s Demo Pitch (Default & Recommended)',
+    subject: 'The first 30 seconds of your next video, on us?',
     body: `Hey {name},
 
 I was watching your content on {channel} today — genuinely impressed by the consistency. Building to {subscribers} subs and over {total_views} views takes serious dedication that 95% of creators quit before reaching.

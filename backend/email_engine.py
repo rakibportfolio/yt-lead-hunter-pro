@@ -121,7 +121,7 @@ Zentic Media
 """
     },
     "var1": {
-        "subject": "quick question about {channel} 🎬",
+        "subject": "The first 30 seconds of your next video, on us?",
         "body": """Hey {name},
 
 I was watching your content on {channel} today — genuinely impressed by the consistency. Building to {subscribers} subs and over {total_views} views takes serious dedication that 95% of creators quit before reaching.
