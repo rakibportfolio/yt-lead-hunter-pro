@@ -33,6 +33,7 @@ def init_db():
             subscribers TEXT,
             email       TEXT,
             website     TEXT,
+            country     TEXT DEFAULT '',
             social_json TEXT DEFAULT '{}',
             ai_score    INTEGER DEFAULT 0,
             lead_type   TEXT DEFAULT 'warm',   -- hot / warm / cold
@@ -43,6 +44,12 @@ def init_db():
             updated_at  TEXT DEFAULT (datetime('now'))
         )
     """)
+
+    # Ensure country column exists if table was previously created
+    try:
+        c.execute("ALTER TABLE leads ADD COLUMN country TEXT DEFAULT ''")
+    except Exception:
+        pass
 
     # ── Emails Table ──────────────────────────────────────────
     c.execute("""
@@ -446,9 +453,9 @@ def insert_lead(lead: dict) -> int:
     conn = get_db()
     c = conn.cursor()
     c.execute("""
-        INSERT INTO leads (name, channel, platform, subscribers, email, website,
+        INSERT INTO leads (name, channel, platform, subscribers, email, website, country,
                            social_json, ai_score, lead_type, status, ai_analysis)
-        VALUES (:name, :channel, :platform, :subscribers, :email, :website,
+        VALUES (:name, :channel, :platform, :subscribers, :email, :website, :country,
                 :social_json, :ai_score, :lead_type, :status, :ai_analysis)
     """, {
         "name":        lead.get("name", ""),
@@ -457,6 +464,7 @@ def insert_lead(lead: dict) -> int:
         "subscribers": lead.get("subscribers", ""),
         "email":       lead.get("email", ""),
         "website":     lead.get("website", ""),
+        "country":     lead.get("country", ""),
         "social_json": json.dumps(lead.get("social", {})),
         "ai_score":    lead.get("ai_score", 0),
         "lead_type":   lead.get("lead_type", "warm"),

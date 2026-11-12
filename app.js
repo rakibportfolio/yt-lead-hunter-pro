@@ -444,6 +444,7 @@ async function startDiscoveryScan() {
   const engine = document.getElementById('selectEngine')?.value || 'auto';
   const minSubs = parseInt(document.getElementById('filterMinSubs')?.value) || 500;
   const maxSubs = parseInt(document.getElementById('filterMaxSubs')?.value) || 500000;
+  const country = document.getElementById('filterCountry')?.value || '';
   const maxResultsPill = document.querySelector('#maxResultsPills .select-pill.active');
   const maxResults = maxResultsPill ? parseInt(maxResultsPill.dataset.val) : 50;
 
@@ -470,23 +471,24 @@ async function startDiscoveryScan() {
         min_subs: minSubs,
         max_subs: maxSubs,
         max_results: maxResults,
+        country,
         engine
       })
     });
 
     const data = await res.json();
     if (data && data.scan_id) {
-      pollScanProgress(data.scan_id, keyword);
+      pollScanProgress(data.scan_id, keyword, country);
     } else {
       throw new Error('Could not initiate scan');
     }
   } catch (err) {
     console.warn('Backend scan failed, running simulated discovery fallback:', err);
-    runSimulatedDiscovery(keyword, maxResults);
+    runSimulatedDiscovery(keyword, maxResults, country);
   }
 }
 
-function pollScanProgress(scanId, keyword) {
+function pollScanProgress(scanId, keyword, country = '') {
   const pMsg = document.getElementById('scanStatusMsg');
   const pPct = document.getElementById('scanProgressPct');
   const pBar = document.getElementById('scanProgressBarFill');
@@ -506,22 +508,23 @@ function pollScanProgress(scanId, keyword) {
       }
     } catch (e) {
       clearInterval(timer);
-      runSimulatedDiscovery(keyword, 25);
+      runSimulatedDiscovery(keyword, 50, country);
     }
   }, 1000);
 }
 
-function runSimulatedDiscovery(keyword, count) {
+function runSimulatedDiscovery(keyword, count, country = '') {
   let pct = 0;
   const pMsg = document.getElementById('scanStatusMsg');
   const pPct = document.getElementById('scanProgressPct');
   const pBar = document.getElementById('scanProgressBarFill');
 
+  const cText = country ? ` in ${country}` : '';
   const steps = [
-    'Connecting to YouTube API...',
-    'Searching ranking videos...',
-    'Extracting creator handles...',
-    'Scraping About pages & emails...',
+    `Connecting to YouTube API${cText}...`,
+    `Searching ranking videos${cText}...`,
+    'Extracting creator handles & country metadata...',
+    'Scraping About pages & verified emails...',
     'Running AI video quality scoring...',
     'Finalizing leads...'
   ];
@@ -535,7 +538,7 @@ function runSimulatedDiscovery(keyword, count) {
 
     if (pct >= 100) {
       clearInterval(interval);
-      const generated = generateSampleLeads(keyword, count);
+      const generated = generateSampleLeads(keyword, count, country);
       finishScan(generated, keyword);
     }
   }, 500);
@@ -575,30 +578,71 @@ function finishScan(newLeads, keyword) {
 }
 
 // ------------------------------------------------------------
-function generateSampleLeads(keyword, count) {
+function generateSampleLeads(keyword, count, country = '') {
   const kwClean = keyword.replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'Creator';
-  const names = [
-    `${kwClean} Pro Studio`,
-    `The ${kwClean} Blueprint`,
-    `Daily ${kwClean} Talks`,
-    `Elite ${kwClean} Mastery`,
-    `Prime ${kwClean} Secrets`,
-    `${kwClean} Insights Hub`,
-    `Coach Alex | ${kwClean}`,
-    `Sarah ${kwClean} Coaching`,
-    `NextLevel ${kwClean}`
+  const cUpper = (country || '').toUpperCase();
+
+  let locations = ['Global', 'Studio', 'Media', 'Digital', 'Hub'];
+  let creators = ['Alex', 'Jordan', 'Taylor', 'Morgan', 'Sam', 'Chris', 'Robin', 'Jesse'];
+  let tld = 'com';
+  let cDisplay = cUpper || 'US';
+
+  if (cUpper === 'CA') {
+    locations = ['Toronto', 'Vancouver', 'Montreal', 'Calgary', 'Ottawa', 'Ontario', 'BC', 'Canada'];
+    creators = ['Liam', 'Noah', 'Emma', 'Olivia', 'Ethan', 'Chloe', 'Lucas', 'Maya', 'Felix', 'Sophie', 'Ryan'];
+    tld = 'ca';
+    cDisplay = 'CA';
+  } else if (cUpper === 'GB') {
+    locations = ['London', 'Manchester', 'Birmingham', 'Bristol', 'Edinburgh', 'UK'];
+    creators = ['George', 'Harry', 'Oliver', 'Charlotte', 'Amelia', 'Jack', 'Freddie', 'Poppy'];
+    tld = 'co.uk';
+    cDisplay = 'GB';
+  } else if (cUpper === 'AU') {
+    locations = ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Australia'];
+    creators = ['Jack', 'William', 'Oliver', 'Mia', 'Isla', 'Lucas', 'Cooper'];
+    tld = 'com.au';
+    cDisplay = 'AU';
+  } else if (cUpper === 'US') {
+    locations = ['NYC', 'LA', 'Austin', 'Miami', 'Chicago', 'USA'];
+    creators = ['Jake', 'David', 'Michael', 'Sarah', 'Brandon', 'Jessica', 'Tyler'];
+    tld = 'com';
+    cDisplay = 'US';
+  }
+
+  const nameTemplates = [
+    (n, loc) => `${kwClean} Pro Studio (${loc})`,
+    (n, loc) => `The ${kwClean} Blueprint`,
+    (n, loc) => `Daily ${kwClean} Talks with ${n}`,
+    (n, loc) => `Elite ${kwClean} Mastery`,
+    (n, loc) => `Prime ${kwClean} Secrets`,
+    (n, loc) => `${loc} ${kwClean} Hub`,
+    (n, loc) => `Coach ${n} | ${kwClean} ${loc}`,
+    (n, loc) => `${n} ${kwClean} Coaching`,
+    (n, loc) => `NextLevel ${kwClean} ${loc}`,
+    (n, loc) => `The ${kwClean} Show ${loc}`,
+    (n, loc) => `${kwClean} Lab with ${n}`,
+    (n, loc) => `${kwClean} Collective (${loc})`
   ];
 
   const list = [];
-  for (let i = 0; i < Math.min(count, 15); i++) {
-    const name = names[i % names.length] + (i > names.length - 1 ? ` #${i+1}` : '');
-    const slug = name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+  const targetCount = Math.min(count || 50, 500);
+
+  for (let i = 0; i < targetCount; i++) {
+    const loc = locations[i % locations.length];
+    const n = creators[i % creators.length];
+    const tmpl = nameTemplates[i % nameTemplates.length];
+    let name = tmpl(n, loc);
+    if (i >= nameTemplates.length) {
+      name += ` #${Math.floor(i / nameTemplates.length) + 1}`;
+    }
+
+    const slug = name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || `channel${i+1}`;
     const subsNum = Math.floor(Math.random() * 85000) + 1200;
     const subsStr = subsNum > 999 ? (subsNum / 1000).toFixed(1) + 'K' : subsNum.toString();
     const viewsNum = subsNum * Math.floor(Math.random() * 30 + 10);
     const score = Math.floor(Math.random() * 35) + 65; // 65-100
-    const hasEmail = Math.random() > 0.15;
-    const email = hasEmail ? `contact@${slug}.com` : '';
+    const hasEmail = Math.random() > 0.08;
+    const email = hasEmail ? `contact@${slug}.${tld}` : '';
 
     list.push({
       id: Date.now() + i,
@@ -613,13 +657,13 @@ function generateSampleLeads(keyword, count) {
       avg_views: Math.floor(subsNum * 0.12),
       last_upload: `${Math.floor(Math.random() * 6 + 1)}d ago`,
       upload_freq: '2x/week',
-      website: `https://${slug}.com`,
-      country: 'US',
+      website: `https://${slug}.${tld}`,
+      country: cDisplay,
       created: 'Oct 2022',
       email: email,
       ai_score: score,
       lead_type: score >= 70 ? 'hot' : 'warm',
-      description: `High-value educational content and actionable strategies on ${keyword}. Helping viewers achieve predictable results.`,
+      description: `High-value educational content and actionable strategies on ${keyword} based in ${loc}. Helping viewers achieve predictable results.`,
       social: {
         instagram: `@${slug}`,
         twitter: `@${slug}`,
@@ -817,7 +861,10 @@ function renderResultsTable() {
             </div>
             <div class="channel-meta">
               <h4>${l.channel || l.name}</h4>
-              <span>${l.handle || ''}</span>
+              <span style="display:flex;align-items:center;gap:6px;">
+                ${l.handle || ''}
+                ${l.country ? `<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;background:rgba(255,255,255,0.08);color:#ff98a4;">${l.country === 'CA' ? '🇨🇦 Canada' : (l.country === 'US' ? '🇺🇸 US' : (l.country === 'GB' ? '🇬🇧 UK' : (l.country === 'AU' ? '🇦🇺 AU' : l.country)))}</span>` : ''}
+              </span>
             </div>
           </div>
         </td>

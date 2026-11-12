@@ -206,7 +206,8 @@ class ScanRequest(BaseModel):
     keyword: str
     min_subs: Optional[int] = 1000
     max_subs: Optional[int] = 500000
-    max_results: Optional[int] = 20
+    max_results: Optional[int] = 50
+    country: Optional[str] = ""
     engine: Optional[str] = "auto"   # "auto", "bright_data", "youtube_standard"
 
 @app.post("/api/scan/youtube")
@@ -238,7 +239,8 @@ def api_scan_youtube(req: ScanRequest, background_tasks: BackgroundTasks):
             max_subs=req.max_subs,
             max_results=req.max_results,
             progress_callback=progress_cb,
-            engine=req.engine
+            engine=req.engine,
+            country=req.country or ""
         )
         scan_progress_store[scan_id]["leads"] = leads
         scan_progress_store[scan_id]["found"]  = len(leads)

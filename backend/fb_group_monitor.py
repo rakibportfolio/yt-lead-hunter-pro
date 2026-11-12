@@ -387,12 +387,30 @@ def extract_post_and_author_urls(f_post, clean_url: str) -> tuple:
 
         # 1. Post Link Detection (/posts/ or /permalink/ or multi_permalinks= or story_fbid=)
         if not post_url:
-            if any(k in href for k in ["/posts/", "/permalink/", "story_fbid=", "multi_permalinks="]):
-                clean_p = href.split("?")[0] if ("?" in href and any(t in href for t in ["__cft__", "__tn__", "comment_id"])) else href
-                if clean_p.startswith("/"):
-                    clean_p = f"https://www.facebook.com{clean_p}"
-                if not any(sub in clean_p for sub in ["comment_id=", "reply_comment_id="]):
-                    post_url = clean_p
+            if "multi_permalinks=" in href:
+                m_perm = re.search(r'multi_permalinks=(\d+)', href)
+                m_grp = re.search(r'/groups/([^/?#]+)', href) or re.search(r'/groups/([^/?#]+)', clean_url)
+                if m_perm and m_grp:
+                    post_url = f"https://www.facebook.com/groups/{m_grp.group(1)}/posts/{m_perm.group(1)}/"
+            elif "story_fbid=" in href:
+                m_fbid = re.search(r'story_fbid=(\d+)', href)
+                m_grp = re.search(r'/groups/([^/?#]+)', href) or re.search(r'/groups/([^/?#]+)', clean_url)
+                if m_fbid and m_grp:
+                    post_url = f"https://www.facebook.com/groups/{m_grp.group(1)}/posts/{m_fbid.group(1)}/"
+                elif m_fbid:
+                    post_url = f"https://www.facebook.com/permalink.php?story_fbid={m_fbid.group(1)}"
+            elif any(k in href for k in ["/posts/", "/permalink/"]):
+                m_post = re.search(r'/groups/([^/?#]+)/(?:posts|permalink)/(\d+)', href)
+                if m_post:
+                    post_url = f"https://www.facebook.com/groups/{m_post.group(1)}/posts/{m_post.group(2)}/"
+                else:
+                    clean_p = href.split("?")[0] if "?" in href else href
+                    if clean_p.startswith("/"):
+                        clean_p = f"https://www.facebook.com{clean_p}"
+                    if not any(sub in href for sub in ["comment_id=", "reply_comment_id="]):
+                        # Ensure it's not just the bare group URL
+                        if "/posts/" in clean_p or "/permalink/" in clean_p:
+                            post_url = clean_p.rstrip("/") + "/"
 
         # 2. Author Profile URL Detection
         if not author_url:
@@ -532,7 +550,8 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                             "post_id": pid,
                             "author_name": author or "Facebook User",
                             "author_url": author_url or "",
-                            "post_url": p_href or clean_url,
+                            "post_url": p_href or "",
+                            "group_url": clean_url,
                             "content": txt,
                             "image_url": img_src or ""
                         })
@@ -574,7 +593,8 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
                                 "post_id": pid,
                                 "author_name": author or "Facebook User",
                                 "author_url": author_url or "",
-                                "post_url": p_href or clean_url,
+                                "post_url": p_href or "",
+                                "group_url": clean_url,
                                 "content": txt,
                                 "image_url": img_src or ""
                             })

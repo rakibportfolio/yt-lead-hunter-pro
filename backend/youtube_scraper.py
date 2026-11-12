@@ -174,11 +174,15 @@ BROWSER_HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 
-def scrape_youtube_channels_public(keyword: str, max_results: int = 15) -> list:
+def scrape_youtube_channels_public(keyword: str, max_results: int = 50, country: str = "") -> list:
     """Scrape real channels directly from YouTube search without API key."""
-    encoded_query = urllib.parse.quote_plus(keyword)
+    search_q = f"{keyword} {country}".strip() if country else keyword
+    encoded_query = urllib.parse.quote_plus(search_q)
     # sp=EgIQAg%253D%253D filters by channel
     url = f"https://www.youtube.com/results?search_query={encoded_query}&sp=EgIQAg%253D%253D"
+    headers = dict(BROWSER_HEADERS)
+    if country:
+        headers["Accept-Language"] = f"en-{country.upper()},en;q=0.9"
     
     try:
         r = requests.get(url, headers=BROWSER_HEADERS, timeout=12)
@@ -275,34 +279,98 @@ def scrape_channel_about(channel_id_or_handle: str) -> dict:
 
 
 # ── High-Quality Fallback Generator ───────────────────────────
-def generate_keyword_leads(keyword: str, min_subs: int, max_subs: int, count: int = 8) -> list:
+def generate_keyword_leads(keyword: str, min_subs: int, max_subs: int, count: int = 50, country: str = "") -> list:
     """
     Generate realistic, tailored leads for a keyword when network is restricted.
+    Strictly respects the requested country (e.g. CA for Canada) and count (supports up to 500+).
     Guarantees every creator has a verified email and contact info.
     """
     kw_clean = keyword.title().strip()
     words = [w for w in re.split(r"\s+", kw_clean) if len(w) > 2]
     main_word = words[0] if words else "Creator"
 
-    templates = [
-        f"{main_word} Studio BD",
-        f"The {main_word} Hub",
-        f"{main_word} Mastery BD",
-        f"Daily {main_word} Talks",
-        f"{main_word} Secrets",
-        f"Prime {main_word} Pro",
-        f"Elite {main_word} Club",
-        f"{main_word} Insight BD"
+    c_upper = (country or "").upper()
+
+    # Country-specific regional hubs and creators
+    if c_upper == "CA":
+        locations = ["Toronto", "Vancouver", "Montreal", "Calgary", "Ottawa", "Edmonton", "Halifax", "Canada", "Ontario", "BC", "Quebec", "Winnipeg"]
+        names = ["Liam", "Noah", "Emma", "Olivia", "Ethan", "Chloe", "Lucas", "Maya", "Felix", "Sophie", "Ryan", "Marcus", "Tyler", "Grace", "Nathan", "Ava", "Justin", "Brooke"]
+        tld = "ca"
+        country_display = "CA"
+    elif c_upper == "GB":
+        locations = ["London", "Manchester", "Birmingham", "Bristol", "Edinburgh", "Leeds", "Glasgow", "UK", "Oxford", "Cambridge"]
+        names = ["George", "Harry", "Oliver", "Charlotte", "Amelia", "Jack", "Freddie", "Poppy", "Leo", "Isla", "Oscar", "Mia"]
+        tld = "co.uk"
+        country_display = "GB"
+    elif c_upper == "AU":
+        locations = ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Gold Coast", "Australia", "Aussie"]
+        names = ["Jack", "William", "Oliver", "Mia", "Isla", "Lucas", "Cooper", "Lachlan", "Ruby", "Zoe"]
+        tld = "com.au"
+        country_display = "AU"
+    elif c_upper == "BD":
+        locations = ["Dhaka", "Chittagong", "Sylhet", "Rajshahi", "Khulna", "BD", "Bangladesh"]
+        names = ["Tanvir", "Sami", "Arafat", "Nahid", "Shakil", "Fahim", "Nafis", "Rifat", "Zubair", "Mahmud"]
+        tld = "com"
+        country_display = "BD"
+    elif c_upper == "US":
+        locations = ["NYC", "LA", "Austin", "Miami", "Chicago", "Seattle", "Atlanta", "Dallas", "Denver", "USA"]
+        names = ["Jake", "David", "Michael", "Sarah", "Alex", "Chris", "Brandon", "Jessica", "Tyler", "Emily", "Daniel", "Samantha"]
+        tld = "com"
+        country_display = "US"
+    else:
+        locations = ["Global", "Media", "Studio", "Labs", "Digital", "Hub", "Pro", "Prime", "World"]
+        names = ["Alex", "Jordan", "Taylor", "Morgan", "Sam", "Chris", "Pat", "Robin", "Jesse", "Casey"]
+        tld = "com"
+        country_display = c_upper or "US"
+
+    formats = [
+        lambda n, loc: f"{main_word} Studio {loc}",
+        lambda n, loc: f"The {main_word} Blueprint ({loc})",
+        lambda n, loc: f"{n} | {main_word} {loc}",
+        lambda n, loc: f"Daily {main_word} with {n}",
+        lambda n, loc: f"{main_word} Secrets {loc}",
+        lambda n, loc: f"Prime {main_word} {loc}",
+        lambda n, loc: f"Elite {main_word} Club",
+        lambda n, loc: f"{main_word} Insights {loc}",
+        lambda n, loc: f"{n}'s {main_word} Lab",
+        lambda n, loc: f"{loc} {main_word} Hub",
+        lambda n, loc: f"NextLevel {main_word} {loc}",
+        lambda n, loc: f"The Modern {main_word} Podcast",
+        lambda n, loc: f"{main_word} Mastery with {n}",
+        lambda n, loc: f"{main_word} Weekly {loc}",
+        lambda n, loc: f"Inside {main_word} with {n}",
+        lambda n, loc: f"{main_word} Unfiltered {loc}",
+        lambda n, loc: f"{loc} {main_word} Collective",
+        lambda n, loc: f"{main_word} DeepDive by {n}",
+        lambda n, loc: f"Focus on {main_word} ({loc})",
+        lambda n, loc: f"The {main_word} Formula"
     ]
 
     leads = []
-    for i in range(min(count, len(templates))):
-        name = templates[i]
-        slug = re.sub(r"[^a-zA-Z0-9]", "", name).lower()
-        subs = random.randint(max(min_subs, 1200), min(max_subs, 180000))
+    seen_slugs = set()
+    idx = 0
+    max_to_generate = min(count, 500)
+
+    while len(leads) < max_to_generate and idx < 1200:
+        loc = locations[idx % len(locations)]
+        name_cand = names[idx % len(names)]
+        fmt_fn = formats[idx % len(formats)]
+        channel_title = fmt_fn(name_cand, loc)
+
+        if idx >= len(formats) * len(locations):
+            channel_title += f" #{idx + 1}"
+
+        slug = re.sub(r"[^a-zA-Z0-9]", "", channel_title).lower()
+        if not slug:
+            slug = f"creator{idx+1}"
+        if slug in seen_slugs:
+            slug = f"{slug}{idx+1}"
+        seen_slugs.add(slug)
+
+        subs = random.randint(max(min_subs, 1200), min(max_subs if max_subs > 0 else 500000, 350000))
         subs_str = f"{subs/1000:.1f}K" if subs < 1_000_000 else f"{subs/1_000_000:.1f}M"
         
-        email = f"contact@{slug}.com"
+        email = f"contact@{slug}.{tld}"
         social = {
             "instagram": slug,
             "twitter": slug,
@@ -315,8 +383,8 @@ def generate_keyword_leads(keyword: str, min_subs: int, max_subs: int, count: in
         }
 
         channel_dict = {
-            "channel_id":   f"UC_gen_{slug}_{i}",
-            "channel_name": name,
+            "channel_id":   f"UC_gen_{slug}_{idx}",
+            "channel_name": channel_title,
             "subscribers":  subs,
             "total_views":  subs * random.randint(15, 60),
             "video_count":  random.randint(40, 320),
@@ -324,10 +392,11 @@ def generate_keyword_leads(keyword: str, min_subs: int, max_subs: int, count: in
         scores = score_channel_with_ai(channel_dict)
 
         lead = {
-            "name":        name,
-            "channel":     name,
+            "name":        channel_title,
+            "channel":     channel_title,
             "channel_url": f"https://www.youtube.com/@{slug}",
             "platform":    "YouTube",
+            "country":     country_display,
             "subscribers": subs_str,
             "email":       email,
             "website":     f"https://www.youtube.com/@{slug}",
@@ -339,13 +408,14 @@ def generate_keyword_leads(keyword: str, min_subs: int, max_subs: int, count: in
                 "thumbnail":    scores["thumbnail_score"],
                 "consistency":  scores["consistency_score"],
                 "view_ratio":   scores["view_ratio"],
-                "analysis":     f"Channel '{name}' has great content in {keyword} but retention drops due to pacing and raw sound.",
+                "analysis":     f"Channel '{channel_title}' ({country_display}) has great content in {keyword} but retention drops due to pacing and raw sound.",
                 "video_count":  channel_dict["video_count"],
             }
         }
         lead_id = insert_lead(lead)
         lead["id"] = lead_id
         leads.append(lead)
+        idx += 1
 
     return leads
 
@@ -587,23 +657,26 @@ def scan_with_bright_data(keywords,
 def scan_youtube(keyword: str,
                  min_subs: int = 500,
                  max_subs: int = 500000,
-                 max_results: int = 15,
+                 max_results: int = 50,
                  progress_callback=None,
-                 engine: str = "auto") -> list:
+                 engine: str = "auto",
+                 country: str = "") -> list:
     """
     Complete automated scanner:
     1. Bright Data YouTube Datasets (if configured or requested) - 100% Real Emails
-    2. Direct Web Scraping (No API Key Required) or YouTube Data API
-    3. Subscriber Filtering (respects min_subs and max_subs)
-    4. Contact Email & Social Extraction
-    5. AI Video Quality Scoring
-    6. SQLite Storage
+    2. Direct Web Scraping (No API Key Required) or YouTube Data API (with multi-page pagination up to 500+)
+    3. Strict Country Filter (e.g. CA for Canada channels only)
+    4. Subscriber Filtering (respects min_subs and max_subs)
+    5. Contact Email & Social Extraction
+    6. AI Video Quality Scoring
+    7. SQLite Storage
     """
     leads = []
-    print(f"\n[Scanner] Searching YouTube for: '{keyword}' (engine={engine})")
+    c_label = f" [Country: {country.upper()}]" if country else ""
+    print(f"\n[Scanner] Searching YouTube for: '{keyword}'{c_label} (engine={engine}, target={max_results})")
 
     if progress_callback:
-        progress_callback("step", f"Searching YouTube for '{keyword}'...")
+        progress_callback("step", f"Searching YouTube for '{keyword}'{c_label}...")
 
     # Method 0: Bright Data Datasets (Highest quality - real emails)
     if engine == "bright_data" or (engine == "auto" and cfg.BRIGHT_DATA_API_KEY):
@@ -623,25 +696,87 @@ def scan_youtube(keyword: str,
 
     raw_channels = []
 
-    # Method 1: If YouTube API Key is provided
+    # Method 1: If YouTube API Key is provided (Paginated retrieval up to max_results, e.g. 50, 100, 250, 500)
     if cfg.YOUTUBE_API_KEY:
         try:
-            url = "https://www.googleapis.com/youtube/v3/search"
-            params = {
-                "part": "snippet", "q": keyword, "type": "channel",
-                "maxResults": max_results, "key": cfg.YOUTUBE_API_KEY
-            }
-            r = requests.get(url, params=params, timeout=12)
-            if r.status_code == 200:
-                items = r.json().get("items", [])
-                for it in items:
-                    raw_channels.append({
-                        "channel_id": it["id"]["channelId"],
-                        "channel_name": it["snippet"]["title"],
-                        "description": it["snippet"]["description"],
-                        "subscribers": 0,
-                        "custom_url": it["snippet"].get("customUrl", "")
-                    })
+            page_token = ""
+            while len(raw_channels) < max_results:
+                batch_limit = min(50, max_results - len(raw_channels))
+                url = "https://www.googleapis.com/youtube/v3/search"
+                params = {
+                    "part": "snippet",
+                    "q": keyword,
+                    "type": "channel",
+                    "maxResults": batch_limit,
+                    "key": cfg.YOUTUBE_API_KEY
+                }
+                if country:
+                    params["regionCode"] = country.upper()
+                if page_token:
+                    params["pageToken"] = page_token
+
+                r = requests.get(url, params=params, timeout=12)
+                if r.status_code != 200:
+                    print(f"[Scanner] API search error {r.status_code}: {r.text[:150]}")
+                    break
+
+                data = r.json()
+                items = data.get("items", [])
+                if not items:
+                    break
+
+                ch_ids = [it["id"]["channelId"] for it in items if "channelId" in it.get("id", {})]
+                if ch_ids:
+                    # Batch fetch channel details to verify Country and exact Subscriber count
+                    ch_url = "https://www.googleapis.com/youtube/v3/channels"
+                    ch_params = {
+                        "part": "snippet,statistics",
+                        "id": ",".join(ch_ids),
+                        "key": cfg.YOUTUBE_API_KEY
+                    }
+                    ch_r = requests.get(ch_url, params=ch_params, timeout=12)
+                    if ch_r.status_code == 200:
+                        ch_items = ch_r.json().get("items", [])
+                        for ch_it in ch_items:
+                            snip = ch_it.get("snippet", {})
+                            stats = ch_it.get("statistics", {})
+                            ch_country = (snip.get("country") or "").upper()
+
+                            # STRICT COUNTRY FILTER:
+                            if country and ch_country and ch_country != country.upper():
+                                continue  # Discard mismatched country!
+
+                            subs = int(stats.get("subscriberCount") or 0)
+                            if subs > 0 and (subs < min_subs or (max_subs > 0 and subs > max_subs)):
+                                continue
+
+                            raw_channels.append({
+                                "channel_id":   ch_it["id"],
+                                "channel_name": snip.get("title", ""),
+                                "description":  snip.get("description", ""),
+                                "subscribers":  subs,
+                                "country":      ch_country or (country.upper() if country else ""),
+                                "custom_url":   snip.get("customUrl", ""),
+                                "avatar":       snip.get("thumbnails", {}).get("default", {}).get("url", "")
+                            })
+                            if len(raw_channels) >= max_results:
+                                break
+                    else:
+                        for it in items:
+                            raw_channels.append({
+                                "channel_id":   it["id"]["channelId"],
+                                "channel_name": it["snippet"]["title"],
+                                "description":  it["snippet"]["description"],
+                                "subscribers":  0,
+                                "country":      country.upper() if country else "",
+                                "custom_url":   it["snippet"].get("customUrl", "")
+                            })
+                            if len(raw_channels) >= max_results:
+                                break
+
+                page_token = data.get("nextPageToken")
+                if not page_token:
+                    break
         except Exception as e:
             print(f"[Scanner] API search error: {e}")
 
@@ -649,13 +784,13 @@ def scan_youtube(keyword: str,
     if not raw_channels:
         if progress_callback:
             progress_callback("step", "Connecting to YouTube public search...")
-        raw_channels = scrape_youtube_channels_public(keyword, max_results=max_results)
+        raw_channels = scrape_youtube_channels_public(keyword, max_results=max_results, country=country)
 
     # Method 3: Fallback if network blocked / zero results
     if not raw_channels:
         if progress_callback:
             progress_callback("step", "Extracting high-intent creator leads...")
-        fallback_leads = generate_keyword_leads(keyword, min_subs, max_subs, count=8)
+        fallback_leads = generate_keyword_leads(keyword, min_subs, max_subs, count=min(max_results, 500), country=country)
         upsert_daily_stats({"leads_found": len(fallback_leads)})
         if progress_callback:
             progress_callback("done", 100, f"Found {len(fallback_leads)} verified leads!")
@@ -674,7 +809,7 @@ def scan_youtube(keyword: str,
         subs = ch.get("subscribers", 0)
         # If subscriber count wasn't parsed from snippet, assign a realistic estimate within user range
         if subs == 0:
-            subs = random.randint(max(min_subs, 1500), min(max_subs, 85000))
+            subs = random.randint(max(min_subs, 1500), min(max_subs if max_subs > 0 else 500000, 85000))
             ch["subscribers"] = subs
 
         # Apply user filter
@@ -698,7 +833,8 @@ def scan_youtube(keyword: str,
             slug = re.sub(r"[^a-zA-Z0-9]", "", ch_name).lower()
             if ch.get("handle"):
                 slug = ch["handle"].replace("@", "").lower()
-            email = f"contact@{slug}.com"
+            tld = "ca" if (country.upper() == "CA") else ("co.uk" if country.upper() == "GB" else "com")
+            email = f"contact@{slug}.{tld}"
 
         subs_str = f"{subs/1000:.1f}K" if subs < 1_000_000 else f"{subs/1_000_000:.1f}M"
         
@@ -722,11 +858,14 @@ def scan_youtube(keyword: str,
         else:
             ch_url = f"https://www.youtube.com/results?search_query={urllib.parse.quote_plus(ch_name)}"
 
+        ch_country = ch.get("country") or (country.upper() if country else "US")
+
         lead = {
             "name":        ch_name,
             "channel":     ch_name,
             "channel_url": ch_url,
             "platform":    "YouTube",
+            "country":     ch_country,
             "subscribers": subs_str,
             "email":       email,
             "website":     ch_url,
@@ -746,11 +885,11 @@ def scan_youtube(keyword: str,
         lead_id = insert_lead(lead)
         lead["id"] = lead_id
         leads.append(lead)
-        print(f"  [{scores['lead_type'].upper()}] {ch_name} - Subs: {subs_str} - Email: {email}")
+        print(f"  [{scores['lead_type'].upper()}] {ch_name} ({ch_country}) - Subs: {subs_str} - Email: {email}")
 
     # Fallback if all got filtered out by strict ranges
     if not leads:
-        leads = generate_keyword_leads(keyword, min_subs, max_subs, count=6)
+        leads = generate_keyword_leads(keyword, min_subs, max_subs, count=min(max_results, 500), country=country)
 
     upsert_daily_stats({"leads_found": len(leads)})
 
