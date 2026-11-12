@@ -178,7 +178,15 @@ Respond ONLY with valid JSON in this exact structure:
 
 def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str, Any]:
     """Smart Rule-based Classifier with regex contact extraction."""
-    c_lower = content.lower()
+    # Strip comments and reactions section so that freelancers replying in comments
+    # do NOT falsely trigger the self-promo rejection on a genuine client's post!
+    clean_content = content
+    for stop_word in ["All reactions:", "Like\nComment\nShare", "View more answers", "View more comments", "Write a comment", "Like\r\nComment\r\nShare"]:
+        if stop_word.lower() in clean_content.lower():
+            idx = clean_content.lower().find(stop_word.lower())
+            clean_content = clean_content[:idx].strip()
+
+    c_lower = clean_content.lower()
 
     # Negative patterns (freelancer promoting their own editing services)
     freelancer_patterns = [
@@ -223,6 +231,15 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
         r'\bkaro\s+lagle\s+(?:inbox|knock|dm|bolben|jogajog)\b',
         r'\beditor\s+lagle\s+(?:inbox|knock|dm|message|jogajog)\s+(?:koren|korun|diben|din)\b',
         r'\bkom\s+(?:taka|dame|kharoche|budget)\s*(?:e)?\s*video\s+edit\b',
+        r'looking\s+for\s+(?:a\s+)?(?:video\s+)?editor\s*\?',
+        r'let(?:’|\'|\s*)s\s+work\s+together',
+        r'\bvideo\s+editing\s+services?\s+offer\b',
+        r'\byou(?:’|\'|\s*)ve\s+found\s+one\b',
+        r'\btry\s+before\s+you\s+hire\b',
+        r'\bfree\s+(?:video\s+editing\s+)?demo\b',
+        r'\bfree\s+(?:test|sample)\s+edit\b',
+        r'\bfree\s+trial\s+edit\b',
+        r'\bhire\s+me\b',
         
         # Bengali promos
         r'আমি\s+(?:একজন\s+)?(?:ভিডিও\s+)?এডিটর',
