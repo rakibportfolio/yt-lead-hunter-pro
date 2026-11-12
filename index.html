@@ -400,7 +400,7 @@
                   <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Country / Market</label>
                   <a href="javascript:void(0)" onclick="clearCountryFilter()" style="font-size:11px;color:var(--primary-red);font-weight:600;">Clear all</a>
                 </div>
-                <select id="filterCountry" class="search-input-field" style="padding:10px 14px;font-size:13.5px;">
+                <select id="filterCountry" class="search-input-field" style="padding:10px 14px;font-size:13.5px;" onchange="renderResultsTable()">
                   <option value="">🌐 Global (No country filter)</option>
                   <option value="US">🇺🇸 United States</option>
                   <option value="GB">🇬🇧 United Kingdom</option>
@@ -1349,6 +1349,6 @@ Micro-Niche
     </div>
   </div>
 
-  <script src="app.js?v=3.4" charset="UTF-8"></script>
+  <script src="app.js?v=4.0_real_canadian_channels" charset="UTF-8"></script>
 </body>
 </html>

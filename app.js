@@ -356,6 +356,7 @@ function toggleAdvancedFilters() {
 function clearCountryFilter() {
   const sel = document.getElementById('filterCountry');
   if (sel) sel.value = '';
+  renderResultsTable();
 }
 
 function pasteClipboardKeywords() {
@@ -837,6 +838,12 @@ function renderResultsTable() {
       (l.handle || '').toLowerCase().includes(q) ||
       (l.email || '').toLowerCase().includes(q)
     );
+  }
+
+  // Country filter from discovery dropdown
+  const selCountry = (document.getElementById('filterCountry')?.value || '').toUpperCase();
+  if (selCountry) {
+    filtered = filtered.filter(l => (l.country || '').toUpperCase() === selCountry);
   }
 
   // Header Counters
