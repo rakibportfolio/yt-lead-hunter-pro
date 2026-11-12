@@ -30,3 +30,4 @@ for r in c.fetchall():
     print("  ", r)
 
 conn.close()
+

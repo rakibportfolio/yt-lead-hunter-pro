@@ -831,7 +831,10 @@ def get_pipeline_board() -> dict:
                l.next_followup, l.updated_at,
                (SELECT COUNT(*) FROM emails e WHERE e.lead_id = l.id) as email_count,
                (SELECT MAX(open_count) FROM emails e WHERE e.lead_id = l.id) as max_opens,
-               (SELECT status FROM emails e WHERE e.lead_id = l.id ORDER BY e.id DESC LIMIT 1) as last_email_status
+               (SELECT status FROM emails e WHERE e.lead_id = l.id ORDER BY e.id DESC LIMIT 1) as last_email_status,
+               (SELECT subject FROM emails e WHERE e.lead_id = l.id ORDER BY e.id DESC LIMIT 1) as last_email_subject,
+               (SELECT sent_at FROM emails e WHERE e.lead_id = l.id ORDER BY e.id DESC LIMIT 1) as last_email_sent_at,
+               (SELECT open_count FROM emails e WHERE e.lead_id = l.id ORDER BY e.id DESC LIMIT 1) as last_email_opens
         FROM leads l
         ORDER BY l.ai_score DESC
     """).fetchall()
@@ -905,6 +908,20 @@ def get_lead_activity(lead_id: int) -> list:
     conn = get_db()
     rows = conn.execute(
         "SELECT * FROM activity_log WHERE lead_id=? ORDER BY created_at DESC LIMIT 20",
+        (lead_id,)
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_lead_emails(lead_id: int) -> list:
+    conn = get_db()
+    rows = conn.execute(
+        """SELECT id, to_address, subject, body, template_used, tracking_id, 
+                  status, open_count, click_count, sent_at, opened_at, clicked_at, error_msg
+           FROM emails 
+           WHERE lead_id=? 
+           ORDER BY id DESC""",
         (lead_id,)
     ).fetchall()
     conn.close()

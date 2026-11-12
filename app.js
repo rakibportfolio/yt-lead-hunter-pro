@@ -1893,9 +1893,13 @@ function renderKanbanCard(lead, stageId) {
   const score = lead.ai_score || 50;
   const name  = (lead.channel || lead.name || 'Unknown').substring(0, 28);
   const subs  = lead.subscribers || '-';
-  const emailDot = lead.last_email_status === 'opened'  ? '[Opened]' :
-                   lead.last_email_status === 'replied'  ? '[Replied]' :
-                   lead.last_email_status === 'sent'     ? '[Sent]' : '';
+  const opens = lead.last_email_opens || lead.max_opens || 0;
+  const emailDot = opens > 0 || lead.last_email_status === 'opened' ? `<span style="color:#7c3aed;font-weight:700;">[👁 Opened ${opens>0?opens+'x':''}]</span>` :
+                   lead.last_email_status === 'replied'  ? '<span style="color:#2563eb;font-weight:700;">[💬 Replied]</span>' :
+                   lead.last_email_status === 'sent'     ? '<span style="color:#16a34a;font-weight:700;">[📤 Sent]</span>' : '';
+  const emailSnippet = lead.last_email_subject
+    ? `<div style="font-size:10.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:4px 0 2px 0;cursor:pointer;" onclick="openCrmPanel(${lead.id})" title="${escapeHtml(lead.last_email_subject)}">✉️ ${escapeHtml(lead.last_email_subject)}</div>`
+    : '';
   const deal = lead.deal_value > 0 ? `<span class="kanban-deal-val">$${Number(lead.deal_value).toLocaleString()}</span>` : '';
 
   return `
@@ -1905,6 +1909,7 @@ function renderKanbanCard(lead, stageId) {
          ondragend="onDragEnd(event)">
       <div class="kanban-card-name" title="${lead.channel || lead.name}">${name}</div>
       <div class="kanban-card-sub">${subs} subs ${emailDot}</div>
+      ${emailSnippet}
       <div class="kanban-card-footer">
         <span class="kanban-tag ${tag}">${tag}</span>
         <span class="kanban-score">${score}</span>
@@ -2013,11 +2018,13 @@ async function openCrmPanel(leadId) {
   if (titleEl) titleEl.textContent = lead.channel || lead.name;
 
   let activities = [];
+  let emails = [];
   try {
     const res = await fetch(`/api/pipeline/${leadId}/activity`);
     if (res.ok) {
       const d = await res.json();
       activities = d.activities || [];
+      emails = d.emails || [];
     }
   } catch (_) {}
 
@@ -2032,6 +2039,37 @@ async function openCrmPanel(leadId) {
           </div>
         </div>`).join('')
     : '<div style="color:var(--text-muted);font-size:12px;">No activity yet</div>';
+
+  const emailsHtml = emails.length > 0
+    ? emails.map(e => {
+        const isOpen = (e.open_count || 0) > 0 || e.status === 'opened';
+        const statusBadge = isOpen
+          ? `<span style="background:#f3e8ff;color:#7c3aed;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;">👁 Opened ${e.open_count || 1}x ${e.opened_at ? '· ' + e.opened_at.substring(11,16) : ''}</span>`
+          : e.status === 'sent'
+            ? `<span style="background:#dcfce7;color:#15803d;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;">📤 Sent · Waiting for Open</span>`
+            : `<span style="background:#fee2e2;color:#b91c1c;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;">${e.status}</span>`;
+        
+        return `
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-main);">${escapeHtml(e.subject || 'No Subject')}</div>
+              <div>${statusBadge}</div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
+              To: <strong style="color:var(--text-main);">${escapeHtml(e.to_address || '')}</strong> · Sent: ${(e.sent_at || '').substring(0, 16)}
+            </div>
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:10px;font-size:11px;color:#334155;white-space:pre-wrap;max-height:180px;overflow-y:auto;font-family:inherit;line-height:1.45;">${escapeHtml(e.body || '')}</div>
+            ${e.tracking_id ? `
+              <div style="margin-top:8px;display:flex;justify-content:flex-end;">
+                <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 10px;background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe;cursor:pointer;" onclick="simulateOpenTracking('${e.tracking_id}', ${leadId})">
+                  🧪 Test Open (Simulate Recipient Opening Email)
+                </button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('')
+    : '<div style="color:var(--text-muted);font-size:12px;">No outreach email sent yet to this creator.</div>';
 
   const currentStage = lead.pipeline_stage || 'new_lead';
   const stageLabel = PIPELINE_STAGES.find(s => s.id === currentStage)?.label || currentStage;
@@ -2055,6 +2093,14 @@ async function openCrmPanel(leadId) {
         <div class="crm-label">Contact</div>
         <div class="crm-value" style="margin-bottom:6px;">${lead.email || 'No email'}</div>
         <div>${socialHtml || '<span style="color:var(--text-muted);font-size:12px;">No social links</span>'}</div>
+      </div>
+
+      <div class="crm-section" style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;">
+        <div class="crm-label" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span>✉️ Sent Outreach Emails (${emails.length})</span>
+          <span style="font-size:10px;color:var(--text-muted);font-weight:normal;">Real-time tracking</span>
+        </div>
+        ${emailsHtml}
       </div>
 
       <div class="crm-section">
@@ -2092,6 +2138,25 @@ async function openCrmPanel(leadId) {
       </div>
     `;
   }
+
+  const p = document.getElementById('crmPanel');
+  if (p) p.style.display = 'block';
+}
+
+async function simulateOpenTracking(trackingId, leadId) {
+  try {
+    const res = await fetch(`/track/open/${trackingId}`);
+    if (res.ok) {
+      showToast('🎉 Tracking pixel triggered! Lead auto-moved to "Email Opened"', 'success');
+      await loadPipelineBoard();
+      openCrmPanel(leadId);
+    } else {
+      showToast('Could not trigger tracking pixel', 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
 
   const p = document.getElementById('crmPanel');
   if (p) p.style.display = 'block';

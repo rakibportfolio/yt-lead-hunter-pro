@@ -665,8 +665,10 @@ def api_update_notes(lead_id: int, req: LeadNotesRequest):
 
 @app.get("/api/pipeline/{lead_id}/activity")
 def api_lead_activity(lead_id: int):
+    from database import get_lead_emails
     activities = get_lead_activity(lead_id)
-    return {"ok": True, "activities": activities}
+    emails = get_lead_emails(lead_id)
+    return {"ok": True, "activities": activities, "emails": emails}
 
 
 # ═══════════════════════════════════════════════════════════════
