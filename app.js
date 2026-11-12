@@ -2280,3 +2280,27 @@ function copyAiPitch() {
   });
 }
 
+async function checkVpsWorkerStatus() {
+  const el = document.getElementById('vpsWorkerStatusText');
+  try {
+    const res = await fetch('/api/worker/status');
+    const data = await res.json();
+    if (data.ok && data.worker) {
+      const w = data.worker;
+      if (el) {
+        el.innerHTML = `✅ <b>VPS Hunter Online</b> • Uptime: <b>${w.uptime_human}</b> • Cycles Completed: <b>#${w.cycles_completed}</b> • Scanned: <b>${w.total_posts_scanned} posts</b> • Leads Found: <b>${w.total_hiring_leads_found}</b>`;
+      }
+      showToast(`VPS 24/7 Hunter is active! Uptime: ${w.uptime_human}, Cycles: #${w.cycles_completed}`, 'success');
+    }
+  } catch (err) {
+    if (el) el.textContent = 'VPS status check error';
+  }
+}
+
+// Check worker status whenever FB Radar page is opened
+const originalLoadFbRadarPage = window.loadFbRadarPage;
+window.loadFbRadarPage = async function() {
+  if (originalLoadFbRadarPage) await originalLoadFbRadarPage();
+  checkVpsWorkerStatus();
+};
+

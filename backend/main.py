@@ -61,9 +61,13 @@ app.add_middleware(
 def startup():
     init_db()
     try:
-        start_fb_monitor()
+        from worker_daemon import WORKER_STATE, start_autonomous_worker_loop
+        if not WORKER_STATE.get("is_running"):
+            t = threading.Thread(target=start_autonomous_worker_loop, daemon=True)
+            t.start()
+            print("[Startup] 24/7 Autonomous Hunter Daemon thread started.")
     except Exception as e:
-        print(f"[Startup Warning] Could not start FB monitor: {e}")
+        print(f"[Startup Warning] Could not start worker daemon: {e}")
     print(f"\n{'='*50}")
     print("  [ZENTIC MEDIA] Client Hunter Backend")
     print(f"  Running at: http://localhost:8000")
@@ -710,6 +714,11 @@ def api_scan_global(background_tasks: BackgroundTasks):
     from multi_platform_hunter import run_multi_platform_hunter
     background_tasks.add_task(run_multi_platform_hunter)
     return {"ok": True, "message": "Global client hunting started across Reddit, RemoteOK & creator job boards in background!"}
+
+@app.get("/api/worker/status")
+def api_worker_status():
+    from worker_daemon import get_worker_status
+    return {"ok": True, "worker": get_worker_status()}
 
 @app.post("/api/fb/test-alert")
 def api_test_fb_alert():
