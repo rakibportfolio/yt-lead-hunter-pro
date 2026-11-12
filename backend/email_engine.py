@@ -119,6 +119,89 @@ Zentic Media
 
 {unsubscribe_link}
 """
+    },
+    "var1": {
+        "subject": "re: 20-second edit for {channel}",
+        "body": """Hey {name},
+
+Loved your recent video! Congrats on growing {channel} to {subscribers} subscribers.
+
+I actually took a quick 20-second clip from your intro and re-edited the hook with dynamic pacing, sound design, and pattern interrupts just to see how much tighter it feels.
+
+Mind if I drop the Google Drive link over? Zero sales pitch—if you like the retention style, you can use it 100% free.
+
+Best,
+Rakibul Hasan (Rakib)
+Founder & Lead Editor | Zentic Media
+Portfolio: https://zenticmedia.com/portfolio"""
+    },
+    "var2": {
+        "subject": "Quick retention thought on your content ({channel})",
+        "body": """Hey {name},
+
+Congrats on over {total_views} views on {channel}!
+
+I noticed views fluctuate across your uploads. On YouTube, if viewer retention drops below 60% in the first 45 seconds, the algorithm immediately slows Browse impressions—usually caused by slow hooks and missing sound cues.
+
+At Zentic Media, we specialize in high-retention editing (https://zenticmedia.com/portfolio).
+
+I'd love to edit a free 20-second retention hook for your upcoming video. No commitment—just to prove the watch-time jump.
+
+Dropping a video this week?
+
+Best,
+Rakibul Hasan (Rakib) | Zentic Media"""
+    },
+    "var3": {
+        "subject": "A/B test for {channel}'s next video?",
+        "body": """Hey {name},
+
+Big fan of your content—you've built an incredible audience of {subscribers} creators!
+
+Talk is cheap, so here's a risk-free test: Send me 20-30 seconds of raw intro footage from your next video. I'll edit a high-retention hook completely free.
+
+Test it against your normal edit. If your retention graph doesn't spike, you lose nothing.
+
+You can check out our recent creator edits here: https://zenticmedia.com/portfolio
+
+Open to giving it a shot?
+
+Best regards,
+Rakibul Hasan (Rakib)
+Lead Video Editor, Zentic Media"""
+    },
+    "var4": {
+        "subject": "Free 20s hook for {channel}?",
+        "body": """Hey {name},
+
+Great work on your latest upload!
+
+I run Zentic Media (https://zenticmedia.com/portfolio), where we specialize in retention editing that keeps viewers watching past the 60-second mark.
+
+To prove our quality, I'd love to edit a 20-second demo hook for your next video 100% free with zero strings attached.
+
+If you like the retention boost, great. If not, it's yours to keep free.
+
+Dropping a video this week? Just reply "yes" and I'll send over the details.
+
+Best,
+Rakibul Hasan (Rakib) | Zentic Media"""
+    },
+    "var5": {
+        "subject": "quick question regarding {channel}",
+        "body": """Hey {name},
+
+Huge congrats on building {channel} to {subscribers} subscribers!
+
+While checking out your uploads, I noticed the intro pacing takes 20-30 seconds to get to the core point, which usually causes early drop-off before YouTube pushes the video to Suggested feeds.
+
+We fix this through micro-resets and tight hooks (portfolio: https://zenticmedia.com/portfolio).
+
+Can I gift you a free 20-second hook edit for your next video so you can see the difference on your retention graph?
+
+Best,
+Rakibul Hasan (Rakib)
+Founder, Zentic Media"""
     }
 }
 
@@ -316,11 +399,13 @@ def send_email(
         return {"success": False, "tracking_id": tracking_id, "email_id": email_id, "error": error_msg}
 
 
-def send_bulk_emails(leads: list, template_name: str = "hot",
+def send_bulk_emails(leads: list, template_name: str = "var1",
+                     custom_subject: str = "",
+                     custom_body: str = "",
                      campaign_id: int = None,
-                     delay_seconds: float = 2.0) -> dict:
+                     delay_seconds: float = 15.0) -> dict:
     """
-    Send emails to a list of leads with personalization.
+    Send emails to a list of leads with personalization and anti-spam delays.
     Respects daily send limit.
     """
     results = {"sent": 0, "failed": 0, "skipped": 0, "details": []}
@@ -331,25 +416,43 @@ def send_bulk_emails(leads: list, template_name: str = "hot",
             results["skipped"] += 1
             continue
 
+        ch_title = lead.get("channel") or lead.get("name") or "Creator"
+        subs_val = str(lead.get("subscribers") or "1.5K")
+        views_val = str(lead.get("total_views") or "45.2K")
+        vids_val = str(lead.get("videos") or 85)
+        created_val = str(lead.get("created") or "Oct 2022")
+
         # Personalize template
         variables = {
-            "name":          lead.get("name", "there"),
-            "channel":       lead.get("channel", "your channel"),
-            "subscribers":   lead.get("subscribers", ""),
+            "name":          ch_title,
+            "channel":       ch_title,
+            "subscribers":   subs_val,
+            "total_views":   views_val,
+            "videos":        vids_val,
+            "created":       created_val,
             "view_ratio":    lead.get("ai_analysis", {}).get("view_ratio", "low"),
             "loss_pct":      random.randint(30, 60),
-            "sender_name":   "Your Name",
+            "sender_name":   "Rakibul Hasan (Rakib)",
             "sender_email":  cfg.GMAIL_ADDRESS,
-            "unsubscribe_link": "",  # Will be filled after email is inserted
+            "unsubscribe_link": "",
         }
 
-        tmpl = get_template(template_name, variables)
+        if custom_subject and custom_body:
+            subj = custom_subject.format_map(SafeDict(variables))
+            b_text = custom_body.format_map(SafeDict(variables))
+            tmpl_label = "custom_campaign"
+        else:
+            tmpl = get_template(template_name, variables)
+            subj = tmpl["subject"]
+            b_text = tmpl["body"]
+            tmpl_label = template_name
+
         result = send_email(
             to_address=lead["email"],
-            subject=tmpl["subject"],
-            body_text=tmpl["body"],
+            subject=subj,
+            body_text=b_text,
             lead_id=lead.get("id"),
-            template_used=template_name,
+            template_used=tmpl_label,
             campaign_id=campaign_id,
         )
 
@@ -359,13 +462,13 @@ def send_bulk_emails(leads: list, template_name: str = "hot",
             results["failed"] += 1
 
         results["details"].append({
-            "lead": lead.get("name"),
+            "lead": ch_title,
             "email": lead["email"],
             **result
         })
 
         import time
-        time.sleep(delay_seconds)  # Human-like delay
+        time.sleep(delay_seconds)  # Human-like delay to preserve sender reputation
 
     print(f"\n[Bulk Email] Done! Sent: {results['sent']} | Failed: {results['failed']} | Skipped: {results['skipped']}")
     return results

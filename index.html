@@ -551,6 +551,9 @@
           <p class="page-subtitle" id="resultsSubHeader">All collected YouTube creator leads and contact profiles</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-primary-red" onclick="openBulkEmailModal()" id="btnBulkEmailSelected" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;font-weight:700;display:flex;align-items:center;gap:6px;padding:9px 16px;box-shadow:0 4px 12px rgba(124,58,237,0.3);cursor:pointer;" title="Send automated emails to selected leads">
+            <span>✉️</span> Send Email to Selected (<span id="bulkEmailCountBadge">0</span>)
+          </button>
           <button class="btn-secondary" onclick="exportDirectToGoogleSheets()" style="background:#137333;color:#fff;border-color:#137333;" title="Open and export directly to Google Sheets">📊 Export to Google Sheets</button>
           <button class="btn-secondary" onclick="clearAllResults()">Clear All</button>
           <button class="btn-secondary" onclick="exportFilteredLeads()">Export Filtered</button>
@@ -1407,6 +1410,96 @@ Micro-Niche
     </div>
   </div>
 
-  <script src="app.js?v=7.0_google_sheets_guide" charset="UTF-8"></script>
+  <!-- Bulk Email Campaign Modal -->
+  <div id="bulkEmailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+    <div style="background:#fff;border-radius:14px;width:92%;max-width:680px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);overflow:hidden;border:1px solid #e2e8f0;animation:fadeIn 0.2s ease;">
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,#7c3aed,#4f46e5);padding:18px 22px;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:24px;">🚀</span>
+          <div>
+            <h3 style="margin:0;font-size:17px;font-weight:800;color:#fff;">Auto Email Outreach Campaign</h3>
+            <p style="margin:2px 0 0 0;font-size:12px;opacity:0.9;">
+              Send hyper-personalized emails via <strong>zenticmediaofficial@gmail.com</strong>
+            </p>
+          </div>
+        </div>
+        <button onclick="closeBulkEmailModal()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+
+      <!-- Body -->
+      <div style="padding:22px;max-height:75vh;overflow-y:auto;color:#1e293b;">
+        <!-- Campaign Summary Bar -->
+        <div style="display:flex;gap:12px;margin-bottom:18px;background:#f8fafc;padding:12px 16px;border-radius:10px;border:1px solid #e2e8f0;">
+          <div style="flex:1;">
+            <span style="font-size:11px;font-weight:700;color:#64748b;display:block;">SELECTED CHANNELS</span>
+            <strong id="bulkSelectedTotal" style="font-size:15px;color:#0f172a;">0 channels</strong>
+          </div>
+          <div style="flex:1;">
+            <span style="font-size:11px;font-weight:700;color:#64748b;display:block;">VERIFIED RECIPIENTS</span>
+            <strong id="bulkValidEmailCount" style="font-size:15px;color:#16a34a;">0 with emails</strong>
+          </div>
+          <div style="flex:1;">
+            <span style="font-size:11px;font-weight:700;color:#64748b;display:block;">SENDER ACCOUNT</span>
+            <strong style="font-size:13px;color:#4f46e5;">zenticmediaofficial@gmail.com</strong>
+          </div>
+        </div>
+
+        <!-- Template Selector -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:700;color:#334155;display:block;margin-bottom:6px;">
+            Choose Email Angle / Template:
+          </label>
+          <select id="bulkTemplateSelect" onchange="onBulkTemplateChange()" style="width:100%;padding:10px 12px;border:1.5px solid #cbd5e1;border-radius:8px;font-size:13px;font-weight:600;background:#fff;cursor:pointer;">
+            <option value="var1">🧪 Variation 1: Finished 20s Sample ("re: 20-second edit for {channel}") [95% Reply Rate]</option>
+            <option value="var2">🧪 Variation 2: Retention Metric ("Quick retention thought on {channel}")</option>
+            <option value="var3">🧪 Variation 3: A/B Test Challenge ("A/B test for {channel}'s next video?")</option>
+            <option value="var4">🧪 Variation 4: Direct Zero-BS ("Free 20s hook for {channel}?") [Ultra-Short]</option>
+            <option value="var5">🧪 Variation 5: Specific Weakness Fix ("quick question regarding {channel}")</option>
+          </select>
+        </div>
+
+        <!-- Subject & Body Live Preview -->
+        <div style="margin-bottom:14px;">
+          <label style="font-size:12px;font-weight:700;color:#334155;display:block;margin-bottom:4px;">Email Subject:</label>
+          <input type="text" id="bulkEmailSubject" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;font-weight:700;background:#f8fafc;" />
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:700;color:#334155;display:block;margin-bottom:4px;">Email Body (Placeholders auto-filled per creator):</label>
+          <textarea id="bulkEmailBody" rows="8" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-size:12.5px;font-family:inherit;line-height:1.5;resize:vertical;background:#f8fafc;color:#1e293b;"></textarea>
+        </div>
+
+        <!-- Sending Safety Settings -->
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div>
+            <strong style="font-size:12.5px;color:#1e40af;">🛡️ Safe Sending Guard</strong>
+            <p style="margin:2px 0 0 0;font-size:11.5px;color:#3b82f6;">Auto-delays 15s between sends to protect Gmail reputation from spam blocks.</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:11px;font-weight:700;color:#1e40af;">Delay:</span>
+            <select id="bulkDelaySelect" style="padding:4px 8px;border-radius:6px;border:1px solid #93c5fd;font-size:12px;background:#fff;">
+              <option value="15">15 seconds (Recommended)</option>
+              <option value="25">25 seconds (Ultra Safe)</option>
+              <option value="5">5 seconds (Fast)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="padding:14px 22px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
+        <span id="bulkSendingStatusText" style="font-size:12px;font-weight:700;color:#64748b;">Ready to launch</span>
+        <div style="display:flex;gap:10px;">
+          <button onclick="closeBulkEmailModal()" class="btn-secondary" style="padding:9px 18px;font-size:13px;">Cancel</button>
+          <button onclick="startBulkEmailSend()" id="btnStartBulkSend" style="background:#7c3aed;color:#fff;border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(124,58,237,0.35);">
+            🚀 Send Campaign Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=8.0_bulk_email_campaign" charset="UTF-8"></script>
 </body>
 </html>

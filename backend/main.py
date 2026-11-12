@@ -307,9 +307,11 @@ def api_send_email(req: EmailSendRequest):
 
 class BulkEmailRequest(BaseModel):
     lead_ids: List[int]
-    template_name: str = "hot"
+    template_name: str = "var1"
+    custom_subject: Optional[str] = ""
+    custom_body: Optional[str] = ""
     campaign_id: Optional[int] = None
-    delay_seconds: float = 2.0
+    delay_seconds: float = 15.0
 
 @app.post("/api/email/bulk")
 def api_bulk_email(req: BulkEmailRequest, background_tasks: BackgroundTasks):
@@ -322,10 +324,12 @@ def api_bulk_email(req: BulkEmailRequest, background_tasks: BackgroundTasks):
         results = send_bulk_emails(
             leads=target_leads,
             template_name=req.template_name,
+            custom_subject=req.custom_subject or "",
+            custom_body=req.custom_body or "",
             campaign_id=req.campaign_id,
             delay_seconds=req.delay_seconds
         )
-        send_telegram(f"📧 *Bulk Email Done!*\n✅ Sent: {results['sent']}\n❌ Failed: {results['failed']}")
+        send_telegram(f"📧 *Bulk Email Campaign Done!*\n✅ Sent: {results['sent']}\n❌ Failed: {results['failed']}\n⚠️ Skipped: {results['skipped']}")
 
     background_tasks.add_task(run_bulk)
     return {"status": "started", "lead_count": len(target_leads)}

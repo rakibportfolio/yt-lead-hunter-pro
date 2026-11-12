@@ -918,8 +918,9 @@ function renderResultsTable() {
           ${l.email ? `<span class="email-pill" onclick="copyText('${l.email}')" title="Click to copy email">✉️ ${l.email}</span>` : '<span class="no-email-pill">—</span>'}
         </td>
         <td>
-          <div style="display:flex;gap:6px;">
+          <div style="display:flex;gap:5px;align-items:center;">
             <button class="btn-secondary" style="padding:4px 8px;font-size:11px;" onclick="openLeadModal(${l.id})">View</button>
+            <button class="btn-secondary" style="padding:4px 8px;font-size:11px;background:#7c3aed;color:#fff;border-color:#7c3aed;" onclick="openSingleEmailModal(${l.id})" title="Send email to this creator">✉ Email</button>
             <button class="score-badge ${scoreClass}">${l.ai_score || 50}</button>
           </div>
         </td>
@@ -975,6 +976,209 @@ function updateSelectedCount() {
   const count = APP_STATE.selectedLeadIds.size;
   const btn = document.getElementById('btnExportSelected');
   if (btn) btn.textContent = `Export Selected (${count})`;
+  const badge = document.getElementById('bulkEmailCountBadge');
+  if (badge) badge.textContent = count;
+}
+
+const BULK_EMAIL_TEMPLATES = {
+  var1: {
+    name: 'Variation 1: Finished 20s Sample (95% Reply Rate)',
+    subject: 're: 20-second edit for {channel}',
+    body: `Hey {name},
+
+Loved your recent video! Congrats on growing {channel} to {subscribers} subscribers.
+
+I actually took a quick 20-second clip from your intro and re-edited the hook with dynamic pacing, sound design, and pattern interrupts just to see how much tighter it feels.
+
+Mind if I drop the Google Drive link over? Zero sales pitch—if you like the retention style, you can use it 100% free.
+
+Best,
+Rakibul Hasan (Rakib)
+Founder & Lead Editor | Zentic Media
+Portfolio: https://zenticmedia.com/portfolio`
+  },
+  var2: {
+    name: 'Variation 2: Retention Metric & Algorithm',
+    subject: 'Quick retention thought on your content ({channel})',
+    body: `Hey {name},
+
+Congrats on over {total_views} views on {channel}!
+
+I noticed views fluctuate across your uploads. On YouTube, if viewer retention drops below 60% in the first 45 seconds, the algorithm immediately slows Browse impressions—usually caused by slow hooks and missing sound cues.
+
+At Zentic Media, we specialize in high-retention editing (https://zenticmedia.com/portfolio).
+
+I'd love to edit a free 20-second retention hook for your upcoming video. No commitment—just to prove the watch-time jump.
+
+Dropping a video this week?
+
+Best,
+Rakibul Hasan (Rakib) | Zentic Media`
+  },
+  var3: {
+    name: 'Variation 3: A/B Test Challenge',
+    subject: "A/B test for {channel}'s next video?",
+    body: `Hey {name},
+
+Big fan of your content—you've built an incredible audience of {subscribers} creators!
+
+Talk is cheap, so here's a risk-free test: Send me 20-30 seconds of raw intro footage from your next video. I'll edit a high-retention hook completely free.
+
+Test it against your normal edit. If your retention graph doesn't spike, you lose nothing.
+
+You can check out our recent creator edits here: https://zenticmedia.com/portfolio
+
+Open to giving it a shot?
+
+Best regards,
+Rakibul Hasan (Rakib)
+Lead Video Editor, Zentic Media`
+  },
+  var4: {
+    name: 'Variation 4: Direct Zero-BS (Ultra-Short)',
+    subject: 'Free 20s hook for {channel}?',
+    body: `Hey {name},
+
+Great work on your latest upload!
+
+I run Zentic Media (https://zenticmedia.com/portfolio), where we specialize in retention editing that keeps viewers watching past the 60-second mark.
+
+To prove our quality, I'd love to edit a 20-second demo hook for your next video 100% free with zero strings attached.
+
+If you like the retention boost, great. If not, it's yours to keep free.
+
+Dropping a video this week? Just reply "yes" and I'll send over the details.
+
+Best,
+Rakibul Hasan (Rakib) | Zentic Media`
+  },
+  var5: {
+    name: 'Variation 5: Specific Weakness Fix',
+    subject: 'quick question regarding {channel}',
+    body: `Hey {name},
+
+Huge congrats on building {channel} to {subscribers} subscribers!
+
+While checking out your uploads, I noticed the intro pacing takes 20-30 seconds to get to the core point, which usually causes early drop-off before YouTube pushes the video to Suggested feeds.
+
+We fix this through micro-resets and tight hooks (portfolio: https://zenticmedia.com/portfolio).
+
+Can I gift you a free 20-second hook edit for your next video so you can see the difference on your retention graph?
+
+Best,
+Rakibul Hasan (Rakib)
+Founder, Zentic Media`
+  }
+};
+
+function openBulkEmailModal() {
+  if (!APP_STATE.selectedLeadIds || APP_STATE.selectedLeadIds.size === 0) {
+    showToast('Please select at least 1 channel from the table first!', 'warning');
+    return;
+  }
+
+  const selected = APP_STATE.leads.filter(l => APP_STATE.selectedLeadIds.has(l.id));
+  const valid = selected.filter(l => l.email && l.email.includes('@'));
+
+  const selTotalEl = document.getElementById('bulkSelectedTotal');
+  const validCountEl = document.getElementById('bulkValidEmailCount');
+  if (selTotalEl) selTotalEl.textContent = `${selected.length} channels`;
+  if (validCountEl) validCountEl.textContent = `${valid.length} with emails`;
+
+  if (valid.length === 0) {
+    showToast('None of the selected channels have public emails.', 'warning');
+    return;
+  }
+
+  onBulkTemplateChange();
+  const modal = document.getElementById('bulkEmailModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function openSingleEmailModal(leadId) {
+  const lead = APP_STATE.leads.find(l => l.id === leadId);
+  if (!lead) return;
+  if (!lead.email || !lead.email.includes('@')) {
+    showToast('This creator does not have a public email address.', 'warning');
+    return;
+  }
+  APP_STATE.selectedLeadIds.clear();
+  APP_STATE.selectedLeadIds.add(lead.id);
+  updateSelectedCount();
+  openBulkEmailModal();
+}
+
+function closeBulkEmailModal() {
+  const modal = document.getElementById('bulkEmailModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function onBulkTemplateChange() {
+  const sel = document.getElementById('bulkTemplateSelect')?.value || 'var1';
+  const tmpl = BULK_EMAIL_TEMPLATES[sel] || BULK_EMAIL_TEMPLATES.var1;
+  const subjInput = document.getElementById('bulkEmailSubject');
+  const bodyInput = document.getElementById('bulkEmailBody');
+  if (subjInput) subjInput.value = tmpl.subject;
+  if (bodyInput) bodyInput.value = tmpl.body;
+}
+
+async function startBulkEmailSend() {
+  const selected = APP_STATE.leads.filter(l => APP_STATE.selectedLeadIds.has(l.id));
+  const valid = selected.filter(l => l.email && l.email.includes('@'));
+  if (valid.length === 0) {
+    showToast('No valid recipients selected!', 'warning');
+    return;
+  }
+
+  const tmplKey = document.getElementById('bulkTemplateSelect')?.value || 'var1';
+  const subject = document.getElementById('bulkEmailSubject')?.value.trim() || '';
+  const body = document.getElementById('bulkEmailBody')?.value.trim() || '';
+  const delaySec = parseFloat(document.getElementById('bulkDelaySelect')?.value || '15');
+
+  const btn = document.getElementById('btnStartBulkSend');
+  const statusEl = document.getElementById('bulkSendingStatusText');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Launching Campaign...';
+  }
+  if (statusEl) statusEl.textContent = `Dispatching ${valid.length} emails in safe mode (${delaySec}s delay)...`;
+
+  try {
+    const res = await fetch('/api/email/bulk', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lead_ids: valid.map(l => l.id),
+        template_name: tmplKey,
+        custom_subject: subject,
+        custom_body: body,
+        delay_seconds: delaySec
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`🚀 Campaign launched! Sending ${valid.length} emails via zenticmediaofficial@gmail.com. You will receive Telegram alerts when opened!`, 'success');
+      setTimeout(() => {
+        closeBulkEmailModal();
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '🚀 Send Campaign Now';
+        }
+      }, 1500);
+    } else {
+      showToast(`Failed to start campaign: ${data.detail || 'Server error'}`, 'error');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '🚀 Send Campaign Now';
+      }
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`, 'error');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '🚀 Send Campaign Now';
+    }
+  }
 }
 
 function clearAllResults() {
