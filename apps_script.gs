@@ -22,7 +22,7 @@
  */
 
 // ── CONFIG ──────────────────────────────────────────────────
-const SENDER_NAME = "Zentic Media";          // Your display name
+const SENDER_NAME = "Rakibul Hasan | Zentic Media";          // Your display name
 const DELAY_SECONDS = 45;                   // Delay between emails (avoid spam flags)
 const SHEET_NAME = "Sheet1";                // Name of the tab with your data
 const STATUS_COL = 6;                       // Column F = status
