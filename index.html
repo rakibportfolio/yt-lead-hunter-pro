@@ -551,6 +551,9 @@
           <p class="page-subtitle" id="resultsSubHeader">All collected YouTube creator leads and contact profiles</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-primary" id="btnEnrichEmails" onclick="triggerEmailEnrichment()" style="background:#059669;color:#fff;border:none;font-weight:700;display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:6px;box-shadow:0 4px 12px rgba(5,150,105,0.3);cursor:pointer;" title="Deep crawl YouTube about, linked websites, and recent videos for real verified emails">
+            <span>🔍</span> <span id="enrichEmailsBtnText">Find Real Emails</span>
+          </button>
           <button class="btn-primary-red" onclick="openBulkEmailModal()" id="btnBulkEmailSelected" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;font-weight:700;display:flex;align-items:center;gap:6px;padding:9px 16px;box-shadow:0 4px 12px rgba(124,58,237,0.3);cursor:pointer;" title="Send automated emails to selected leads">
             <span>✉️</span> Send Email to Selected (<span id="bulkEmailCountBadge">0</span>)
           </button>

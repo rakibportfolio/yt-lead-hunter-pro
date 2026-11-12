@@ -2747,3 +2747,49 @@ window.loadFbRadarPage = async function() {
   checkVpsWorkerStatus();
 };
 
+// ═══════════════════════════════════════════════════════════════
+// DEEP EMAIL ENRICHMENT (CRAWL YOUTUBE ABOUT, WEBSITES & VIDEOS)
+// ═══════════════════════════════════════════════════════════════
+async function triggerEmailEnrichment() {
+  const btn = document.getElementById('btnEnrichEmails');
+  const btnText = document.getElementById('enrichEmailsBtnText');
+  const selectedIds = Array.from(selectedLeadIds || []);
+
+  if (btn) btn.disabled = true;
+  if (btnText) btnText.innerHTML = '⏳ Crawling & Verifying...';
+  showToast(selectedIds.length > 0 
+    ? `🔍 Deep scanning ${selectedIds.length} selected channels for real business emails...` 
+    : '🔍 Deep scanning channels without emails (About, Websites, Videos)...', 'info');
+
+  try {
+    const res = await fetch(API_BASE + '/api/leads/enrich-emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lead_ids: selectedIds.length > 0 ? selectedIds : [],
+        limit: 30
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      if (data.enriched_count > 0) {
+        showToast(`🎉 Found and verified ${data.enriched_count} real emails!`, 'success');
+      } else {
+        showToast(`Scan complete. Analyzed ${data.total_processed} channels.`, 'info');
+      }
+      if (typeof loadResultsData === 'function') {
+        await loadResultsData();
+      }
+    } else {
+      showToast('Enrichment error: ' + (data.error || 'Failed'), 'error');
+    }
+  } catch (err) {
+    showToast('Failed to connect to email enrichment API', 'error');
+  } finally {
+    if (btn) btn.disabled = false;
+    if (btnText) btnText.innerHTML = 'Find Real Emails';
+  }
+}
+window.triggerEmailEnrichment = triggerEmailEnrichment;
+
+

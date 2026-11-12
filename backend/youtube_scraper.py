@@ -308,22 +308,33 @@ def scrape_youtube_channels_public(keyword: str, max_results: int = 50, country:
 
 
 def scrape_channel_about(channel_id_or_handle: str) -> dict:
-    """Fetch channel page to find direct business email and ALL social links."""
+    """
+    Fetch channel page to find 100% REAL business email and ALL social links.
+    Deep multi-stage extraction:
+    1. YouTube /about page
+    2. Linked official website / linktree crawling
+    3. Recent video descriptions
+    4. DNS deliverability validation
+    """
     handle = channel_id_or_handle.strip()
     if not handle.startswith("@") and not handle.startswith("UC"):
         handle = f"@{handle}"
-    
+
+    try:
+        from enrich_emails import deep_extract_channel_email
+        res = deep_extract_channel_email(channel_url=f"https://www.youtube.com/{handle}", handle=handle)
+        collected_email = res.get("email", "")
+    except Exception:
+        collected_email = ""
+
+    collected_social = {}
     urls_to_try = [
         f"https://www.youtube.com/{handle}",
         f"https://www.youtube.com/{handle}/about"
     ]
-    
-    collected_email = ""
-    collected_social = {}
-    
     for url in urls_to_try:
         try:
-            r = requests.get(url, headers=BROWSER_HEADERS, timeout=8)
+            r = requests.get(url, headers=BROWSER_HEADERS, timeout=6)
             if r.status_code == 200:
                 if not collected_email:
                     collected_email = extract_email_from_text(r.text)
@@ -333,7 +344,7 @@ def scrape_channel_about(channel_id_or_handle: str) -> dict:
                     break
         except Exception:
             continue
-            
+
     return {"email": collected_email, "social": collected_social}
 
 
@@ -900,9 +911,10 @@ def scan_youtube(keyword: str,
         email = extract_email_from_text(desc)
         social = extract_social_from_text(desc)
 
-        # If email not found in search snippet, try checking channel about page (limit deep fetch to first 25 for fast response)
-        if not email and ch.get("handle") and idx < 25:
-            about_data = scrape_channel_about(ch["handle"])
+        # If email not found in search snippet, try checking channel about page (deep fetch for top 30)
+        target_handle = ch.get("handle") or ch.get("custom_url") or ch.get("channel_id")
+        if not email and target_handle and idx < 30:
+            about_data = scrape_channel_about(target_handle)
             if about_data.get("email"):
                 email = about_data["email"]
             if about_data.get("social"):

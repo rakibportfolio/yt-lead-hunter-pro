@@ -217,6 +217,56 @@ def api_generate_custom_pitch(body: dict):
     return {"success": True, **pitch}
 
 
+@app.post("/api/leads/enrich-emails")
+def api_enrich_emails(body: dict = None):
+    """
+    Deep scan and enrich channels with REAL, DNS-verified emails.
+    Extracts from:
+    1. Channel About Page & Bio
+    2. Linked Official Website / Linktree crawling
+    3. Recent Video descriptions
+    """
+    body = body or {}
+    lead_ids = body.get("lead_ids", [])
+    limit = int(body.get("limit", 30))
+
+    from enrich_emails import deep_extract_channel_email
+    conn = get_db()
+    if lead_ids:
+        placeholders = ",".join(["?"] * len(lead_ids))
+        leads = conn.execute(
+            f"SELECT id, name, handle, channel_url, description FROM leads WHERE id IN ({placeholders})",
+            lead_ids
+        ).fetchall()
+    else:
+        leads = conn.execute(
+            "SELECT id, name, handle, channel_url, description FROM leads "
+            "WHERE (email IS NULL OR email = '') AND channel_url IS NOT NULL AND channel_url != '' "
+            f"LIMIT {limit}"
+        ).fetchall()
+
+    enriched = []
+    for l in leads:
+        lead_dict = dict(l)
+        res = deep_extract_channel_email(
+            channel_url=lead_dict.get("channel_url", ""),
+            handle=lead_dict.get("handle", ""),
+            description=lead_dict.get("description", "")
+        )
+        if res.get("email"):
+            conn.execute("UPDATE leads SET email = ? WHERE id = ?", (res["email"], lead_dict["id"]))
+            conn.commit()
+            enriched.append({
+                "id": lead_dict["id"],
+                "name": lead_dict["name"],
+                "email": res["email"],
+                "source": res.get("source", "")
+            })
+
+    conn.close()
+    return {"success": True, "total_processed": len(leads), "enriched_count": len(enriched), "enriched": enriched}
+
+
 # ═══════════════════════════════════════════════════════════════
 # YOUTUBE SCANNER API
 # ═══════════════════════════════════════════════════════════════
