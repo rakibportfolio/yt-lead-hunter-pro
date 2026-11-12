@@ -5,6 +5,10 @@
  */
 
 // ------------------------------------------------------------
+const API_BASE = (window.location.protocol === 'file:' || !window.location.host || window.location.host === '')
+  ? 'http://localhost:8000'
+  : '';
+
 const SOCIAL_CONFIG = {
   instagram:  { short: 'IG',  color: '#E1306C', label: 'Instagram' },
   twitter:    { short: 'TW',  color: '#1DA1F2', label: 'Twitter/X' },
@@ -463,7 +467,7 @@ async function startDiscoveryScan() {
 
   // API Call to FastAPI Backend
   try {
-    const res = await fetch('/api/scan/youtube', {
+    const res = await fetch(API_BASE + '/api/scan/youtube', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -495,7 +499,7 @@ function pollScanProgress(scanId, keyword, country = '') {
 
   const timer = setInterval(async () => {
     try {
-      const res = await fetch(`/api/scan/progress/${scanId}`);
+      const res = await fetch(`${API_BASE}/api/scan/progress/${scanId}`);
       const data = await res.json();
 
       if (pMsg && data.step) pMsg.textContent = data.step;
@@ -649,7 +653,7 @@ function generateSampleLeads(keyword, count, country = '') {
       channel: name,
       name: name,
       handle: `@${slug}`,
-      channel_url: `https://www.youtube.com/@${slug}`,
+      channel_url: `https://www.youtube.com/results?search_query=${encodeURIComponent(name + ' ' + (cUpper === 'CA' ? 'Canada' : cDisplay))}`,
       subscribers: subsStr,
       subs_raw: subsNum,
       total_views: (viewsNum / 1000).toFixed(1) + 'K',
@@ -657,7 +661,7 @@ function generateSampleLeads(keyword, count, country = '') {
       avg_views: Math.floor(subsNum * 0.12),
       last_upload: `${Math.floor(Math.random() * 6 + 1)}d ago`,
       upload_freq: '2x/week',
-      website: `https://${slug}.${tld}`,
+      website: `https://www.youtube.com/results?search_query=${encodeURIComponent(name + ' ' + (cUpper === 'CA' ? 'Canada' : cDisplay))}`,
       country: cDisplay,
       created: 'Oct 2022',
       email: email,
@@ -690,7 +694,7 @@ function generateSampleLeads(keyword, count, country = '') {
 // ------------------------------------------------------------
 async function loadLeadsFromDatabase() {
   try {
-    const res = await fetch('/api/leads');
+    const res = await fetch(API_BASE + '/api/leads');
     const data = await res.json();
     if (data && data.leads && data.leads.length > 0) {
       APP_STATE.leads = data.leads.map(l => ({
@@ -1082,7 +1086,7 @@ async function generateAIPitch() {
   showToast('Generating personalized retention pitch...', 'info');
 
   try {
-    const res = await fetch('/api/leads/generate-custom-pitch', {
+    const res = await fetch(API_BASE + '/api/leads/generate-custom-pitch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, channel: name, handle })
@@ -1285,7 +1289,7 @@ async function saveBrightDataSettings() {
   }
   showToast('Saving Bright Data configuration...', 'info');
   try {
-    await fetch('/api/settings/brightdata', {
+    await fetch(API_BASE + '/api/settings/brightdata', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ api_key: val })
@@ -1347,7 +1351,7 @@ async function loadPipelineBoard() {
   board.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text-muted);font-weight:600;">Loading pipeline...</div>`;
 
   try {
-    const res = await fetch('/api/pipeline/board');
+    const res = await fetch(API_BASE + '/api/pipeline/board');
     if (res.ok) {
       const data = await res.json();
       if (data.ok) {
@@ -1374,7 +1378,7 @@ async function loadPipelineBoard() {
 
 async function loadPipelineStats() {
   try {
-    const res = await fetch('/api/pipeline/stats');
+    const res = await fetch(API_BASE + '/api/pipeline/stats');
     if (!res.ok) return;
     const data = await res.json();
     if (!data.ok) return;
@@ -1521,7 +1525,7 @@ async function moveLeadToStage(leadId, toStage, fromStage) {
   renderKanbanBoard();
 
   try {
-    await fetch('/api/pipeline/move', {
+    await fetch(API_BASE + '/api/pipeline/move', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ lead_id: leadId, stage: toStage })
@@ -1653,7 +1657,7 @@ async function saveDealValue(leadId) {
   const val = parseFloat(document.getElementById('dealValInput')?.value || 0);
   const stage = Object.keys(PIPELINE_BOARD).find(s => PIPELINE_BOARD[s].some(l => l.id === leadId)) || 'new_lead';
   try {
-    await fetch('/api/pipeline/move', {
+    await fetch(API_BASE + '/api/pipeline/move', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ lead_id: leadId, stage, deal_value: val })
@@ -1836,7 +1840,7 @@ async function loadFbRadarPage() {
 
 async function loadFbGroups() {
   try {
-    const res = await fetch('/api/fb/groups');
+    const res = await fetch(API_BASE + '/api/fb/groups');
     if (!res.ok) return;
     const data = await res.json();
     if (data.ok) {
@@ -1851,7 +1855,7 @@ async function loadFbGroups() {
 
 async function loadFbAlerts() {
   try {
-    const res = await fetch('/api/fb/alerts');
+    const res = await fetch(API_BASE + '/api/fb/alerts');
     if (!res.ok) return;
     const data = await res.json();
     if (data.ok) {
@@ -2111,7 +2115,7 @@ async function submitAddFbGroup() {
   }
 
   try {
-    const res = await fetch('/api/fb/groups', {
+    const res = await fetch(API_BASE + '/api/fb/groups', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name || url, url, interval_min: interval })
@@ -2157,7 +2161,7 @@ async function deleteFbGroupItem(id) {
 async function testFbAlert() {
   showToast('Generating test hiring post & dispatching Telegram alert...', 'info');
   try {
-    const res = await fetch('/api/fb/test-alert', { method: 'POST' });
+    const res = await fetch(API_BASE + '/api/fb/test-alert', { method: 'POST' });
     const data = await res.json();
     if (data.ok) {
       if (data.telegram_sent) {
@@ -2175,7 +2179,7 @@ async function testFbAlert() {
 async function scanFbNow() {
   showToast('🔍 Triggering immediate scan across active groups...', 'info');
   try {
-    const res = await fetch('/api/fb/scan-now', { method: 'POST' });
+    const res = await fetch(API_BASE + '/api/fb/scan-now', { method: 'POST' });
     const data = await res.json();
     if (data.ok) {
       showToast(data.message || 'Scan in progress', 'success');
@@ -2201,7 +2205,7 @@ async function saveTelegramSettings() {
   }
 
   try {
-    const res = await fetch('/api/settings/telegram', {
+    const res = await fetch(API_BASE + '/api/settings/telegram', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ bot_token: token, chat_id: chatId })
@@ -2243,7 +2247,7 @@ let CURRENT_PITCH_ALERT = null;
 async function huntGlobalJobsNow() {
   showToast('🌍 Triggering Global Hunt across Reddit, RemoteOK & Creator job boards...', 'info');
   try {
-    const res = await fetch('/api/hunter/scan-global', { method: 'POST' });
+    const res = await fetch(API_BASE + '/api/hunter/scan-global', { method: 'POST' });
     const data = await res.json();
     if (data.ok) {
       showToast(data.message || 'Global hunting started in background!', 'success');
@@ -2284,7 +2288,7 @@ async function generatePitchForCurrentAlert() {
   const portUrl = (portInput?.value || '').trim();
 
   try {
-    const res = await fetch('/api/jobs/generate-pitch', {
+    const res = await fetch(API_BASE + '/api/jobs/generate-pitch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2330,7 +2334,7 @@ function copyAiPitch() {
 async function checkVpsWorkerStatus() {
   const el = document.getElementById('vpsWorkerStatusText');
   try {
-    const res = await fetch('/api/worker/status');
+    const res = await fetch(API_BASE + '/api/worker/status');
     const data = await res.json();
     if (data.ok && data.worker) {
       const w = data.worker;
