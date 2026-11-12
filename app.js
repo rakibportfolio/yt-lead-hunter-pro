@@ -1824,6 +1824,38 @@ async function loadPipelineBoard() {
   updatePipelineStatsFallback();
 }
 
+async function checkCrmReplies() {
+  const btn = document.getElementById('checkRepliesBtn');
+  const originalText = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Checking Gmail...';
+  }
+  showToast('Connecting to Gmail IMAP via mailsuite...', 'info');
+
+  try {
+    const res = await fetch(API_BASE + '/api/pipeline/check-replies', { method: 'POST' });
+    const data = await res.json();
+    if (data.ok) {
+      if (data.replies_found > 0) {
+        showToast(`🎉 ${data.replies_found} lead(s) replied to your pitch! Moved to "Replied"`, 'success');
+        await loadPipelineBoard();
+      } else {
+        showToast(`Checked ${data.checked} emails. No new replies from outreach leads yet.`, 'info');
+      }
+    } else {
+      showToast('Error checking replies: ' + (data.error || 'Unknown error'), 'error');
+    }
+  } catch (err) {
+    showToast('Failed to connect to reply monitor: ' + err.message, 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText || '📥 Check Replies (Mailsuite)';
+    }
+  }
+}
+
 async function loadPipelineStats() {
   try {
     const res = await fetch(API_BASE + '/api/pipeline/stats');

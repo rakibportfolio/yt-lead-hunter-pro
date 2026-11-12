@@ -671,6 +671,17 @@ def api_lead_activity(lead_id: int):
     return {"ok": True, "activities": activities, "emails": emails}
 
 
+@app.post("/api/pipeline/check-replies")
+def api_check_replies():
+    """Trigger mailsuite to check Gmail inbox for replies from outreach leads."""
+    try:
+        from reply_monitor import check_inbox_replies
+        res = check_inbox_replies(limit=40)
+        return res
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+
 # ═══════════════════════════════════════════════════════════════
 # BRIGHT DATA & OUTREACH EXPORT ENDPOINTS
 # ═══════════════════════════════════════════════════════════════
