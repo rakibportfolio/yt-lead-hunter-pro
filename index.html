@@ -200,7 +200,7 @@
               <button class="btn-primary-red" onclick="navigatePage('find-leads')">🔍 Find New Leads</button>
               <button class="btn-secondary" onclick="navigatePage('results')">📈 View Results</button>
               <button class="btn-secondary" onclick="navigatePage('exports')">↓ Export Leads</button>
-              <button class="btn-secondary" onclick="exportGoogleSheetsCSV()">📊 Google Sheets CSV (Apps Script)</button>
+              <button class="btn-secondary" onclick="exportDirectToGoogleSheets()" style="background:#137333;color:#fff;border-color:#137333;">📊 Export to Google Sheets</button>
             </div>
           </div>
         </div>
@@ -550,7 +550,8 @@
           <h2 class="page-title">Results</h2>
           <p class="page-subtitle" id="resultsSubHeader">All collected YouTube creator leads and contact profiles</p>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-secondary" onclick="exportDirectToGoogleSheets()" style="background:#137333;color:#fff;border-color:#137333;" title="Open and export directly to Google Sheets">📊 Export to Google Sheets</button>
           <button class="btn-secondary" onclick="clearAllResults()">Clear All</button>
           <button class="btn-secondary" onclick="exportFilteredLeads()">Export Filtered</button>
           <button class="btn-secondary" onclick="exportSelectedLeads()" id="btnExportSelected">Export Selected (0)</button>
@@ -1349,6 +1350,6 @@ Micro-Niche
     </div>
   </div>
 
-  <script src="app.js?v=5.0_clean_no_fakes" charset="UTF-8"></script>
+  <script src="app.js?v=6.0_metrics_logos_sheets" charset="UTF-8"></script>
 </body>
 </html>

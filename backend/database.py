@@ -46,10 +46,23 @@ def init_db():
     """)
 
     # Ensure country column exists if table was previously created
-    try:
-        c.execute("ALTER TABLE leads ADD COLUMN country TEXT DEFAULT ''")
-    except Exception:
-        pass
+    for col, col_type in [
+        ("country", "TEXT DEFAULT ''"),
+        ("avatar", "TEXT DEFAULT ''"),
+        ("handle", "TEXT DEFAULT ''"),
+        ("channel_url", "TEXT DEFAULT ''"),
+        ("total_views", "TEXT DEFAULT ''"),
+        ("videos", "INTEGER DEFAULT 0"),
+        ("avg_views", "TEXT DEFAULT ''"),
+        ("last_upload", "TEXT DEFAULT 'Recently'"),
+        ("upload_freq", "TEXT DEFAULT '2x/week'"),
+        ("created", "TEXT DEFAULT 'Oct 2022'"),
+        ("description", "TEXT DEFAULT ''"),
+    ]:
+        try:
+            c.execute(f"ALTER TABLE leads ADD COLUMN {col} {col_type}")
+        except Exception:
+            pass
 
     # ── Emails Table ──────────────────────────────────────────
     c.execute("""
@@ -454,22 +467,36 @@ def insert_lead(lead: dict) -> int:
     c = conn.cursor()
     c.execute("""
         INSERT INTO leads (name, channel, platform, subscribers, email, website, country,
-                           social_json, ai_score, lead_type, status, ai_analysis)
+                           social_json, ai_score, lead_type, status, ai_analysis,
+                           avatar, handle, channel_url, total_views, videos, avg_views,
+                           last_upload, upload_freq, created, description)
         VALUES (:name, :channel, :platform, :subscribers, :email, :website, :country,
-                :social_json, :ai_score, :lead_type, :status, :ai_analysis)
+                :social_json, :ai_score, :lead_type, :status, :ai_analysis,
+                :avatar, :handle, :channel_url, :total_views, :videos, :avg_views,
+                :last_upload, :upload_freq, :created, :description)
     """, {
         "name":        lead.get("name", ""),
         "channel":     lead.get("channel", ""),
         "platform":    lead.get("platform", "YouTube"),
-        "subscribers": lead.get("subscribers", ""),
+        "subscribers": str(lead.get("subscribers", "")),
         "email":       lead.get("email", ""),
         "website":     lead.get("website", ""),
         "country":     lead.get("country", ""),
         "social_json": json.dumps(lead.get("social", {})),
-        "ai_score":    lead.get("ai_score", 0),
+        "ai_score":    int(lead.get("ai_score", 0) or 0),
         "lead_type":   lead.get("lead_type", "warm"),
-        "status":      "new",
+        "status":      lead.get("status", "new"),
         "ai_analysis": json.dumps(lead.get("ai_analysis", {})),
+        "avatar":      lead.get("avatar", ""),
+        "handle":      lead.get("handle", ""),
+        "channel_url": lead.get("channel_url", lead.get("website", "")),
+        "total_views": str(lead.get("total_views", "")),
+        "videos":      int(lead.get("videos", 0) or 0),
+        "avg_views":   str(lead.get("avg_views", "")),
+        "last_upload": lead.get("last_upload", "Recently"),
+        "upload_freq": lead.get("upload_freq", "2x/week"),
+        "created":     lead.get("created", "Oct 2022"),
+        "description": lead.get("description", "")
     })
     lead_id = c.lastrowid
     conn.commit()
@@ -491,7 +518,23 @@ def get_all_leads(status=None, lead_type=None):
     query += " ORDER BY ai_score DESC"
     rows = c.execute(query, params).fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+    leads = []
+    for r in rows:
+        d = dict(r)
+        if "social_json" in d and d["social_json"]:
+            try:
+                d["social"] = json.loads(d["social_json"])
+            except Exception:
+                d["social"] = {}
+        else:
+            d["social"] = {}
+        if "ai_analysis" in d and isinstance(d["ai_analysis"], str) and d["ai_analysis"]:
+            try:
+                d["ai_analysis"] = json.loads(d["ai_analysis"])
+            except Exception:
+                pass
+        leads.append(d)
+    return leads
 
 
 def update_lead_status(lead_id: int, status: str):
