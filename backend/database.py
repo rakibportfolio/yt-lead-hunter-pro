@@ -638,43 +638,125 @@ def insert_email(email_data: dict) -> int:
 
 def mark_email_sent(email_id: int):
     conn = get_db()
+    now_iso = datetime.now().isoformat()
     conn.execute("UPDATE emails SET status='sent', sent_at=? WHERE id=?",
-                 (datetime.now().isoformat(), email_id))
+                 (now_iso, email_id))
+
+    # Automatically advance lead in CRM Pipeline to 'outreach_sent'
+    email_row = conn.execute("SELECT lead_id, to_address, subject FROM emails WHERE id=?", (email_id,)).fetchone()
+    if email_row and email_row["lead_id"]:
+        lid = email_row["lead_id"]
+        conn.execute("""
+            UPDATE leads 
+            SET status = 'sent',
+                pipeline_stage = CASE 
+                    WHEN pipeline_stage IN ('new_lead', 'new', '', NULL) THEN 'outreach_sent'
+                    ELSE pipeline_stage 
+                END,
+                updated_at = ?
+            WHERE id = ?
+        """, (now_iso, lid))
+        try:
+            conn.execute("""
+                INSERT INTO lead_activity (lead_id, activity_type, description, created_at)
+                VALUES (?, 'email_sent', ?, ?)
+            """, (lid, f"Cold outreach sent: '{email_row['subject']}' to {email_row['to_address']}", now_iso))
+        except Exception:
+            pass
+
     conn.commit()
     conn.close()
 
 
 def mark_email_opened(tracking_id: str):
     conn = get_db()
+    now_iso = datetime.now().isoformat()
     conn.execute("""
         UPDATE emails
         SET status='opened',
-            opened_at = COALESCE(opened_at, datetime('now')),
+            opened_at = COALESCE(opened_at, ?),
             open_count = open_count + 1
         WHERE tracking_id=?
-    """, (tracking_id,))
+    """, (now_iso, tracking_id))
+
+    # Advance lead in CRM Pipeline to 'email_opened'
+    email_row = conn.execute("SELECT lead_id, to_address FROM emails WHERE tracking_id=?", (tracking_id,)).fetchone()
+    if email_row and email_row["lead_id"]:
+        lid = email_row["lead_id"]
+        conn.execute("""
+            UPDATE leads
+            SET pipeline_stage = CASE
+                    WHEN pipeline_stage IN ('new_lead', 'outreach_sent', '') THEN 'email_opened'
+                    ELSE pipeline_stage
+                END,
+                updated_at = ?
+            WHERE id = ?
+        """, (now_iso, lid))
+        try:
+            conn.execute("""
+                INSERT INTO lead_activity (lead_id, activity_type, description, created_at)
+                VALUES (?, 'email_opened', 'Recipient opened outreach email (tracking pixel triggered)', ?)
+            """, (lid, now_iso))
+        except Exception:
+            pass
+
     conn.commit()
     conn.close()
 
 
 def mark_email_clicked(tracking_id: str):
     conn = get_db()
+    now_iso = datetime.now().isoformat()
     conn.execute("""
         UPDATE emails
         SET status='clicked',
-            clicked_at = COALESCE(clicked_at, datetime('now')),
+            clicked_at = COALESCE(clicked_at, ?),
             click_count = click_count + 1
         WHERE tracking_id=?
-    """, (tracking_id,))
+    """, (now_iso, tracking_id))
+
+    email_row = conn.execute("SELECT lead_id FROM emails WHERE tracking_id=?", (tracking_id,)).fetchone()
+    if email_row and email_row["lead_id"]:
+        lid = email_row["lead_id"]
+        conn.execute("""
+            UPDATE leads
+            SET pipeline_stage = CASE
+                    WHEN pipeline_stage IN ('new_lead', 'outreach_sent', '') THEN 'email_opened'
+                    ELSE pipeline_stage
+                END,
+                updated_at = ?
+            WHERE id = ?
+        """, (now_iso, lid))
+
     conn.commit()
     conn.close()
 
 
 def mark_email_replied(tracking_id: str):
     conn = get_db()
+    now_iso = datetime.now().isoformat()
     conn.execute("""
         UPDATE emails SET status='replied', replied_at=? WHERE tracking_id=?
-    """, (datetime.now().isoformat(), tracking_id))
+    """, (now_iso, tracking_id))
+
+    email_row = conn.execute("SELECT lead_id FROM emails WHERE tracking_id=?", (tracking_id,)).fetchone()
+    if email_row and email_row["lead_id"]:
+        lid = email_row["lead_id"]
+        conn.execute("""
+            UPDATE leads
+            SET status = 'replied',
+                pipeline_stage = 'replied',
+                updated_at = ?
+            WHERE id = ?
+        """, (now_iso, lid))
+        try:
+            conn.execute("""
+                INSERT INTO lead_activity (lead_id, activity_type, description, created_at)
+                VALUES (?, 'email_replied', 'Client replied to outreach email!', ?)
+            """, (lid, now_iso))
+        except Exception:
+            pass
+
     conn.commit()
     conn.close()
 

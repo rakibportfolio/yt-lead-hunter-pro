@@ -1212,7 +1212,12 @@ async function startBulkEmailSend() {
     });
     const data = await res.json();
     if (res.ok) {
-      showToast(`🚀 Campaign launched! Sending ${valid.length} emails via zenticmediaofficial@gmail.com. You will receive Telegram alerts when opened!`, 'success');
+      valid.forEach(l => {
+        l.status = 'sent';
+        l.pipeline_stage = 'outreach_sent';
+      });
+      if (typeof updatePipelineStatsFallback === 'function') updatePipelineStatsFallback();
+      showToast(`🚀 Campaign launched! Sending ${valid.length} emails via zenticmediaofficial@gmail.com. Leads moved to 'Outreach Sent' in CRM!`, 'success');
       setTimeout(() => {
         closeBulkEmailModal();
         if (btn) {
@@ -1838,7 +1843,8 @@ async function loadPipelineStats() {
     if (replyEl) replyEl.textContent = s['replied']?.count || 0;
     if (closeEl) closeEl.textContent = s['deal_closed']?.count || 0;
     if (revEl) revEl.textContent = '$' + Number(data.total_closed_revenue || 0).toLocaleString();
-    if (badgeEl) badgeEl.textContent = s['deal_closed']?.count || 0;
+    const activePipelineCount = (s['outreach_sent']?.count || 0) + (s['email_opened']?.count || 0) + (s['replied']?.count || 0) + (s['meeting_booked']?.count || 0);
+    if (badgeEl) badgeEl.textContent = activePipelineCount;
   } catch (_) {}
 }
 
