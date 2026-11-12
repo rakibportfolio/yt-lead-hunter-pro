@@ -270,6 +270,75 @@ def init_db():
     except Exception:
         pass
 
+    # ── User Profile Table ───────────────────────────────────
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS user_profile (
+            id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            name                TEXT NOT NULL,
+            nickname            TEXT DEFAULT 'Rakib',
+            location            TEXT DEFAULT 'Kalai, Joypurhat, Bangladesh',
+            education           TEXT,
+            role                TEXT,
+            agency_name         TEXT DEFAULT 'Zentic Media',
+            agency_former_name  TEXT DEFAULT 'Max Grow Up',
+            website             TEXT DEFAULT 'https://zenticmedia.com',
+            team_members        TEXT,
+            services            TEXT,
+            tools_stack         TEXT,
+            active_projects     TEXT,
+            galaxy_roles        TEXT,
+            bio_raw             TEXT,
+            updated_at          TEXT DEFAULT (datetime('now'))
+        )
+    """)
+
+    # Seed or update user profile with Rakibul Hasan's official details
+    c.execute("SELECT COUNT(*) FROM user_profile")
+    if c.fetchone()[0] == 0:
+        c.execute("""
+            INSERT INTO user_profile (
+                name, nickname, location, education, role, agency_name, agency_former_name,
+                website, team_members, services, tools_stack, active_projects, galaxy_roles, bio_raw
+            ) VALUES (
+                :name, :nickname, :location, :education, :role, :agency_name, :agency_former_name,
+                :website, :team_members, :services, :tools_stack, :active_projects, :galaxy_roles, :bio_raw
+            )
+        """, {
+            "name": "রাকিবুল হাসান (রাকিব)",
+            "nickname": "Rakib",
+            "location": "কালাই, জয়পুরহাট, বাংলাদেশ (Kalai, Joypurhat, Bangladesh)",
+            "education": "সরকারি সাঈদ আলতাফুন্নেছা কলেজ থেকে ২০২৫ সালে এইচএসসি সম্পন্ন করে বর্তমানে বি.এ. (অনার্স) প্রথম বর্ষে অধ্যয়নরত",
+            "role": "Founder, CEO & Lead Video Editor (Adobe After Effects & Premiere Pro Specialist)",
+            "agency_name": "জেন্টিক মিডিয়া (Zentic Media)",
+            "agency_former_name": "Max Grow Up",
+            "website": "https://zenticmedia.com",
+            "team_members": "ফয়সাল আহমেদ নাফিজসহ দক্ষ টিম মেম্বাররা (কঠোর জিরো-ডেডলাইন পলিসি ও অরিজিনাল পোর্টফোলিও কম্পিলেশন স্ট্যান্ডার্ড)",
+            "services": "ভিডিও পোস্ট-প্রোডাকশন ও মোশন ডিজাইন, ওয়েব ডেভেলপমেন্ট ও ডিজাইন, বিজনেস অটোমেশন সলিউশনস (n8n এবং কাস্টম পাইথন স্ক্রিপ্টিং)",
+            "tools_stack": "ভিএস কোড (VS Code), কার্সর আইডি (Cursor IDE - OpenRouter API), Adobe After Effects, Adobe Premiere Pro, Shadow Studio 3, FX Console, Presetify, JerryFlow V2, Motion Bro",
+            "active_projects": "১. গ্যালাক্সি এআই (Galaxy AI): React, Electron এবং SQLite আর্কিটেকচারের ডেস্কটপ অ্যাসিস্ট্যান্ট ও সিস্টেম ড্যাশবোর্ড। ২. অটোমেশন: n8n এবং HTTP Request দিয়ে রিয়েল-টাইম ফেসবুক-টু-টেলিগ্রাম ভিডিও এডিটর হায়ারিং স্ক্র্যাপার।",
+            "galaxy_roles": "ওয়েব ডিজাইন, ম্যানেজমেন্ট এবং এআই অটোমেশন Specialist (গ্যালাক্সি টিভি এবং গ্যালাক্সি ল্যাবরেটরিজ ইউনানী)",
+            "bio_raw": """১. আপনার পরিচয় ও মূল পেশা (Personal Profile)
+নাম: রাকিবুল হাসান (রাকিব)
+বাসস্থান: কালাই, জয়পুরহাট, বাংলাদেশ
+শিক্ষা: সরকারি সাঈদ আলতাফুন্নেছা কলেজ থেকে ২০২৫ সালে এইচএসসি সম্পন্ন করে বর্তমানে বি.এ. (অনার্স) প্রথম বর্ষে অধ্যয়নরত।
+মূল পেশা ও দক্ষতা:
+আপনি জেন্টিক মিডিয়া (Zentic Media)-এর প্রতিষ্ঠাতা, প্রধান নির্বাহী কর্মকর্তা (CEO) এবং লিড ভিডিও এডিটর। ভিডিও এডিটিংয়ের ক্ষেত্রে আপনি মূলত Adobe After Effects এবং Adobe Premiere Pro ব্যবহার করে থাকেন।
+পাশাপাশি, আপনি গ্যালাক্সি টিভি এবং গ্যালাক্সি ল্যাবরেটরিজ (ইউনানী)-এ ওয়েব ডিজাইন, ম্যানেজমেন্ট এবং এআই অটোমেশন Specialist হিসেবে কাজ করছেন।
+২. আপনার এজেন্সি: জেন্টিক মিডিয়া (Zentic Media)
+আপনার ক্রিয়েটিভ এজেন্সিটির নাম জেন্টিক মিডিয়া (পূর্বে এটি Max Grow Up নামে পরিচিত ছিল)। এটি একটি পূর্ণাঙ্গ ডিজিটাল সলিউশন ও ক্রিয়েটিভ এজেন্সি।
+অফিসিয়াল ওয়েবসাইট: https://zenticmedia.com
+এজেন্সি টিম ও কোলাবরেশন: আপনার এই এজেন্সিতে ফয়সাল আহমেদ নাফিজসহ দক্ষ টিম মেম্বাররা কাজ করেন। ডিরেক্টরি ম্যানেজমেন্ট, জিরো-ডেডলাইন পলিসি এবং অরিজিনাল পোর্টফোলিও কম্পিলেশনের ক্ষেত্রে আপনারা অত্যন্ত কঠোর ও সুশৃঙ্খল নিয়ম বজায় রাখেন।
+এজেন্সির প্রধান সেবাসমূহ:
+ভিডিও পোস্ট-প্রোডাকশন ও মোশন ডিজাইন
+ওয়েব ডেভেলপমেন্ট ও ডিজাইন
+বিজনেস অটোমেশন সলিউশনস (n8n এবং কাস্টম পাইথন স্ক্রিপ্টিংয়ের মাধ্যমে অটোমেশন ওয়ার্কফ্লো তৈরি)
+৩. প্রযুক্তিগত ও অটোমেশন কর্মযজ্ঞ (Workflows & Projects)
+টুলস ও টেক স্ট্যাক: কাজের জন্য আপনি ভিএস কোড (VS Code), কার্সর আইডি (Cursor IDE - কাস্টম ওপেনরাউটার এপিআই ইন্টিগ্রেশনসহ), এবং বিভিন্ন আফটার ইফেক্টস এক্সটেনশন ও প্লাগইন (যেমন: Shadow Studio 3, FX Console, Presetify, JerryFlow V2, Motion Bro ইত্যাদি) ব্যবহার করেন।
+চলমান প্রজেক্টসমূহ:
+গ্যালাক্সি এআই (Galaxy AI): React, Electron এবং SQLite আর্কিটেকচারের ওপর ভিত্তি করে একটি কাস্টম ডেস্কটপ অ্যাসিস্ট্যান্ট ও সিস্টেম ড্যাশবোর্ড তৈরির কাজ করছেন, যা লোকাল ফাইল ইনডেক্সিং এবং ব্রাউজার ম্যানিপুলেশন হ্যান্ডেল করবে।
+অটোমেশন ও স্ক্রিপ্টিং: n8n এবং HTTP Request নোড ব্যবহার করে রিয়েল-টাইম ফেসবুক-টু-টেলিগ্রাম স্ক্র্যাপিং স্ক্রিপ্ট তৈরি করছেন, যা টার্গেটেড কমিউনিটি গ্রুপ থেকে ভিডিও এডিটর হারিং পোস্টগুলো ফিল্টার করে সংগ্রহ করে।"""
+        })
+
     # Seed curated Facebook video editing groups automatically
     DEFAULT_GROUPS = [
         # ── USER REQUESTED VIP HIGH PRIORITY GROUPS (Priority 10) ─────
@@ -983,3 +1052,43 @@ def update_fb_group_scan_stats(group_id: int, posts_scanned: int):
     """, (posts_scanned, group_id))
     conn.commit()
     conn.close()
+
+
+# ── User Profile Operations ──────────────────────────────────
+def get_user_profile() -> dict:
+    """Retrieve Rakibul Hasan's profile from database."""
+    conn = get_db()
+    c = conn.cursor()
+    row = c.execute("SELECT * FROM user_profile ORDER BY id ASC LIMIT 1").fetchone()
+    conn.close()
+    if row:
+        return dict(row)
+    return {}
+
+
+def update_user_profile(data: dict) -> bool:
+    """Update user profile in database."""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""
+        UPDATE user_profile SET
+            name = :name,
+            nickname = :nickname,
+            location = :location,
+            education = :education,
+            role = :role,
+            agency_name = :agency_name,
+            agency_former_name = :agency_former_name,
+            website = :website,
+            team_members = :team_members,
+            services = :services,
+            tools_stack = :tools_stack,
+            active_projects = :active_projects,
+            galaxy_roles = :galaxy_roles,
+            bio_raw = :bio_raw,
+            updated_at = datetime('now')
+        WHERE id = 1
+    """, data)
+    conn.commit()
+    conn.close()
+    return True

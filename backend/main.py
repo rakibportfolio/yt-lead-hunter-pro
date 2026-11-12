@@ -36,7 +36,8 @@ from database import (
     mark_email_replied, insert_social_message, mark_social_sent,
     upsert_daily_stats, get_db,
     get_pipeline_board, move_pipeline_stage, get_pipeline_stats,
-    log_activity, get_lead_activity, update_lead_tag, update_lead_notes
+    log_activity, get_lead_activity, update_lead_tag, update_lead_notes,
+    get_user_profile, update_user_profile
 )
 from email_engine import send_email, send_bulk_emails, get_template, TEMPLATES
 from youtube_scraper import scan_youtube, generate_channel_pitch, scrape_channel_recent_videos
@@ -144,6 +145,24 @@ async def unsubscribe(tracking_id: str):
     <p>You won't receive any more emails from Zentic Media.</p>
     </body></html>
     """)
+
+
+# ═══════════════════════════════════════════════════════════════
+# USER & AGENCY PROFILE API
+# ═══════════════════════════════════════════════════════════════
+
+@app.get("/api/profile")
+def api_get_profile():
+    """Get official user and agency profile."""
+    prof = get_user_profile()
+    return {"success": True, "profile": prof}
+
+
+@app.post("/api/profile")
+def api_update_profile(body: dict):
+    """Update profile details."""
+    update_user_profile(body)
+    return {"success": True, "message": "Profile updated successfully"}
 
 
 # ═══════════════════════════════════════════════════════════════

@@ -1255,8 +1255,9 @@ If it blows you away and spikes your average view duration, we can talk about pa
 Are you planning an upload this week? Just reply "Yes" to this email or grab 5 mins on my calendar ({calendly_url}) and I'll send the sample over!
 
 Best regards,
-Farhan | Lead Editor, Zentic Media
-Portfolio: {portfolio_url}"""
+Rakibul Hasan (Rakib)
+Founder & Lead Video Editor | Zentic Media
+Website: {portfolio_url}"""
 
     return {
         "subject": subject,
