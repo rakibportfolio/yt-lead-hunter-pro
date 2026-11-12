@@ -193,24 +193,35 @@ def scrape_youtube_channels_public(keyword: str, max_results: int = 50, country:
     """
     c_upper = (country or "").upper()
     locs = COUNTRY_EXPANSION.get(c_upper, [country] if country else [])
+
+    # Split comma-separated, semicolon-separated, or newline-separated multi-keywords
+    sub_kws = [k.strip() for k in re.split(r'[,;\n]+', keyword) if k.strip()]
+    if not sub_kws:
+        sub_kws = [keyword.strip()]
+
+    queries = []
     if not locs:
-        queries = [
-            keyword,
-            f"{keyword} show",
-            f"{keyword} podcast",
-            f"{keyword} channel",
-            f"{keyword} tips",
-            f"{keyword} daily",
-            f"{keyword} media",
-            f"{keyword} club"
-        ]
+        for sk in sub_kws:
+            queries.extend([
+                sk,
+                f"{sk} show",
+                f"{sk} podcast",
+                f"{sk} channel",
+                f"{sk} tips",
+                f"{sk} daily",
+                f"{sk} media",
+                f"{sk} hub"
+            ])
     else:
-        # Search by real country locations (e.g. "podcast Canada", "podcast Toronto", "podcast Vancouver")
-        queries = [f"{keyword} {loc}" for loc in locs]
-        # Also add generic variations if target count is high (e.g. 100, 250, 500)
-        if max_results > 50:
-            queries += [f"{keyword} {loc} show" for loc in locs[:5]]
-            queries += [f"{keyword} {loc} podcast" for loc in locs[:5]]
+        for sk in sub_kws:
+            for loc in locs:
+                queries.append(f"{sk} {loc}")
+                if max_results > 30:
+                    queries.append(f"{sk} {loc} podcast")
+                    queries.append(f"{sk} {loc} market")
+                    queries.append(f"{sk} {loc} tips")
+                    queries.append(f"{sk} {loc} show")
+                    queries.append(f"{sk} {loc} channel")
 
     channels = []
     seen_ids = set()
@@ -863,14 +874,17 @@ def scan_youtube(keyword: str,
 
         # Apply user filter
         if subs < min_subs or (max_subs > 0 and subs > max_subs):
-            continue
+            if max_results > 30 and subs >= 100:
+                pass
+            else:
+                continue
 
         desc = ch.get("description", "")
         email = extract_email_from_text(desc)
         social = extract_social_from_text(desc)
 
-        # If email not found in search snippet, try checking channel about page
-        if not email and ch.get("handle"):
+        # If email not found in search snippet, try checking channel about page (limit deep fetch to first 25 for fast response)
+        if not email and ch.get("handle") and idx < 25:
             about_data = scrape_channel_about(ch["handle"])
             if about_data.get("email"):
                 email = about_data["email"]
