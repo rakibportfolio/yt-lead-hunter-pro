@@ -251,16 +251,17 @@ if __name__ == "__main__":
     send_daily_report()
 
 
-def send_telegram_photo(caption: str, photo_url: str = None, reply_markup: dict = None) -> bool:
+def send_telegram_photo(caption: str, photo_url: str = None, reply_markup: dict = None, chat_id: str = None) -> bool:
     """Send photo with caption to Telegram chat, fallback to message."""
-    if not cfg.TELEGRAM_BOT_TOKEN or not cfg.TELEGRAM_CHAT_ID:
+    target_chat = chat_id or cfg.TELEGRAM_CHAT_ID
+    if not cfg.TELEGRAM_BOT_TOKEN or not target_chat:
         print("[Telegram] Demo mode: No credentials configured.")
         return False
 
     if photo_url and (photo_url.startswith("http://") or photo_url.startswith("https://")):
         url = f"https://api.telegram.org/bot{cfg.TELEGRAM_BOT_TOKEN}/sendPhoto"
         payload = {
-            "chat_id": cfg.TELEGRAM_CHAT_ID,
+            "chat_id": target_chat,
             "photo": photo_url,
             "caption": caption[:1024],  # Telegram caption limit
             "parse_mode": "HTML"
@@ -278,7 +279,7 @@ def send_telegram_photo(caption: str, photo_url: str = None, reply_markup: dict 
     # Fallback to sendMessage
     url = f"https://api.telegram.org/bot{cfg.TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
-        "chat_id": cfg.TELEGRAM_CHAT_ID,
+        "chat_id": target_chat,
         "text": caption,
         "parse_mode": "HTML",
         "disable_web_page_preview": False
@@ -391,4 +392,5 @@ def alert_fb_hiring_post(job: dict) -> bool:
 
     reply_markup = {"inline_keyboard": inline_keyboard} if inline_keyboard else None
 
-    return send_telegram_photo(caption=caption, photo_url=image_url, reply_markup=reply_markup)
+    fb_chat_id = getattr(cfg, "TELEGRAM_FB_CHAT_ID", "") or cfg.TELEGRAM_CHAT_ID
+    return send_telegram_photo(caption=caption, photo_url=image_url, reply_markup=reply_markup, chat_id=fb_chat_id)
