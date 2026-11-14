@@ -2950,4 +2950,105 @@ async function triggerEmailEnrichment() {
 }
 window.triggerEmailEnrichment = triggerEmailEnrichment;
 
+// ══════════════════════════════════════════════════════════════════════
+// AGENCY AI DEAL CLOSER & OBJECTION HANDLER (msitarzewski/agency-agents)
+// ══════════════════════════════════════════════════════════════════════
+
+window.lastCloserOptions = {};
+
+function openAgencyCloserModal(leadName = '', channel = '', initialText = '') {
+  const modal = document.getElementById('agencyCloserModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  if (leadName) document.getElementById('closerLeadName').value = leadName;
+  if (channel) document.getElementById('closerChannel').value = channel;
+  if (initialText) document.getElementById('closerClientReply').value = initialText;
+  const results = document.getElementById('closerResultsArea');
+  if (results) results.style.display = 'none';
+}
+window.openAgencyCloserModal = openAgencyCloserModal;
+
+function closeAgencyCloserModal() {
+  const modal = document.getElementById('agencyCloserModal');
+  if (modal) modal.style.display = 'none';
+}
+window.closeAgencyCloserModal = closeAgencyCloserModal;
+
+function setCloserPreset(text) {
+  const txtArea = document.getElementById('closerClientReply');
+  if (txtArea) {
+    txtArea.value = text;
+    txtArea.focus();
+  }
+}
+window.setCloserPreset = setCloserPreset;
+
+async function runAgencyCloser() {
+  const clientReply = document.getElementById('closerClientReply').value.trim();
+  const leadName = document.getElementById('closerLeadName').value.trim();
+  const channel = document.getElementById('closerChannel').value.trim();
+  const btn = document.getElementById('btnGenerateCloser');
+
+  if (!clientReply) {
+    showToast('Please enter or paste the client\'s reply message first.', 'warning');
+    return;
+  }
+
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Analyzing & Drafting Agency Closer Responses...';
+
+  try {
+    const res = await fetch(API_BASE + '/api/agency/close-reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_reply: clientReply,
+        lead_name: leadName || 'there',
+        channel: channel || ''
+      })
+    });
+    const data = await res.json();
+    if (data.success && data.options) {
+      window.lastCloserOptions = data.options;
+      const resultsArea = document.getElementById('closerResultsArea');
+      const badge = document.getElementById('closerIntentBadge');
+      const optA = document.getElementById('closerOptA');
+      const optB = document.getElementById('closerOptB');
+      const optC = document.getElementById('closerOptC');
+
+      if (badge) badge.innerText = (data.objection_type || 'INQUIRY').toUpperCase();
+      if (optA) optA.textContent = data.options.option_a || '';
+      if (optB) optB.textContent = data.options.option_b || '';
+      if (optC) optC.textContent = data.options.option_c || '';
+
+      if (resultsArea) resultsArea.style.display = 'block';
+      showToast('Generated 3 calibrated agency closer responses!', 'success');
+    } else {
+      showToast('Failed to generate responses: ' + (data.error || 'Unknown error'), 'error');
+    }
+  } catch (err) {
+    showToast('Error connecting to Agency Closer API: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
+}
+window.runAgencyCloser = runAgencyCloser;
+
+function copyCloserOption(optKey) {
+  const text = window.lastCloserOptions[optKey];
+  if (!text) {
+    showToast('No text available to copy.', 'warning');
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(`Copied ${optKey.replace('_', ' ').toUpperCase()} to clipboard! 📋`, 'success');
+  }).catch(() => {
+    showToast('Failed to copy. Please select and copy manually.', 'error');
+  });
+}
+window.copyCloserOption = copyCloserOption;
+
+
 

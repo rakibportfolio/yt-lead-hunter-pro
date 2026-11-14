@@ -1071,6 +1071,9 @@ Micro-Niche
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
       <button class="btn-primary" style="padding:8px 16px;font-size:12px;" onclick="loadPipelineBoard()">🔄 Refresh Board</button>
       <button class="btn-secondary" id="checkRepliesBtn" style="padding:8px 16px;font-size:12px;background:#f0fdf4;color:#166534;border-color:#bbf7d0;font-weight:600;" onclick="checkCrmReplies()">📥 Check Replies (Mailsuite)</button>
+      <button class="btn-secondary" id="agencyCloserBtn" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;font-weight:600;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(79,70,229,0.25);" onclick="openAgencyCloserModal()">
+        <span>🤖</span> Agency AI Closer
+      </button>
       <button class="btn-secondary" style="padding:8px 16px;font-size:12px;" onclick="pushAllLeadsToPipeline()">➕ Push All Leads to Pipeline</button>
       <div style="margin-left:auto;font-size:12px;color:var(--text-muted);" id="pipeLastUpdated">Last updated: —</div>
     </div>
@@ -1499,6 +1502,94 @@ Micro-Niche
           <button onclick="startBulkEmailSend()" id="btnStartBulkSend" style="background:#7c3aed;color:#fff;border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(124,58,237,0.35);">
             🚀 Send Campaign Now
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Agency AI Deal Closer (Inspired by msitarzewski/agency-agents) -->
+  <div id="agencyCloserModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+    <div style="background:#fff;border-radius:14px;width:94%;max-width:760px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);border:1px solid #e2e8f0;display:flex;flex-direction:column;">
+      <!-- Modal Header -->
+      <div style="background:linear-gradient(135deg,#312e81,#4f46e5,#7c3aed);padding:18px 24px;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:20px;">🤖</div>
+          <div>
+            <h3 style="margin:0;font-size:16px;font-weight:800;letter-spacing:-0.2px;">Agency AI Deal Closer & Objection Handler</h3>
+            <p style="margin:2px 0 0 0;font-size:12px;opacity:0.85;">Convert creator replies into booked calls & paid projects (msitarzewski/agency-agents)</p>
+          </div>
+        </div>
+        <button onclick="closeAgencyCloserModal()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="padding:22px;display:flex;flex-direction:column;gap:16px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:5px;">Client / Creator Name</label>
+            <input type="text" id="closerLeadName" placeholder="e.g. David Miller" style="width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:7px;font-size:13px;box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:5px;">Channel / Project</label>
+            <input type="text" id="closerChannel" placeholder="e.g. @DavidEdits / US Creator" style="width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:7px;font-size:13px;box-sizing:border-box;" />
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:5px;">Client Reply / Incoming Message (Paste here)</label>
+          <textarea id="closerClientReply" rows="3" placeholder="e.g. 'How much do you charge per video?' OR 'I already have an editor' OR 'Sure, let's do a free test hook'" style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:7px;font-size:13px;font-family:inherit;box-sizing:border-box;resize:vertical;"></textarea>
+        </div>
+
+        <!-- Quick Objection Presets -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+          <span style="font-size:11px;font-weight:700;color:#64748b;">Quick Presets:</span>
+          <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 9px;" onclick="setCloserPreset('How much do you charge per reel and long-form video?')">💰 Pricing Inquiry</button>
+          <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 9px;" onclick="setCloserPreset('Can you share your portfolio and past work?')">📁 Portfolio Request</button>
+          <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 9px;" onclick="setCloserPreset('I already have a full-time editor right now.')">🛡️ Already Has Editor</button>
+          <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 9px;" onclick="setCloserPreset('Yes, let\'s try the free 30s demo hook. What do you need?')">🚀 Ready for Free Demo</button>
+        </div>
+
+        <button onclick="runAgencyCloser()" id="btnGenerateCloser" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(79,70,229,0.3);">
+          <span>⚡</span> Generate Agency Closing Options
+        </button>
+
+        <!-- Results Container -->
+        <div id="closerResultsArea" style="display:none;margin-top:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:8px 12px;background:#f1f5f9;border-radius:8px;">
+            <span style="font-size:12px;font-weight:700;color:#334155;">
+              🎯 Detected Intent: <span id="closerIntentBadge" style="background:#4f46e5;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;text-transform:uppercase;">PRICING</span>
+            </span>
+            <span style="font-size:11.5px;color:#64748b;">Choose the response that fits best:</span>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <!-- Option A -->
+            <div style="border:1px solid #e2e8f0;border-radius:9px;padding:14px;background:#fff;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="font-weight:700;font-size:13px;color:#1e293b;">Option A: Direct Call / Demo Closer</span>
+                <button class="btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="copyCloserOption('option_a')">📋 Copy Option A</button>
+              </div>
+              <pre id="closerOptA" style="white-space:pre-wrap;font-family:inherit;font-size:12.5px;color:#334155;margin:0;line-height:1.5;background:#f8fafc;padding:10px;border-radius:6px;border:1px solid #e2e8f0;"></pre>
+            </div>
+
+            <!-- Option B -->
+            <div style="border:1px solid #e2e8f0;border-radius:9px;padding:14px;background:#fff;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="font-weight:700;font-size:13px;color:#1e293b;">Option B: Value-First Free Test Closer (Zero Risk)</span>
+                <button class="btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="copyCloserOption('option_b')">📋 Copy Option B</button>
+              </div>
+              <pre id="closerOptB" style="white-space:pre-wrap;font-family:inherit;font-size:12.5px;color:#334155;margin:0;line-height:1.5;background:#f8fafc;padding:10px;border-radius:6px;border:1px solid #e2e8f0;"></pre>
+            </div>
+
+            <!-- Option C -->
+            <div style="border:1px solid #e2e8f0;border-radius:9px;padding:14px;background:#fff;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="font-weight:700;font-size:13px;color:#1e293b;">Option C: Retainer & Package Proposal Closer</span>
+                <button class="btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="copyCloserOption('option_c')">📋 Copy Option C</button>
+              </div>
+              <pre id="closerOptC" style="white-space:pre-wrap;font-family:inherit;font-size:12.5px;color:#334155;margin:0;line-height:1.5;background:#f8fafc;padding:10px;border-radius:6px;border:1px solid #e2e8f0;"></pre>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -188,8 +188,31 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
 
     c_lower = clean_content.lower()
 
-    # Negative patterns (freelancer promoting their own editing services)
+    # Mandatory: Post MUST mention video editing or media creation
+    video_keywords = ['video', 'editor', 'editing', 'reels', 'shorts', 'premiere', 'after effects', 
+                      'motion graphics', 'animat', 'capcut', 'davinci', 'vlog', 'content creator', 
+                      'ভিডিও', 'এডিটর', 'এডিট']
+    has_video_keyword = any(k in c_lower for k in video_keywords)
+    if not has_video_keyword:
+        return {
+            "is_hiring": False,
+            "confidence_score": 0,
+            "client_name": "Unknown",
+            "job_type": "Irrelevant (No Video Keyword)",
+            "budget": "",
+            "contact_phone": "",
+            "contact_whatsapp": "",
+            "contact_email": "",
+            "contact_telegram": "",
+            "ai_summary": "Not a video editing post."
+        }
+
+    # Negative patterns (freelancer promoting their own editing services or selling items)
     freelancer_patterns = [
+        # Non-video sales (fridges, rent, laptops, etc.)
+        r'\b(?:urgent\s+sale|ghar\s+ka\s+rent|rent\s+dana|for\s+sale|selling\s+my|house\s+for\s+rent)\b',
+        r'\b(?:sale|selling|kharidna|bechna)\b',
+        
         # English self-identity & promos
         r'\b(?:i|i[\'’]?m|im|hy\s+i[\'’]?m|hy\s+i\s+am|hello\s+i[\'’]?m|hello\s+i\s+am)\s+(?:a\s+)?(?:professional\s+|freelance\s+|skilled\s+)?(?:video\s+)?editor\b',
         r'\b(?:i|i[\'’]?m|im)\s+(?:available|open|ready)\s+(?:for\s+)?(?:work|hire|projects?|clients?|commissions?|rush\s+edits?)\b',
@@ -267,7 +290,7 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
     hiring_patterns = [
         r'\b(?:need|looking\s+for|hiring|seeking|want|require|wanted)\b[^\.\n\?!]{0,40}\b(?:video\s+editor|editor|motion\s+designer|animator)\b',
         r'\b(?:video\s+editor|editor|motion\s+designer)\s*(?:lagbe|dorkar|khujchi|chahida|need|hiring|chai|proyojon)\b',
-        r'\b(?:urgent|urgently|urgent\s+requirement|we\s+are\s+hiring|job\s+offer|job\s+circular|recruitment)\b',
+        r'\b(?:urgent\s+requirement|we\s+are\s+hiring|job\s+offer|job\s+circular|recruitment)\b',
         r'\b(?:send\s+portfolio|inbox\s+with\s+portfolio|inbox\s+your\s+rate|apply\s+at|drop\s+portfolio|send\s+cv|send\s+resume)\b',
         r'\b(?:who\s+can\s+edit\s+my\s+videos|need\s+someone\s+to\s+edit|can\s+anyone\s+edit|anyone\s+available\s+to\s+edit)\b',
         r'\b(?:video\s+edit\s+korate\s+chai|editing\s+er\s+lok\s+lagbe|editor\s+dorkar)\b',

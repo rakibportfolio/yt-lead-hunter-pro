@@ -41,6 +41,9 @@ from database import (
 )
 from email_engine import send_email, send_bulk_emails, get_template, TEMPLATES
 from youtube_scraper import scan_youtube, generate_channel_pitch, scrape_channel_recent_videos
+from agency_agents import (
+    generate_agency_pitch, generate_closer_reply, generate_dm_pitch, analyze_objection_type
+)
 from telegram_bot import (
     send_telegram, send_daily_report, alert_email_opened,
     alert_email_replied, alert_email_clicked, alert_new_leads_found,
@@ -494,6 +497,50 @@ class PitchRequest(BaseModel):
     subs:    Optional[str] = ""
     email:   Optional[str] = ""
     channel_url: Optional[str] = ""
+
+class CloseReplyRequest(BaseModel):
+    client_reply: str
+    lead_name: Optional[str] = "there"
+    channel: Optional[str] = ""
+    context: Optional[str] = None
+
+class DMScriptRequest(BaseModel):
+    client: Optional[str] = "there"
+    need: Optional[str] = "video editing"
+    platform: Optional[str] = "Facebook"
+
+@app.post("/api/agency/generate-pitch")
+def api_agency_generate_pitch(req: PitchRequest):
+    """Agency Copywriter Agent: Generates high-converting creator pitch."""
+    try:
+        data = req.dict()
+        pitch = generate_agency_pitch(data)
+        return {"success": True, **pitch}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/agency/close-reply")
+def api_agency_close_reply(req: CloseReplyRequest):
+    """Agency Deal Closer Agent: Generates 3 closing responses for client replies."""
+    try:
+        result = generate_closer_reply(
+            client_reply=req.client_reply,
+            lead_name=req.lead_name or "there",
+            channel=req.channel or "",
+            context=req.context
+        )
+        return {"success": True, **result}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/agency/dm-script")
+def api_agency_dm_script(req: DMScriptRequest):
+    """Agency DM Sniper Agent: Generates rapid DM scripts for hiring posts."""
+    try:
+        result = generate_dm_pitch(req.dict())
+        return {"success": True, **result}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 @app.post("/api/leads/generate-pitch")
 def api_generate_pitch(req: PitchRequest):
