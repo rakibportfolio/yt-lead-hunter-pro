@@ -26,10 +26,7 @@ from fb_group_monitor import (
     scrape_facebook_group_posts, classify_fb_post_with_ai,
     is_post_fresh
 )
-from multi_platform_hunter import (
-    scrape_reddit_subreddits, scrape_remoteok_video_jobs,
-    alert_international_job
-)
+
 from telegram_bot import alert_fb_hiring_post, send_telegram
 
 # ── Global Worker Stats ──────────────────────────────────────
@@ -159,119 +156,7 @@ def run_single_hunter_cycle():
     except Exception as fe:
         print(f"[Cycle #{cycle_num}] Facebook scan step error: {fe}")
 
-    # ──────────────────────────────────────────────────────────
-    # 2. REDDIT SUBREDDITS HUNTING
-    # ──────────────────────────────────────────────────────────
-    try:
-        print(f"\n[Cycle #{cycle_num}] Scanning creator Reddit subreddits...")
-        reddit_posts = scrape_reddit_subreddits(max_posts_per_sub=8)
-        WORKER_STATE["total_posts_scanned"] += len(reddit_posts)
-
-        for p in reddit_posts:
-            p_url = p["post_url"]
-            content = p["content"]
-            auth = p["author_name"]
-            grp = p["group_name"]
-
-            if is_fb_post_seen("", content, p_url):
-                continue
-
-            fresh = is_post_fresh(content, max_hours=12)
-            ai_res = classify_fb_post_with_ai(content, auth, grp)
-            is_h = 1 if (fresh and ai_res.get("is_hiring")) else 0
-
-            alert_data = {
-                "group_id": None,
-                "group_name": grp,
-                "post_id": generate_fb_post_id(p_url, content),
-                "author_name": auth,
-                "author_url": p.get("author_url", ""),
-                "post_url": p_url,
-                "content": content,
-                "image_url": "",
-                "is_hiring": is_h,
-                "client_name": auth,
-                "job_type": ai_res.get("job_type", "Video Editor"),
-                "budget": ai_res.get("budget", "Negotiable (USD)"),
-                "contact_phone": "",
-                "contact_email": "",
-                "contact_whatsapp": "",
-                "contact_telegram": "",
-                "confidence_score": 95 if is_h else 20,
-                "ai_summary": content[:220],
-                "telegram_sent": 0,
-                "telegram_sent_at": None,
-                "platform": "reddit"
-            }
-
-            if is_h:
-                sent_ok = alert_international_job(alert_data)
-                if sent_ok:
-                    alert_data["telegram_sent"] = 1
-                    alert_data["telegram_sent_at"] = datetime.now().isoformat()
-                    WORKER_STATE["total_telegram_sent"] += 1
-                WORKER_STATE["total_hiring_leads_found"] += 1
-                print(f"  🎯 [REDDIT HIRING ALERT SENT]: {auth} ({alert_data['job_type']}) - {grp}")
-
-            insert_fb_alert(alert_data)
-
-    except Exception as re:
-        print(f"[Cycle #{cycle_num}] Reddit scan step error: {re}")
-
-    # ──────────────────────────────────────────────────────────
-    # 3. REMOTEOK GLOBAL JOBS HUNTING
-    # ──────────────────────────────────────────────────────────
-    try:
-        print(f"\n[Cycle #{cycle_num}] Checking RemoteOK for video editor jobs...")
-        remote_posts = scrape_remoteok_video_jobs(limit=10)
-        WORKER_STATE["total_posts_scanned"] += len(remote_posts)
-
-        for p in remote_posts:
-            p_url = p["post_url"]
-            content = p["content"]
-            company = p["author_name"]
-            grp = p["group_name"]
-
-            if is_fb_post_seen("", content, p_url):
-                continue
-
-            alert_data = {
-                "group_id": None,
-                "group_name": grp,
-                "post_id": generate_fb_post_id(p_url, content),
-                "author_name": company,
-                "author_url": p.get("author_url", ""),
-                "post_url": p_url,
-                "content": content,
-                "image_url": "",
-                "is_hiring": 1,
-                "client_name": company,
-                "job_type": "Video Editor",
-                "budget": p.get("budget", "Negotiable (USD)"),
-                "contact_phone": "",
-                "contact_email": "",
-                "contact_whatsapp": "",
-                "contact_telegram": "",
-                "confidence_score": 98,
-                "ai_summary": content[:220],
-                "telegram_sent": 0,
-                "telegram_sent_at": None,
-                "platform": "remoteok"
-            }
-
-            sent_ok = alert_international_job(alert_data)
-            if sent_ok:
-                alert_data["telegram_sent"] = 1
-                alert_data["telegram_sent_at"] = datetime.now().isoformat()
-                WORKER_STATE["total_telegram_sent"] += 1
-            WORKER_STATE["total_hiring_leads_found"] += 1
-            print(f"  🎯 [REMOTEOK HIRING ALERT SENT]: {company}")
-
-            insert_fb_alert(alert_data)
-
-    except Exception as ro_err:
-        print(f"[Cycle #{cycle_num}] RemoteOK scan step error: {ro_err}")
-
+    # Reddit and RemoteOK disabled permanently as per user requirement: Facebook-only channel
     print(f"\n[Cycle #{cycle_num} Complete] Total leads found so far: {WORKER_STATE['total_hiring_leads_found']} | Telegram alerts sent: {WORKER_STATE['total_telegram_sent']}")
 
 
