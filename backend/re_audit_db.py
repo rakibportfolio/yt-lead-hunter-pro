@@ -35,3 +35,4 @@ for r in rows:
 conn.commit()
 conn.close()
 print(f"\nAudit complete! Removed {fake_count} false positives. Retained {true_count} genuine client jobs.")
+
