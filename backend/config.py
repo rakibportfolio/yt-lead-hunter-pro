@@ -38,7 +38,7 @@ class Config:
     DAILY_SEND_LIMIT = int(os.getenv("DAILY_SEND_LIMIT", "200"))
 
     # Email tracking — your server URL (where pixel lives)
-    TRACKING_BASE_URL = os.getenv("TRACKING_BASE_URL", "https://discharge-sight-advancement-passed.trycloudflare.com")
+    TRACKING_BASE_URL = os.getenv("TRACKING_BASE_URL", "https://shares-treating-resource-interviews.trycloudflare.com")
 
     # ── YouTube API ───────────────────────────────────────────
     YOUTUBE_API_KEY = _clean_val(os.getenv("YOUTUBE_API_KEY", ""))
