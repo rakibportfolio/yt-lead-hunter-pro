@@ -145,7 +145,8 @@ def run_single_hunter_cycle():
                         WORKER_STATE["total_hiring_leads_found"] += 1
                         print(f"  🎯 [FB HIRING ALERT SENT]: {alert_data['client_name']} ({alert_data['job_type']}) - {gname}")
 
-                    insert_fb_alert(alert_data)
+                        # ONLY insert true hiring leads into the alerts database
+                        insert_fb_alert(alert_data)
 
             except Exception as ge:
                 print(f"[Cycle #{cycle_num}] Error scanning FB group {gname}: {ge}")

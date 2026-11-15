@@ -209,6 +209,10 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
 
     # Negative patterns (freelancer promoting their own editing services or selling items)
     freelancer_patterns = [
+        # Static graphics, labels, packages, non-video design work
+        r'\b(?:label\s+design|package\s+design|packaging\s+design|logo\s+design|banner\s+design|t-shirt\s+design|business\s+card|flyer\s+design|poster\s+design)\b',
+        r'(?:লেবেল\s*ডিজাইন|প্যাকেজিং\s*ডিজাইন|লোগো\s*ডিজাইন|ব্যানার\s*ডিজাইন|নতুন\s*প্রজেক্ট\s*সম্পন্ন|প্রজেক্ট\s*সম্পন্ন)',
+        r'\b(?:new\s+project\s+completed|project\s+completed|portfolio\s+showcase)\b',
         # Non-video sales (fridges, rent, laptops, etc.)
         r'\b(?:urgent\s+sale|ghar\s+ka\s+rent|rent\s+dana|for\s+sale|selling\s+my|house\s+for\s+rent)\b',
         r'\b(?:sale|selling|kharidna|bechna)\b',
