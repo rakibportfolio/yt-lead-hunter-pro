@@ -171,66 +171,10 @@ def scrape_remoteok_video_jobs(limit: int = 20) -> List[Dict[str, Any]]:
 def alert_international_job(job: dict) -> bool:
     """
     Sends structured Telegram alert for Reddit or RemoteOK jobs.
+    STRICT USER RULE: Only Facebook posts should be alerted. Non-FB alerts disabled.
     """
-    platform = job.get("platform", "global").title()
-    group_name = job.get("group_name", "International Community")
-    author_name = job.get("author_name", "Client")
-    author_url = job.get("author_url", "")
-    post_url = job.get("post_url", "")
-    title = job.get("title", "Video Editor Wanted")
-    content = job.get("content", "")[:350]
-    budget = job.get("budget", "Negotiable (USD)")
-    job_type = job.get("job_type", "Video Editor")
-
-    badge = "🔴 <b>[REDDIT HIRING]</b>" if platform.lower() == "reddit" else "🟢 <b>[REMOTE JOB]</b>"
-
-    caption = f"""{badge} 🎯 <b>HIGH-TICKET CLIENT LEAD!</b>
-━━━━━━━━━━━━━━━━━━━━
-🌐 <b>Platform:</b> {platform} ({group_name})
-👤 <b>Poster / Client:</b> {author_name}
-"""
-    if author_url:
-        caption += f"👤 <b>Client Profile / DM:</b> <a href='{author_url}'>Click to Contact Poster</a>\n"
-    if post_url:
-        caption += f"🔗 <b>Direct Link:</b> <a href='{post_url}'>Open Job Details</a>\n"
-
-    caption += f"""💼 <b>Role:</b> {job_type}
-💰 <b>Budget / Pay:</b> {budget}
-
-📋 <b>Description:</b>
-<i>"{content}"</i>
-━━━━━━━━━━━━━━━━━━━━
-⚡ <b>Apply fast before other international editors!</b>"""
-
-    # Telegram buttons
-    inline_keyboard = []
-    btn_row = []
-    if author_url:
-        btn_label = "💬 Message on Reddit" if platform.lower() == "reddit" else "🏢 Company Profile"
-        btn_row.append({"text": btn_label, "url": author_url})
-    if post_url:
-        btn_row.append({"text": "🔗 View Exact Job", "url": post_url})
-    if btn_row:
-        inline_keyboard.append(btn_row)
-
-    # Send International / Reddit alerts ONLY to personal chat, NEVER to the dedicated FB group
-    target_chat = cfg.TELEGRAM_CHAT_ID
-    url = f"https://api.telegram.org/bot{cfg.TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": target_chat,
-        "text": caption,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": False
-    }
-    if inline_keyboard:
-        payload["reply_markup"] = {"inline_keyboard": inline_keyboard}
-
-    try:
-        r = requests.post(url, json=payload, timeout=12)
-        return r.status_code == 200
-    except Exception as e:
-        print(f"[Telegram] Error sending international alert: {e}")
-        return False
+    print("[Guard] Non-Facebook alert blocked. User requested ONLY Facebook group posts.")
+    return False
 
 
 def run_multi_platform_hunter() -> dict:
