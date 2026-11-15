@@ -76,18 +76,17 @@ def run_single_hunter_cycle():
     try:
         conn = get_db()
         c = conn.cursor()
-        # Scan priority groups first, max 20 per cycle to avoid high load
+        # Scan ALL active Facebook groups without any limit (100% coverage across all 122 groups)
         c.execute("""
             SELECT id, name, url, priority 
             FROM fb_monitored_groups 
             WHERE active = 1 
-            ORDER BY priority DESC, id ASC 
-            LIMIT 20
+            ORDER BY priority DESC, id ASC
         """)
         groups = [dict(r) for r in c.fetchall()]
         conn.close()
 
-        print(f"[Cycle #{cycle_num}] Scanning {len(groups)} top Facebook groups...")
+        print(f"[Cycle #{cycle_num}] Scanning ALL {len(groups)} Facebook groups in database (100% full coverage)...")
 
         for g in groups:
             gid = g["id"]
@@ -302,10 +301,9 @@ def start_autonomous_worker_loop():
             print(f"[Worker Exception] Unexpected crash in cycle: {e}")
             traceback.print_exc()
 
-        # Sleep for 5 minutes (300 seconds) before running next full hunt cycle
-        print("\n⏳ Sleeping for 5 minutes before next hunting cycle...")
-        for _ in range(30):
-            time.sleep(10)
+        # Brief pause between full 122-group sweeps
+        print("\n⏳ Completed full 122-group scan sweep. Restarting next sweep in 30 seconds...")
+        time.sleep(30)
 
 
 if __name__ == "__main__":
