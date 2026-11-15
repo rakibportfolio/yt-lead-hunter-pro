@@ -298,7 +298,7 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
 
     # Positive hiring patterns (Client / Employer looking to PAY an editor)
     hiring_patterns = [
-        r'\b(?:need|looking\s+for|hiring|seeking|want|require|wanted)\b[^\.\n\?!]{0,40}\b(?:video\s+editor|editor|motion\s+designer|animator)\b',
+        r'\b(?:need|looking\s+for|lf|hiring|seeking|want|require|wanted)\b[^\.\n\?!]{0,40}\b(?:video\s+editor|editor|motion\s+designer|animator)\b',
         r'\b(?:video\s+editor|editor|motion\s+designer)\s*(?:lagbe|dorkar|khujchi|chahida|need|hiring|chai|proyojon)\b',
         r'\b(?:urgent\s+requirement|we\s+are\s+hiring|job\s+offer|job\s+circular|recruitment)\b',
         r'\b(?:send\s+portfolio|inbox\s+with\s+portfolio|inbox\s+your\s+rate|apply\s+at|drop\s+portfolio|send\s+cv|send\s+resume)\b',
@@ -312,7 +312,10 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
         r'ভিডিও\s*এডিটর\s*খুঁজছি',
         r'ভিডিও\s*এডিট\s*করাতে\s*চাই',
         r'জরুরী\s*ভিত্তিতে\s*এডিটর',
-        r'কাজের\s*জন্য\s*এডিটর'
+        r'কাজের\s*জন্য\s*এডিটর',
+        r'(?:কেউ|কেউ)\s+(?:ভিডিও\s+)?(?:এডিটিং|এডিট)\s+করে\s+দিতে\s+পারবেন',
+        r'ভিডিও\s+(?:এডিটিং|এডিট)\s+করে\s+দেওয়ার\s+(?:কেউ|কেউ)',
+        r'ভিডিও\s+এডিট\s+করতে\s+পারেন'
     ]
 
     is_hiring = any(re.search(p, c_lower) for p in hiring_patterns)
