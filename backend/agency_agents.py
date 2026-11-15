@@ -395,3 +395,4 @@ def generate_dm_pitch(job_info: Dict[str, Any]) -> Dict[str, Any]:
         "portfolio": portfolio,
         "persona": "AgencyDMSniper"
     }
+

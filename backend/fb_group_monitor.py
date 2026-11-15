@@ -213,13 +213,19 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
         r'\b(?:urgent\s+sale|ghar\s+ka\s+rent|rent\s+dana|for\s+sale|selling\s+my|house\s+for\s+rent)\b',
         r'\b(?:sale|selling|kharidna|bechna)\b',
         
-        # English self-identity & promos
-        r'\b(?:i|i[\'’]?m|im|hy\s+i[\'’]?m|hy\s+i\s+am|hello\s+i[\'’]?m|hello\s+i\s+am)\s+(?:a\s+)?(?:professional\s+|freelance\s+|skilled\s+)?(?:video\s+)?editor\b',
+        # English self-identity & promos (must use 'i am' or 'i'm' or 'im' - NOT bare 'i' which would match 'i need')
+        r'\b(?:i\s+am|i[\'’]?m|im|hy\s+i[\'’]?m|hy\s+i\s+am|hello\s+i[\'’]?m|hello\s+i\s+am)\s+(?:a\s+)?(?:professional\s+|freelance\s+|skilled\s+|experienced\s+)?(?:[\w\s]{0,25})?(?:video\s+)?editor\b',
         r'\b(?:i|i[\'’]?m|im)\s+(?:available|open|ready)\s+(?:for\s+)?(?:work|hire|projects?|clients?|commissions?|rush\s+edits?)\b',
         r'\bopen\s+for\s+(?:work|hire|projects?|clients?|commissions?|rush\s+edits?)\b',
+        r'\blooking\s+for\s+clients?\b',
+        r'\bopen\s+for\s+clients?\b',
         r'\baccepting\s+(?:new\s+)?(?:clients?|projects?|rush\s+edits?|orders?)\b',
         r'\bhire\s+me\b',
         r'\b(?:let\s+me|i\s+can|i\s+will)\s+edit\s+your\b',
+        r'\bi\s+can\s+(?:create|make|edit|provide|produce)\b',
+        r'\bneed\s+(?:a\s+)?(?:video\s+)?editor\s+for\s+your\b',
+        r'\bfor\s+(?:work|collaboration|orders?)\s*[,:]?\s*(?:contact|dm|inbox|call|whatsapp)\b',
+        r'\bcontact\s+(?:no|number)\s*[:=-]',
         r'\b(?:my|check\s+my|view\s+my|here\s+is\s+my)\s+portfolio\b',
         r'\bportfolio\s*(?:link|below|here)?\s*[:=-]\s*https?',
         r'\b(?:my|our)\s+recent\s+work\b',
@@ -281,7 +287,11 @@ def classify_fb_post_heuristic(content: str, author_name: str = "") -> Dict[str,
         r'কারো\s+লাগলে\s+নক\s+দিয়েন',
         r'কারো\s+কাজ\s+লাগলে',
         r'কম\s+(?:বাজেটে|খরচে|টাকায়)\s+ভিডিও\s+এডিট',
-        r'আমার\s+পোর্টফোলিও'
+        r'আমার\s+পোর্টফোলিও',
+        r'যাদের[^\n\.\?!]{0,50}(?:লাগবে|দরকার)[^\n\.\?!]{0,50}(?:যোগাযোগ|ইনবক্স|নক|মেসেজ|whatsapp)',
+        r'কারো[^\n\.\?!]{0,50}(?:লাগলে|দরকার|লাগবে)[^\n\.\?!]{0,50}(?:যোগাযোগ|ইনবক্স|নক|মেসেজ|whatsapp)',
+        r'তারা\s+যোগাযোগ\s+করুন',
+        r'তারা\s+ইনবক্স\s+করুন'
     ]
 
     is_freelancer = any(re.search(p, c_lower) for p in freelancer_patterns)

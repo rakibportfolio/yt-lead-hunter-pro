@@ -213,7 +213,8 @@ def alert_international_job(job: dict) -> bool:
     if btn_row:
         inline_keyboard.append(btn_row)
 
-    target_chat = getattr(cfg, "TELEGRAM_FB_CHAT_ID", "") or cfg.TELEGRAM_CHAT_ID
+    # Send International / Reddit alerts ONLY to personal chat, NEVER to the dedicated FB group
+    target_chat = cfg.TELEGRAM_CHAT_ID
     url = f"https://api.telegram.org/bot{cfg.TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": target_chat,

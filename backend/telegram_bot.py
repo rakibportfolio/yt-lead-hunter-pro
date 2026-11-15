@@ -308,6 +308,22 @@ def alert_fb_hiring_post(job: dict) -> bool:
     image_url = job.get("image_url", "")
     summary = job.get("ai_summary", job.get("content", ""))[:350]
     content_txt = job.get("content", "")
+    plat = job.get("platform", "facebook").lower()
+
+    # 1. Platform Guard: Strictly reject Reddit, RemoteOK or non-FB posts from FB group
+    if plat != "facebook" or any(bad in (post_url or "").lower() for bad in ["reddit.com", "remoteok", "forhire"]):
+        print(f"[Telegram Guard] Discarded non-Facebook post from FB Jobs channel: {post_url}")
+        return False
+
+    # 2. Strict False-Positive Hiring Check: Never allow seller promotions or non-video posts
+    try:
+        from fb_group_monitor import classify_fb_post_heuristic
+        check = classify_fb_post_heuristic(content_txt, author_name)
+        if not check.get("is_hiring"):
+            print(f"[Telegram Guard] Discarded non-hiring/seller post: {client_name} - {content_txt[:60]}")
+            return False
+    except Exception as e:
+        print(f"[Telegram Guard] Classification check warning: {e}")
 
     # Telegram Anti-Duplicate Guard
     try:
