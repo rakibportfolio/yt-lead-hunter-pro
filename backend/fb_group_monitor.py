@@ -553,12 +553,13 @@ def scrape_facebook_group_posts(group_url: str, limit: int = 10) -> List[Dict[st
 
             page = context.new_page()
 
-            # 1. Main group feed: grab newest posts directly in reverse chronological order
+            # 1. Main group feed: force CHRONOLOGICAL (Newest Posts first) so recent posts are never hidden
+            chrono_url = f"{clean_url}/?sorting_setting=CHRONOLOGICAL" if "?" not in clean_url else f"{clean_url}&sorting_setting=CHRONOLOGICAL"
             try:
-                page.goto(clean_url, timeout=22000, wait_until="domcontentloaded")
+                page.goto(chrono_url, timeout=22000, wait_until="domcontentloaded")
                 page.wait_for_timeout(3000)
             except Exception as ge:
-                print(f"[FB Playwright] Note loading {clean_url}: {ge}")
+                print(f"[FB Playwright] Note loading {chrono_url}: {ge}")
 
             seen_post_urls = set()
             # Incremental scrolls: grab posts as they appear in the feed
