@@ -65,10 +65,12 @@ const APP_STATE = {
   discoveryMode: 'single', // -------------------------------------------------------------
   strategy: 'auto',
   leads: [],
+  latestScanLeads: [],
+  latestScanKeyword: '',
   selectedLeadIds: new Set(),
   activeLeadForModal: null,
   activeScoreFilter: 'all',
-  activeResultsTab: 'qualified',
+  activeResultsTab: 'latest',
   recentSearches: [],
   quotaLimit: 30000,
   quotaUsed: 0,
@@ -580,9 +582,21 @@ function finishScan(newLeads, keyword) {
   const pBox = document.getElementById('liveScanProgressBox');
   if (pBox) pBox.style.display = 'none';
 
-  // Merge leads
-  newLeads.forEach(l => {
-    if (!APP_STATE.leads.some(existing => existing.channel === l.channel || existing.id === l.id)) {
+  const validNewLeads = Array.isArray(newLeads) ? newLeads : [];
+
+  // 1. Save ONLY the new leads into latestScanLeads (separated from old leads!)
+  APP_STATE.latestScanLeads = [...validNewLeads];
+  APP_STATE.latestScanKeyword = keyword || '';
+
+  // Persist latest scan so browser reload preserves the Just Discovered tab
+  try {
+    localStorage.setItem('yt_lead_hunter_latest_leads', JSON.stringify(APP_STATE.latestScanLeads));
+    localStorage.setItem('yt_lead_hunter_latest_keyword', APP_STATE.latestScanKeyword);
+  } catch (e) {}
+
+  // 2. Merge into all leads collection
+  validNewLeads.forEach(l => {
+    if (!APP_STATE.leads.some(existing => existing.channel === l.channel || (l.id && existing.id === l.id))) {
       APP_STATE.leads.unshift(l);
     }
   });
@@ -590,16 +604,19 @@ function finishScan(newLeads, keyword) {
   // Track search session
   APP_STATE.recentSearches.unshift({
     keyword,
-    count: newLeads.length,
-    highScore: newLeads.filter(l => (l.ai_score || 0) >= 70).length,
+    count: validNewLeads.length,
+    highScore: validNewLeads.filter(l => (l.ai_score || 0) >= 70).length,
     date: new Date().toLocaleDateString()
   });
 
   // Update Quota
-  APP_STATE.quotaUsed += Math.min(newLeads.length * 35, 1200);
+  APP_STATE.quotaUsed += Math.min(validNewLeads.length * 35, 1200);
 
   updateDashboardMetrics();
-  showToast(`Found ${newLeads.length} leads for "${keyword}"!`, 'success');
+  showToast(`⚡ Discovered ${validNewLeads.length} new leads! Showing Just Discovered tab.`, 'success');
+
+  // Immediately activate the 'latest' tab so user sees ONLY what was just discovered!
+  switchResultsTab('latest');
   navigatePage('results');
 }
 
@@ -742,6 +759,20 @@ async function loadLeadsFromDatabase() {
   } catch (err) {
     APP_STATE.leads = [];
   }
+  try {
+    const savedLatest = localStorage.getItem('yt_lead_hunter_latest_leads');
+    if (savedLatest && (!APP_STATE.latestScanLeads || APP_STATE.latestScanLeads.length === 0)) {
+      APP_STATE.latestScanLeads = JSON.parse(savedLatest);
+      APP_STATE.latestScanKeyword = localStorage.getItem('yt_lead_hunter_latest_keyword') || '';
+    }
+  } catch (e) {}
+
+  if (APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0) {
+    APP_STATE.activeResultsTab = 'latest';
+  } else {
+    APP_STATE.activeResultsTab = 'all';
+  }
+
   updateDashboardMetrics();
   renderResultsTable();
 }
@@ -844,7 +875,32 @@ function renderResultsTable() {
   const tbody = document.getElementById('leadsTableBody');
   if (!tbody) return;
 
-  let filtered = [...APP_STATE.leads];
+  const isLatestMode = (APP_STATE.activeResultsTab === 'latest' && APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0);
+  const source = isLatestMode ? APP_STATE.latestScanLeads : APP_STATE.leads;
+
+  // Update tabs visual state
+  const tabLatest = document.getElementById('tabLatestLeads');
+  const tabAll = document.getElementById('tabAllLeads');
+  if (tabLatest) tabLatest.classList.toggle('active', isLatestMode);
+  if (tabAll) tabAll.classList.toggle('active', !isLatestMode);
+
+  // Update badges
+  const bLatest = document.getElementById('badgeLatestLeads');
+  const bAll = document.getElementById('badgeAllLeads');
+  if (bLatest) bLatest.textContent = (APP_STATE.latestScanLeads || []).length;
+  if (bAll) bAll.textContent = (APP_STATE.leads || []).length;
+
+  // Update sub-header notice with quick-switch link
+  const subHeader = document.getElementById('resultsSubHeader');
+  if (subHeader) {
+    if (isLatestMode) {
+      subHeader.innerHTML = `⚡ <b>Just Discovered:</b> Showing <b>${APP_STATE.latestScanLeads.length}</b> leads found in latest scan (${APP_STATE.latestScanKeyword || 'Recent'}). • <a href="javascript:void(0)" onclick="switchResultsTab('all')" style="color:var(--primary-red);font-weight:700;text-decoration:underline;">Switch to All Leads (${APP_STATE.leads.length}) →</a>`;
+    } else {
+      subHeader.innerHTML = `📁 <b>All Leads:</b> Showing all <b>${APP_STATE.leads.length}</b> collected leads in database history. ${APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0 ? `• <a href="javascript:void(0)" onclick="switchResultsTab('latest')" style="color:var(--primary-red);font-weight:700;text-decoration:underline;">Switch to Just Discovered (${APP_STATE.latestScanLeads.length}) →</a>` : ''}`;
+    }
+  }
+
+  let filtered = [...source];
 
   // Score chip filter
   if (APP_STATE.activeScoreFilter === 'high') filtered = filtered.filter(l => (l.ai_score || 0) >= 70);
@@ -867,15 +923,18 @@ function renderResultsTable() {
     filtered = filtered.filter(l => (l.country || '').toUpperCase() === selCountry);
   }
 
-  // Header Counters
-  document.getElementById('resTotalCount').textContent = APP_STATE.leads.length;
-  document.getElementById('resHighCount').textContent = APP_STATE.leads.filter(l => (l.ai_score || 0) >= 70).length;
-  document.getElementById('resMedCount').textContent = APP_STATE.leads.filter(l => (l.ai_score || 0) >= 40 && (l.ai_score || 0) < 70).length;
-  document.getElementById('resLowCount').textContent = APP_STATE.leads.filter(l => (l.ai_score || 0) < 40).length;
-  document.getElementById('visibleChannelsCount').textContent = `${filtered.length} channels`;
+  // Header Counters based on active view source
+  document.getElementById('resTotalCount').textContent = source.length;
+  document.getElementById('resHighCount').textContent = source.filter(l => (l.ai_score || 0) >= 70).length;
+  document.getElementById('resMedCount').textContent = source.filter(l => (l.ai_score || 0) >= 40 && (l.ai_score || 0) < 70).length;
+  document.getElementById('resLowCount').textContent = source.filter(l => (l.ai_score || 0) < 40).length;
+  document.getElementById('visibleChannelsCount').textContent = `${filtered.length} channels (${isLatestMode ? 'Just Discovered' : 'All Leads'})`;
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:36px;color:var(--text-muted);font-weight:600;">No matching channels found. Try adjusting filters or running a new scan.</td></tr>`;
+    const emptyMsg = isLatestMode
+      ? `No channels in latest scan. <a href="javascript:void(0)" onclick="switchResultsTab('all')" style="color:var(--primary-red);text-decoration:underline;">Click here to view All Leads (${APP_STATE.leads.length})</a> or run a new search.`
+      : `No matching channels found. Try adjusting filters or running a new scan.`;
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:36px;color:var(--text-muted);font-weight:600;">${emptyMsg}</td></tr>`;
     return;
   }
 
@@ -942,17 +1001,24 @@ function setScoreFilter(filter, btn) {
 
 function switchResultsTab(tab) {
   APP_STATE.activeResultsTab = tab;
-  document.getElementById('tabQualifiedLeads').classList.toggle('active', tab === 'qualified');
-  document.getElementById('tabDiscoveryVault').classList.toggle('active', tab === 'vault');
+  const tabLatest = document.getElementById('tabLatestLeads');
+  const tabAll = document.getElementById('tabAllLeads');
+  if (tabLatest) tabLatest.classList.toggle('active', tab === 'latest');
+  if (tabAll) tabAll.classList.toggle('active', tab === 'all');
   renderResultsTable();
 }
 
 // ------------------------------------------------------------
 function toggleSelectAll(checkbox) {
   const isChecked = checkbox.checked;
-  APP_STATE.leads.forEach(l => {
-    if (isChecked) APP_STATE.selectedLeadIds.add(l.id);
-    else APP_STATE.selectedLeadIds.delete(l.id);
+  const isLatestMode = (APP_STATE.activeResultsTab === 'latest' && APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0);
+  const source = isLatestMode ? APP_STATE.latestScanLeads : APP_STATE.leads;
+
+  source.forEach(l => {
+    if (l && l.id) {
+      if (isChecked) APP_STATE.selectedLeadIds.add(l.id);
+      else APP_STATE.selectedLeadIds.delete(l.id);
+    }
   });
   document.querySelectorAll('.lead-row-check').forEach(cb => cb.checked = isChecked);
   updateSelectedCount();
@@ -1072,7 +1138,8 @@ function openBulkEmailModal() {
     return;
   }
 
-  const selected = APP_STATE.leads.filter(l => APP_STATE.selectedLeadIds.has(l.id));
+  const allAvailable = [...APP_STATE.leads, ...(APP_STATE.latestScanLeads || [])];
+  const selected = allAvailable.filter((l, idx, self) => APP_STATE.selectedLeadIds.has(l.id) && self.findIndex(x => x.id === l.id) === idx);
   const valid = selected.filter(l => l.email && l.email.includes('@'));
 
   const selTotalEl = document.getElementById('bulkSelectedTotal');
@@ -1175,7 +1242,8 @@ function onBulkTemplateChange() {
 }
 
 async function startBulkEmailSend() {
-  const selected = APP_STATE.leads.filter(l => APP_STATE.selectedLeadIds.has(l.id));
+  const allAvailable = [...APP_STATE.leads, ...(APP_STATE.latestScanLeads || [])];
+  const selected = allAvailable.filter((l, idx, self) => APP_STATE.selectedLeadIds.has(l.id) && self.findIndex(x => x.id === l.id) === idx);
   const valid = selected.filter(l => l.email && l.email.includes('@'));
   if (valid.length === 0) {
     showToast('No valid recipients selected!', 'warning');
@@ -1241,6 +1309,12 @@ async function startBulkEmailSend() {
 function clearAllResults() {
   if (confirm('Are you sure you want to clear all collected results?')) {
     APP_STATE.leads = [];
+    APP_STATE.latestScanLeads = [];
+    APP_STATE.latestScanKeyword = '';
+    try {
+      localStorage.removeItem('yt_lead_hunter_latest_leads');
+      localStorage.removeItem('yt_lead_hunter_latest_keyword');
+    } catch (e) {}
     APP_STATE.selectedLeadIds.clear();
     updateDashboardMetrics();
     renderResultsTable();
@@ -1250,7 +1324,7 @@ function clearAllResults() {
 
 // ------------------------------------------------------------
 function openLeadModal(leadId) {
-  const lead = APP_STATE.leads.find(l => l.id === leadId);
+  const lead = APP_STATE.leads.find(l => l.id === leadId) || (APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.find(l => l.id === leadId));
   if (!lead) return;
   APP_STATE.activeLeadForModal = lead;
 
@@ -1463,7 +1537,10 @@ function updateExportPreview() {
 }
 
 function triggerExportDownload() {
-  if (APP_STATE.leads.length === 0) {
+  const isLatestMode = (APP_STATE.activeResultsTab === 'latest' && APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0);
+  const source = isLatestMode ? APP_STATE.latestScanLeads : APP_STATE.leads;
+
+  if (!source || source.length === 0) {
     showToast('No leads available to export. Run a scan first!', 'warning');
     return;
   }
@@ -1477,7 +1554,7 @@ function triggerExportDownload() {
   const headers = checkedCols.map(c => EXPORT_COLUMNS.find(col => col.id === c)?.label || c);
   let csv = headers.join(',') + '\n';
 
-  APP_STATE.leads.forEach(l => {
+  source.forEach(l => {
     const row = checkedCols.map(col => {
       let val = '';
       if (col === 'score') val = l.ai_score || 50;
@@ -1496,11 +1573,12 @@ function triggerExportDownload() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `yt_leads_${new Date().toISOString().slice(0,10)}.csv`;
+  const prefix = isLatestMode ? 'just_discovered_leads' : 'all_leads';
+  a.download = `${prefix}_${new Date().toISOString().slice(0,10)}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  showToast('Export downloaded successfully!', 'success');
+  showToast(`Exported ${source.length} leads successfully!`, 'success');
 }
 
 function exportFilteredLeads() {
@@ -1512,7 +1590,8 @@ function exportSelectedLeads() {
     showToast('No leads selected! Check rows in table first.', 'warning');
     return;
   }
-  const selected = APP_STATE.leads.filter(l => APP_STATE.selectedLeadIds.has(l.id));
+  const allAvailable = [...APP_STATE.leads, ...(APP_STATE.latestScanLeads || [])];
+  const selected = allAvailable.filter((l, idx, self) => APP_STATE.selectedLeadIds.has(l.id) && self.findIndex(x => x.id === l.id) === idx);
   let csv = 'channel_name,email,subscribers,url,score\n';
   selected.forEach(l => {
     csv += `"${l.channel}","${l.email || ''}","${l.subscribers}","${l.channel_url}","${l.ai_score || 50}"\n`;
@@ -1597,8 +1676,9 @@ function buildLeadsCsvBlob(leads) {
   return new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
 }
 
-function downloadLeadsCsvBackup() {
-  const leads = APP_STATE.leads || [];
+function downloadLeadsCsvBackup(customLeads) {
+  const isLatestMode = (APP_STATE.activeResultsTab === 'latest' && APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0);
+  const leads = customLeads || (isLatestMode ? APP_STATE.latestScanLeads : APP_STATE.leads) || [];
   if (leads.length === 0) {
     showToast('No leads available to download.', 'warning');
     return;
@@ -1606,15 +1686,17 @@ function downloadLeadsCsvBackup() {
   const blob = buildLeadsCsvBlob(leads);
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `google_sheets_leads_${leads.length}.csv`;
+  const prefix = isLatestMode ? 'just_discovered_leads' : 'all_leads';
+  a.download = `${prefix}_${leads.length}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  showToast('📥 CSV file downloaded successfully!', 'success');
+  showToast(`📥 Exported ${leads.length} leads to CSV!`, 'success');
 }
 
 function copyLeadsToClipboardAgain() {
-  const leads = APP_STATE.leads || [];
+  const isLatestMode = (APP_STATE.activeResultsTab === 'latest' && APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0);
+  const leads = (isLatestMode ? APP_STATE.latestScanLeads : APP_STATE.leads) || [];
   if (leads.length === 0) {
     showToast('No leads available to copy.', 'warning');
     return;
@@ -1641,36 +1723,42 @@ function closeGoogleSheetsModal() {
 }
 
 async function exportDirectToGoogleSheets() {
+  const isLatestMode = (APP_STATE.activeResultsTab === 'latest' && APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0);
+  let targetLeads = isLatestMode ? APP_STATE.latestScanLeads : APP_STATE.leads;
+
   // If no leads in memory, try fetching from database
-  if (!APP_STATE.leads || APP_STATE.leads.length === 0) {
-    try {
-      const res = await fetch('/api/leads');
-      const data = await res.json();
-      if (data && data.leads && data.leads.length > 0) {
-        APP_STATE.leads = data.leads;
+  if (!targetLeads || targetLeads.length === 0) {
+    if (!APP_STATE.leads || APP_STATE.leads.length === 0) {
+      try {
+        const res = await fetch('/api/leads');
+        const data = await res.json();
+        if (data && data.leads && data.leads.length > 0) {
+          APP_STATE.leads = data.leads;
+        }
+      } catch (e) {
+        console.warn('Auto-fetch leads failed:', e);
       }
-    } catch (e) {
-      console.warn('Auto-fetch leads failed:', e);
     }
+    targetLeads = APP_STATE.leads;
   }
 
-  if (!APP_STATE.leads || APP_STATE.leads.length === 0) {
+  if (!targetLeads || targetLeads.length === 0) {
     showToast('No leads found! Run a search first.', 'warning');
     return;
   }
 
   // 1. Copy formatted TSV into clipboard (guaranteed to work across HTTP VPS)
-  const tsv = buildLeadsTsvData(APP_STATE.leads);
+  const tsv = buildLeadsTsvData(targetLeads);
   copyToClipboardReliable(tsv);
 
   // 2. Download CSV file automatically
-  downloadLeadsCsvBackup();
+  downloadLeadsCsvBackup(targetLeads);
 
   // 3. Open Google Sheets in new tab
   window.open('https://sheets.new', '_blank');
 
   // 4. Show friendly guide modal on screen
-  openGoogleSheetsModal(APP_STATE.leads.length);
+  openGoogleSheetsModal(targetLeads.length);
 }
 
 function exportGoogleSheetsCSV() {
@@ -2904,7 +2992,7 @@ window.loadFbRadarPage = async function() {
 async function triggerEmailEnrichment() {
   const btn = document.getElementById('btnEnrichEmails');
   const btnText = document.getElementById('enrichEmailsBtnText');
-  const selectedIds = Array.from(selectedLeadIds || []);
+  const selectedIds = Array.from(APP_STATE.selectedLeadIds || []);
 
   if (btn) btn.disabled = true;
   if (btnText) btnText.innerHTML = '⏳ Crawling & Verifying...';
@@ -2928,9 +3016,12 @@ async function triggerEmailEnrichment() {
       } else {
         showToast(`Scan complete. Analyzed ${data.total_processed} channels.`, 'info');
       }
-      if (typeof loadResultsData === 'function') {
+      if (typeof loadLeadsFromDatabase === 'function') {
+        await loadLeadsFromDatabase();
+      } else if (typeof loadResultsData === 'function') {
         await loadResultsData();
       }
+      renderResultsTable();
     } else {
       showToast('Enrichment error: ' + (data.error || 'Failed'), 'error');
     }
