@@ -26,7 +26,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, JSONResponse, HTMLResponse, RedirectResponse, FileResponse
 import requests
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Any, Union
 
 from config import cfg
 from database import (
@@ -441,7 +441,8 @@ def api_send_email(req: EmailSendRequest):
 
 
 class BulkEmailRequest(BaseModel):
-    lead_ids: List[int]
+    lead_ids: Optional[List[Any]] = []
+    leads: Optional[List[dict]] = []
     template_name: str = "var1"
     custom_subject: Optional[str] = ""
     custom_body: Optional[str] = ""
@@ -450,21 +451,37 @@ class BulkEmailRequest(BaseModel):
 
 @app.post("/api/email/bulk")
 def api_bulk_email(req: BulkEmailRequest, background_tasks: BackgroundTasks):
-    all_leads = get_all_leads()
-    target_leads = [l for l in all_leads if l["id"] in req.lead_ids]
+    target_leads = []
+    if req.leads:
+        target_leads = [l for l in req.leads if l.get("email")]
+
+    if not target_leads and req.lead_ids:
+        all_leads = get_all_leads()
+        req_id_set = {str(i) for i in (req.lead_ids or []) if i is not None}
+        target_leads = [
+            l for l in all_leads
+            if str(l.get("id")) in req_id_set or
+               str(l.get("handle", "")).replace("@", "") in req_id_set or
+               str(l.get("channel", "")).strip() in req_id_set
+        ]
+
     if not target_leads:
-        raise HTTPException(404, "No matching leads found")
+        raise HTTPException(404, "No matching leads found with valid email addresses")
 
     def run_bulk():
-        results = send_bulk_emails(
-            leads=target_leads,
-            template_name=req.template_name,
-            custom_subject=req.custom_subject or "",
-            custom_body=req.custom_body or "",
-            campaign_id=req.campaign_id,
-            delay_seconds=req.delay_seconds
-        )
-        send_telegram(f"📧 *Bulk Email Campaign Done!*\n✅ Sent: {results['sent']}\n❌ Failed: {results['failed']}\n⚠️ Skipped: {results['skipped']}")
+        try:
+            results = send_bulk_emails(
+                leads=target_leads,
+                template_name=req.template_name,
+                custom_subject=req.custom_subject or "",
+                custom_body=req.custom_body or "",
+                campaign_id=req.campaign_id,
+                delay_seconds=req.delay_seconds
+            )
+            send_telegram(f"📧 *Bulk Email Campaign Done!*\n✅ Sent: {results['sent']}\n❌ Failed: {results['failed']}\n⚠️ Skipped: {results['skipped']}")
+        except Exception as e:
+            print(f"[Bulk Email Background Error] {e}")
+            send_telegram(f"⚠️ *Bulk Email Error:* {e}")
 
     background_tasks.add_task(run_bulk)
     return {"status": "started", "lead_count": len(target_leads)}

@@ -409,10 +409,11 @@ def send_email(
                 "mode": "demo", "error": None}
 
     tracking_id = str(uuid.uuid4())
+    safe_lead_id = int(lead_id) if (lead_id is not None and str(lead_id).isdigit()) else None
 
     # Insert into DB before sending
     email_id = insert_email({
-        "lead_id":      lead_id,
+        "lead_id":      safe_lead_id,
         "to_address":   to_address,
         "subject":      subject,
         "body":         body_text,
@@ -517,11 +518,12 @@ def send_bulk_emails(leads: list, template_name: str = "var1",
             b_text = tmpl["body"]
             tmpl_label = template_name
 
+        safe_lead_id = int(lead.get("id")) if (lead.get("id") is not None and str(lead.get("id")).isdigit()) else None
         result = send_email(
             to_address=lead["email"],
             subject=subj,
             body_text=b_text,
-            lead_id=lead.get("id"),
+            lead_id=safe_lead_id,
             template_used=tmpl_label,
             campaign_id=campaign_id,
         )
@@ -532,7 +534,7 @@ def send_bulk_emails(leads: list, template_name: str = "var1",
             results["failed"] += 1
 
         results["details"].append({
-            "lead": ch_title,
+            "lead": clean_channel or raw_title,
             "email": lead["email"],
             **result
         })

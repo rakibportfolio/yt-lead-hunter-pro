@@ -1377,11 +1377,22 @@ function onBulkTemplateChange() {
 }
 
 async function startBulkEmailSend() {
-  const allAvailable = [...APP_STATE.leads, ...(APP_STATE.latestScanLeads || [])];
-  const selected = allAvailable.filter((l, idx, self) => APP_STATE.selectedLeadIds.has(l.id) && self.findIndex(x => x.id === l.id) === idx);
+  const checkedBoxes = document.querySelectorAll('.lead-row-check:checked');
+  const checkedIds = new Set(Array.from(checkedBoxes).map(cb => cb.getAttribute('data-id')).filter(Boolean));
+
+  const isLatestMode = (APP_STATE.activeResultsTab === 'latest' && APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0);
+  const source = isLatestMode ? APP_STATE.latestScanLeads : APP_STATE.leads;
+  const allAvailable = [...source, ...APP_STATE.leads];
+
+  const selected = allAvailable.filter((l, idx, self) => {
+    const lid = String(l.id !== undefined && l.id !== null ? l.id : (l.handle ? l.handle.replace(/[^a-zA-Z0-9_]/g, '') : ''));
+    const isSel = checkedIds.has(lid) || APP_STATE.selectedLeadIds.has(lid) || (!isNaN(lid) && APP_STATE.selectedLeadIds.has(Number(lid)));
+    return isSel && self.findIndex(x => (x.id && x.id === l.id) || (x.handle && x.handle === l.handle)) === idx;
+  });
+
   const valid = selected.filter(l => l.email && l.email.includes('@'));
   if (valid.length === 0) {
-    showToast('No valid recipients selected!', 'warning');
+    showToast('No valid recipients selected with email addresses!', 'warning');
     return;
   }
 
@@ -1404,6 +1415,7 @@ async function startBulkEmailSend() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         lead_ids: valid.map(l => l.id),
+        leads: valid,
         template_name: tmplKey,
         custom_subject: subject,
         custom_body: body,
