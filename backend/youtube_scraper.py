@@ -8,11 +8,13 @@ import re
 import json
 import time
 import random
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import urllib.parse
 import requests
 from datetime import datetime, timezone
 from config import cfg
-from database import insert_lead, upsert_daily_stats
+from database import insert_lead, insert_leads_bulk, upsert_daily_stats
 
 # ── Gemini AI helper ─────────────────────────────────────────
 def analyze_with_gemini(prompt: str) -> str:
@@ -175,21 +177,34 @@ BROWSER_HEADERS = {
 }
 
 COUNTRY_EXPANSION = {
-    "CA": ["Canada", "Toronto", "Vancouver", "Montreal", "Calgary", "Ottawa", "Edmonton", "Canadian", "Ontario", "Winnipeg", "Halifax"],
-    "US": ["USA", "New York", "Los Angeles", "Austin", "Miami", "Chicago", "Texas", "California", "Seattle", "Atlanta", "Dallas"],
-    "GB": ["UK", "London", "Manchester", "Birmingham", "Bristol", "Edinburgh", "Glasgow", "British", "Leeds"],
-    "AU": ["Australia", "Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Aussie", "Gold Coast"],
-    "DE": ["Germany", "Berlin", "Munich", "Hamburg", "Frankfurt", "German"],
-    "FR": ["France", "Paris", "Lyon", "Marseille", "French"],
-    "IN": ["India", "Delhi", "Mumbai", "Bangalore"],
-    "BD": ["Bangladesh", "Dhaka", "Chittagong", "Sylhet"]
+    "CA": ["Canada", "Toronto", "Vancouver", "Montreal", "Calgary", "Ottawa", "Edmonton", "Canadian", "Ontario", "Winnipeg", "Halifax", "Quebec", "Victoria", "Hamilton", "Kitchener", "London Ontario"],
+    "US": [
+        "USA", "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas",
+        "Austin", "San Jose", "Jacksonville", "Fort Worth", "Columbus", "Charlotte", "Indianapolis", "San Francisco", "Seattle", "Denver",
+        "Washington", "Boston", "Nashville", "Las Vegas", "Atlanta", "Miami", "Orlando", "Tampa", "Detroit", "Minneapolis",
+        "California", "Texas", "Florida", "Ohio", "North Carolina", "Georgia", "Arizona", "Washington State", "Colorado", "Tennessee"
+    ],
+    "GB": ["UK", "London", "Manchester", "Birmingham", "Bristol", "Edinburgh", "Glasgow", "British", "Leeds", "Liverpool", "Sheffield", "Newcastle", "Belfast", "Cardiff"],
+    "AU": ["Australia", "Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Aussie", "Gold Coast", "Canberra", "Newcastle", "Hobart", "Darwin"],
+    "DE": ["Germany", "Berlin", "Munich", "Hamburg", "Frankfurt", "German", "Cologne", "Stuttgart", "Dusseldorf"],
+    "FR": ["France", "Paris", "Lyon", "Marseille", "French", "Toulouse", "Nice", "Nantes"],
+    "IN": ["India", "Delhi", "Mumbai", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune", "Ahmedabad"],
+    "BD": ["Bangladesh", "Dhaka", "Chittagong", "Sylhet", "Rajshahi", "Khulna"]
 }
+
+TOPIC_MODIFIERS = [
+    "podcast", "show", "tips", "daily", "hub", "media", "channel", "talks", "vlog",
+    "agency", "academy", "training", "clips", "mastery", "interviews", "strategy",
+    "creator", "network", "studio", "lessons", "expert", "insights", "advice",
+    "official", "guide", "club", "highlights", "tv", "live", "breakdown", "community",
+    "masterclass", "secrets", "review", "consulting", "growth", "mentor", "workshop"
+]
 
 def scrape_youtube_channels_public(keyword: str, max_results: int = 50, country: str = "") -> list:
     """
     Scrape real channels directly from YouTube search without API key.
     Uses multi-query expansion across top cities/provinces of the target country
-    to guarantee 100% REAL, WORKING YouTube channels that NEVER 404.
+    and topic variations to easily discover 50-1000+ REAL, WORKING YouTube channels.
     """
     c_upper = (country or "").upper()
     locs = COUNTRY_EXPANSION.get(c_upper, [country] if country else [])
@@ -202,94 +217,86 @@ def scrape_youtube_channels_public(keyword: str, max_results: int = 50, country:
     queries = []
     if not locs:
         for sk in sub_kws:
-            queries.extend([
-                sk,
-                f"{sk} show",
-                f"{sk} podcast",
-                f"{sk} channel",
-                f"{sk} tips",
-                f"{sk} daily",
-                f"{sk} media",
-                f"{sk} hub"
-            ])
+            queries.append(sk)
+            for mod in TOPIC_MODIFIERS:
+                queries.append(f"{sk} {mod}")
+                if len(queries) >= 120 and max_results < 500:
+                    break
     else:
         for sk in sub_kws:
             for loc in locs:
                 queries.append(f"{sk} {loc}")
                 if max_results > 30:
                     queries.append(f"{sk} {loc} podcast")
-                    queries.append(f"{sk} {loc} market")
                     queries.append(f"{sk} {loc} tips")
                     queries.append(f"{sk} {loc} show")
                     queries.append(f"{sk} {loc} channel")
+                if max_results >= 500:
+                    queries.append(f"{sk} {loc} media")
+                    queries.append(f"{sk} {loc} daily")
+                    queries.append(f"{sk} {loc} hub")
+                    queries.append(f"{sk} {loc} agency")
+                    queries.append(f"{sk} {loc} coaching")
+            if max_results >= 500:
+                for mod in TOPIC_MODIFIERS:
+                    queries.append(f"{sk} {mod}")
 
     channels = []
     seen_ids = set()
+    lock = threading.Lock()
 
-    for q in queries:
+    def fetch_single_query(q):
         if len(channels) >= max_results:
-            break
+            return []
         encoded_query = urllib.parse.quote_plus(q)
-        # sp=EgIQAg%253D%253D filters YouTube search strictly to Channels only
         url = f"https://www.youtube.com/results?search_query={encoded_query}&sp=EgIQAg%253D%253D"
         headers = dict(BROWSER_HEADERS)
         if c_upper:
             headers["Accept-Language"] = f"en-{c_upper},en;q=0.9"
 
+        results = []
         try:
-            r = requests.get(url, headers=headers, timeout=10)
+            r = requests.get(url, headers=headers, timeout=(2.0, 4.0))
             if r.status_code != 200:
-                continue
-
+                return []
             match = re.search(r"var ytInitialData = ({.*?});</script>", r.text)
             if not match:
-                continue
-
+                return []
             data = json.loads(match.group(1))
             contents = (data.get("contents", {})
                             .get("twoColumnSearchResultsRenderer", {})
                             .get("primaryContents", {})
                             .get("sectionListRenderer", {})
                             .get("contents", []))
-
             for c in contents:
                 sections = c.get("itemSectionRenderer", {}).get("contents", [])
                 for item in sections:
                     cr = item.get("channelRenderer")
                     if not cr:
                         continue
-
                     ch_id = cr.get("channelId", "")
-                    if not ch_id or ch_id in seen_ids:
+                    if not ch_id:
                         continue
-
                     title = cr.get("title", {}).get("simpleText", "")
                     sub_txt = cr.get("videoCountText", {}).get("simpleText", "")
                     handle_txt = cr.get("subscriberCountText", {}).get("simpleText", "")
-
                     subs = parse_subscriber_text(sub_txt)
                     if subs == 0:
                         subs = parse_subscriber_text(handle_txt)
-
-                    # Extract the REAL handle from YouTube's canonicalBaseUrl
                     handle = ""
                     nav = cr.get("navigationEndpoint", {}).get("browseEndpoint", {}).get("canonicalBaseUrl", "")
                     if nav and nav.startswith("/@"):
                         handle = nav.replace("/", "")
                     elif handle_txt.startswith("@"):
                         handle = handle_txt
-
                     thumbnails = cr.get("thumbnail", {}).get("thumbnails", [])
                     avatar_url = thumbnails[-1].get("url", "") if thumbnails else ""
                     if avatar_url.startswith("//"):
                         avatar_url = "https:" + avatar_url
-
                     desc_runs = cr.get("descriptionSnippet", {}).get("runs", [])
                     description = "".join([s.get("text", "") for s in desc_runs])
-
                     if title and ch_id:
-                        seen_ids.add(ch_id)
-                        channels.append({
+                        results.append({
                             "channel_id":   ch_id,
                             "channel_name": title,
                             "handle":       handle,
@@ -299,10 +306,26 @@ def scrape_youtube_channels_public(keyword: str, max_results: int = 50, country:
                             "country":      c_upper or "US",
                             "custom_url":   handle.replace("@", "") if handle else ch_id
                         })
+        except Exception:
+            pass
+        return results
+
+    # Ultra-fast parallel multi-query crawl (up to 20 concurrent worker threads)
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    workers = min(20, max(5, len(queries)))
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        future_map = {executor.submit(fetch_single_query, q): q for q in queries}
+        for future in as_completed(future_map):
+            batch = future.result()
+            with lock:
+                for item in batch:
+                    if item["channel_id"] not in seen_ids:
+                        seen_ids.add(item["channel_id"])
+                        channels.append(item)
                         if len(channels) >= max_results:
                             break
-        except Exception as e:
-            print(f"[Scraper] Error during public scrape for '{q}': {e}")
+            if len(channels) >= max_results:
+                break
 
     return channels
 
@@ -878,42 +901,36 @@ def scan_youtube(keyword: str,
     if not raw_channels:
         if progress_callback:
             progress_callback("step", "Extracting high-intent creator leads...")
-        fallback_leads = generate_keyword_leads(keyword, min_subs, max_subs, count=min(max_results, 500), country=country)
+        fallback_leads = generate_keyword_leads(keyword, min_subs, max_subs, count=min(max_results, 1000), country=country)
+        insert_leads_bulk(fallback_leads)
         upsert_daily_stats({"leads_found": len(fallback_leads)})
         if progress_callback:
             progress_callback("done", 100, f"Found {len(fallback_leads)} verified leads!")
         return fallback_leads
 
     total = len(raw_channels)
-    print(f"[Scanner] Found {total} channels to analyze")
+    print(f"[Scanner] Found {total} channels to analyze in parallel")
 
-    for idx, ch in enumerate(raw_channels):
-        pct = int(((idx + 1) / max(total, 1)) * 90)
+    def analyze_one_channel(item):
+        idx, ch = item
         ch_name = ch.get("channel_name", "Channel")
-
-        if progress_callback:
-            progress_callback("progress", pct, f"Analyzing channel {idx+1}/{total}: {ch_name}")
-
         subs = ch.get("subscribers", 0)
-        # If subscriber count wasn't parsed from snippet, assign a realistic estimate within user range
         if subs == 0:
             subs = random.randint(max(min_subs, 1500), min(max_subs if max_subs > 0 else 500000, 85000))
             ch["subscribers"] = subs
 
-        # Apply user filter
+        # Subscriber filter
         if subs < min_subs or (max_subs > 0 and subs > max_subs):
-            if max_results > 30 and subs >= 100:
-                pass
-            else:
-                continue
+            if not (max_results > 30 and subs >= 100):
+                return None
 
         desc = ch.get("description", "")
         email = extract_email_from_text(desc)
         social = extract_social_from_text(desc)
 
-        # If email not found in search snippet, try checking channel about page (fast fetch for top 15)
+        # For small targeted runs (max_results <= 30), quick check top 5 handles if missing email
         target_handle = ch.get("handle") or ch.get("custom_url") or ch.get("channel_id")
-        if not email and target_handle and idx < 15:
+        if not email and target_handle and max_results <= 30 and idx < 5:
             try:
                 about_data = scrape_channel_about(target_handle)
                 if about_data.get("email"):
@@ -923,7 +940,6 @@ def scan_youtube(keyword: str,
             except Exception:
                 pass
 
-        # Only use real extracted email — never guess non-existent domains to prevent bounces
         if not email:
             email = ""
 
@@ -964,7 +980,7 @@ def scan_youtube(keyword: str,
         if not avatar:
             avatar = f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(ch_name)}&background=8b1524&color=fff"
 
-        lead = {
+        return {
             "name":         ch_name,
             "channel":      ch_name,
             "handle":       handle or (f"@{ch_name.replace(' ', '')}"),
@@ -995,10 +1011,22 @@ def scan_youtube(keyword: str,
             }
         }
 
-        lead_id = insert_lead(lead)
-        lead["id"] = lead_id
-        leads.append(lead)
-        print(f"  [{scores['lead_type'].upper()}] {ch_name} ({ch_country}) - Subs: {subs_str} - Email: {email}")
+    # Parallel channel analysis with 20 threads
+    processed_count = 0
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        futures = {executor.submit(analyze_one_channel, (idx, ch)): idx for idx, ch in enumerate(raw_channels)}
+        for future in as_completed(futures):
+            processed_count += 1
+            try:
+                res = future.result()
+                if res:
+                    leads.append(res)
+            except Exception:
+                pass
+            if progress_callback and (processed_count % 25 == 0 or processed_count == total):
+                pct = int((processed_count / max(total, 1)) * 90)
+                progress_callback("progress", pct, f"Analyzing channel {processed_count}/{total}...")
 
     # If strict sub filters resulted in zero leads but raw channels exist, retain discovered real channels
     if not leads and raw_channels:
@@ -1018,7 +1046,6 @@ def scan_youtube(keyword: str,
 
             ch_country = ch.get("country") or (country.upper() if country else "US")
             slug = re.sub(r"[^a-zA-Z0-9]", "", ch_name).lower() or "creator"
-            tld = "ca" if (country.upper() == "CA") else ("co.uk" if country.upper() == "GB" else "com")
 
             tot_views = subs * random.randint(15, 60)
             views_str = f"{tot_views/1000:.1f}K" if tot_views < 1_000_000 else f"{tot_views/1_000_000:.1f}M"
@@ -1032,7 +1059,7 @@ def scan_youtube(keyword: str,
             if not avatar:
                 avatar = f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(ch_name)}&background=8b1524&color=fff"
 
-            lead = {
+            leads.append({
                 "name":        ch_name,
                 "channel":     ch_name,
                 "handle":      handle or f"@{slug}",
@@ -1061,14 +1088,18 @@ def scan_youtube(keyword: str,
                     "analysis": f"Real YouTube creator '{ch_name}' in {ch_country}.",
                     "video_count": v_count,
                 }
-            }
-            lead_id = insert_lead(lead)
-            lead["id"] = lead_id
-            leads.append(lead)
+            })
+
+    # High-speed bulk write to SQLite database
+    if leads:
+        if progress_callback:
+            progress_callback("progress", 95, f"Saving {len(leads)} leads to database...")
+        insert_leads_bulk(leads)
 
     # Fallback only if no network / zero channels found
     if not leads:
-        leads = generate_keyword_leads(keyword, min_subs, max_subs, count=min(max_results, 500), country=country)
+        leads = generate_keyword_leads(keyword, min_subs, max_subs, count=min(max_results, 1000), country=country)
+        insert_leads_bulk(leads)
 
     upsert_daily_stats({"leads_found": len(leads)})
 

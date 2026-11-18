@@ -318,7 +318,7 @@ function calculatePreSearchEstimate() {
   const estLeads = Math.round(targetResults * 0.85 * multiplier);
   const quotaUnits = Math.round(targetResults * 2.8 * multiplier);
   const quotaPct = Math.min(100, Math.round((quotaUnits / APP_STATE.quotaLimit) * 100));
-  const estTimeSeconds = Math.max(5, Math.round(targetResults * 0.4 * multiplier));
+  const estTimeSeconds = Math.max(5, Math.round(targetResults * 0.03 * multiplier));
 
   const elLeads = document.getElementById('estQualifiedLeads');
   const elUnits = document.getElementById('estQuotaUnits');
