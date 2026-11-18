@@ -150,13 +150,49 @@
     });
   }
 
+  // Auto-capture revealed email from YouTube's native "View email address" button
+  function setupNativeViewEmailAutoCapture() {
+    const emailEls = document.querySelectorAll('#email, ytd-channel-about-metadata-renderer #email, a[href^="mailto:"], tp-yt-paper-dialog #email');
+    emailEls.forEach(el => {
+      const text = el.innerText || el.textContent || (el.href || '').replace('mailto:', '');
+      const match = text.match(/[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/);
+      if (match && !el.dataset.zenticCaptured) {
+        el.dataset.zenticCaptured = "true";
+        const email = match[0].toLowerCase();
+        
+        // Show auto-captured badge right next to the revealed email
+        const badge = document.createElement("span");
+        badge.style.cssText = "display:inline-block;margin-left:8px;padding:3px 8px;background:#059669;color:#fff;border-radius:4px;font-size:11px;font-weight:700;";
+        badge.textContent = "✓ Auto-Captured & Copied (Zentic)";
+        if (el.parentElement) el.parentElement.appendChild(badge);
+
+        // Auto-copy to clipboard
+        try {
+          navigator.clipboard.writeText(email);
+        } catch (e) {}
+
+        // Send to Zentic Backend
+        const handleMatch = window.location.pathname.match(/(@[a-zA-Z0-9_.-]+)/);
+        fetch(BACKEND_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ target: handleMatch ? handleMatch[1] : window.location.href, description: email })
+        }).catch(() => {});
+      }
+    });
+  }
+
   // Observe DOM changes to catch dialogs dynamically
   const observer = new MutationObserver(() => {
     injectEmailExtractor();
+    setupNativeViewEmailAutoCapture();
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
 
   // Initial attempt
-  setTimeout(injectEmailExtractor, 1000);
+  setTimeout(() => {
+    injectEmailExtractor();
+    setupNativeViewEmailAutoCapture();
+  }, 1000);
 })();
