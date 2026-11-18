@@ -1017,10 +1017,10 @@ def scan_youtube(keyword: str,
             }
         }
 
-    # Parallel channel analysis with 20 threads
+    # Parallel channel analysis with optimized 12 threads
     processed_count = 0
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    with ThreadPoolExecutor(max_workers=20) as executor:
+    with ThreadPoolExecutor(max_workers=12) as executor:
         futures = {executor.submit(analyze_one_channel, (idx, ch)): idx for idx, ch in enumerate(raw_channels)}
         for future in as_completed(futures):
             processed_count += 1

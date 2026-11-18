@@ -410,7 +410,7 @@ def api_scan_youtube(req: ScanRequest, background_tasks: BackgroundTasks):
 
 
 @app.get("/api/scan/progress/{scan_id}")
-def api_scan_progress(scan_id: str):
+async def api_scan_progress(scan_id: str):
     """Poll scan progress."""
     data = scan_progress_store.get(scan_id, {"status": "not_found"})
     return data
@@ -726,7 +726,7 @@ def api_dashboard_stats():
 
 
 @app.get("/api/health")
-def health():
+async def health():
     return {
         "status": "ok",
         "version": "1.0.0",
