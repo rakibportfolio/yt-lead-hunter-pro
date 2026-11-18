@@ -660,6 +660,16 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination Controls (20 per page) -->
+      <div class="table-pagination" id="resultsPagination" style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);margin-top:16px;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:13px;color:var(--text-muted);font-weight:600;" id="paginationInfo">
+          Showing 1–20 of 0 channels
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;" id="paginationButtons">
+          <!-- Dynamic pagination buttons -->
+        </div>
+      </div>
     </section>
 
     <!-- ============================================================
@@ -1635,6 +1645,6 @@ Micro-Niche
     </div>
   </div>
 
-  <script src="app.js?v=8.4_deep_scan_coverage" charset="UTF-8"></script>
+  <script src="app.js?v=8.5_unlimited_pagination" charset="UTF-8"></script>
 </body>
 </html>

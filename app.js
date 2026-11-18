@@ -71,6 +71,8 @@ const APP_STATE = {
   activeLeadForModal: null,
   activeScoreFilter: 'all',
   activeResultsTab: 'latest',
+  resultsPage: 1,
+  pageSize: 20,
   recentSearches: [],
   quotaLimit: 30000,
   quotaUsed: 0,
@@ -1011,6 +1013,8 @@ function renderResultsTable() {
   document.getElementById('visibleChannelsCount').textContent = `${filtered.length} channels (${isLatestMode ? 'Just Discovered' : 'All Leads'})`;
 
   if (filtered.length === 0) {
+    const pagEl = document.getElementById('resultsPagination');
+    if (pagEl) pagEl.style.display = 'none';
     const emptyMsg = isLatestMode
       ? `No channels in latest scan. <a href="javascript:void(0)" onclick="switchResultsTab('all')" style="color:var(--primary-red);text-decoration:underline;">Click here to view All Leads (${APP_STATE.leads.length})</a> or run a new search.`
       : `No matching channels found. Try adjusting filters or running a new scan.`;
@@ -1018,10 +1022,22 @@ function renderResultsTable() {
     return;
   }
 
-  tbody.innerHTML = filtered.map((l, idx) => {
+  // Pagination Logic (20 channels per page)
+  const pageSize = APP_STATE.pageSize || 20;
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+
+  if (!APP_STATE.resultsPage || APP_STATE.resultsPage < 1) APP_STATE.resultsPage = 1;
+  if (APP_STATE.resultsPage > totalPages) APP_STATE.resultsPage = totalPages;
+
+  const startIdx = (APP_STATE.resultsPage - 1) * pageSize;
+  const endIdx = Math.min(startIdx + pageSize, totalItems);
+  const pageItems = filtered.slice(startIdx, endIdx);
+
+  tbody.innerHTML = pageItems.map((l, idx) => {
     const leadId = (l.id !== undefined && l.id !== null && l.id !== '')
       ? String(l.id)
-      : (l.handle ? l.handle.replace(/[^a-zA-Z0-9_]/g, '') : `lead_${idx}`);
+      : (l.handle ? l.handle.replace(/[^a-zA-Z0-9_]/g, '') : `lead_${startIdx + idx}`);
     l.id = leadId;
     const isChecked = APP_STATE.selectedLeadIds.has(leadId) || (!isNaN(leadId) && APP_STATE.selectedLeadIds.has(Number(leadId)));
     const scoreClass = (l.ai_score || 0) >= 70 ? 'high' : ((l.ai_score || 0) >= 40 ? 'med' : 'low');
@@ -1079,13 +1095,68 @@ function renderResultsTable() {
     selectAll.checked = (allRowCbs.length > 0 && allRowCbs.length === checkedRowCbs.length);
   }
   updateSelectedCount();
+
+  // Render Pagination Controls
+  const pagEl = document.getElementById('resultsPagination');
+  const pagInfo = document.getElementById('paginationInfo');
+  const pagBtns = document.getElementById('paginationButtons');
+
+  if (pagEl) pagEl.style.display = totalItems > 0 ? 'flex' : 'none';
+  if (pagInfo) {
+    pagInfo.innerHTML = `Showing <b>${startIdx + 1}–${endIdx}</b> of <b>${totalItems}</b> channels • Page <b>${APP_STATE.resultsPage}</b> of <b>${totalPages}</b>`;
+  }
+
+  if (pagBtns) {
+    let btnsHtml = '';
+    const prevDisabled = APP_STATE.resultsPage <= 1 ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : '';
+    btnsHtml += `<button class="btn-secondary" style="padding:6px 12px;font-size:12px;font-weight:700;" onclick="changeResultsPage(${APP_STATE.resultsPage - 1})" ${prevDisabled}>◀ Prev</button>`;
+
+    let startP = Math.max(1, APP_STATE.resultsPage - 2);
+    let endP = Math.min(totalPages, startP + 4);
+    if (endP - startP < 4) {
+      startP = Math.max(1, endP - 4);
+    }
+
+    if (startP > 1) {
+      btnsHtml += `<button class="btn-secondary" style="padding:6px 10px;font-size:12px;" onclick="changeResultsPage(1)">1</button>`;
+      if (startP > 2) btnsHtml += `<span style="color:var(--text-muted);padding:0 2px;">...</span>`;
+    }
+
+    for (let p = startP; p <= endP; p++) {
+      const isActive = (p === APP_STATE.resultsPage);
+      const activeStyle = isActive
+        ? 'background:#8b1524;color:#fff;border-color:#8b1524;font-weight:800;'
+        : 'font-weight:600;';
+      btnsHtml += `<button class="btn-secondary" style="padding:6px 11px;font-size:12px;${activeStyle}" onclick="changeResultsPage(${p})">${p}</button>`;
+    }
+
+    if (endP < totalPages) {
+      if (endP < totalPages - 1) btnsHtml += `<span style="color:var(--text-muted);padding:0 2px;">...</span>`;
+      btnsHtml += `<button class="btn-secondary" style="padding:6px 10px;font-size:12px;" onclick="changeResultsPage(${totalPages})">${totalPages}</button>`;
+    }
+
+    const nextDisabled = APP_STATE.resultsPage >= totalPages ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : '';
+    btnsHtml += `<button class="btn-secondary" style="padding:6px 12px;font-size:12px;font-weight:700;" onclick="changeResultsPage(${APP_STATE.resultsPage + 1})" ${nextDisabled}>Next ▶</button>`;
+
+    pagBtns.innerHTML = btnsHtml;
+  }
 }
 
+function changeResultsPage(newPage) {
+  APP_STATE.resultsPage = newPage;
+  renderResultsTable();
+  const tbl = document.getElementById('mainLeadsTable');
+  if (tbl) tbl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+window.changeResultsPage = changeResultsPage;
+
 function filterResultsTable() {
+  APP_STATE.resultsPage = 1;
   renderResultsTable();
 }
 
 function setScoreFilter(filter, btn) {
+  APP_STATE.resultsPage = 1;
   APP_STATE.activeScoreFilter = filter;
   document.querySelectorAll('#view-results .select-pill').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
@@ -1093,6 +1164,7 @@ function setScoreFilter(filter, btn) {
 }
 
 function switchResultsTab(tab) {
+  APP_STATE.resultsPage = 1;
   APP_STATE.activeResultsTab = tab;
   const tabLatest = document.getElementById('tabLatestLeads');
   const tabAll = document.getElementById('tabAllLeads');
