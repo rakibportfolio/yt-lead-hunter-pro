@@ -378,8 +378,14 @@ def api_scan_youtube(req: ScanRequest, background_tasks: BackgroundTasks):
     }
 
     def run_scan():
-        def progress_cb(event_type, value, msg=""):
-            if event_type == "progress":
+        def progress_cb(event_type, value, msg="", new_lead=None):
+            if event_type == "lead_found":
+                if new_lead:
+                    scan_progress_store[scan_id]["leads"].append(new_lead)
+                    scan_progress_store[scan_id]["found"] = len(scan_progress_store[scan_id]["leads"])
+                    scan_progress_store[scan_id]["progress"] = value
+                    scan_progress_store[scan_id]["step"] = msg
+            elif event_type == "progress":
                 scan_progress_store[scan_id]["progress"] = value
                 scan_progress_store[scan_id]["step"] = msg
             elif event_type == "step":
@@ -387,6 +393,7 @@ def api_scan_youtube(req: ScanRequest, background_tasks: BackgroundTasks):
             elif event_type == "done":
                 scan_progress_store[scan_id]["status"] = "done"
                 scan_progress_store[scan_id]["progress"] = 100
+                scan_progress_store[scan_id]["step"] = msg or "Complete"
 
         leads = scan_youtube(
             keyword=req.keyword,

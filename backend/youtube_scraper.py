@@ -200,11 +200,12 @@ TOPIC_MODIFIERS = [
     "masterclass", "secrets", "review", "consulting", "growth", "mentor", "workshop"
 ]
 
-def scrape_youtube_channels_public(keyword: str, max_results: int = 50, country: str = "") -> list:
+def scrape_youtube_channels_public(keyword: str, max_results: int = 50, country: str = "", existing_identifiers: set = None) -> list:
     """
     Scrape real channels directly from YouTube search without API key.
     Uses multi-query expansion across top cities/provinces of the target country
     and topic variations to easily discover 50-1000+ REAL, WORKING YouTube channels.
+    Skips channels that are already saved in existing_identifiers.
     """
     c_upper = (country or "").upper()
     locs = COUNTRY_EXPANSION.get(c_upper, [country] if country else [])
@@ -296,6 +297,15 @@ def scrape_youtube_channels_public(keyword: str, max_results: int = 50, country:
                     desc_runs = cr.get("descriptionSnippet", {}).get("runs", [])
                     description = "".join([s.get("text", "") for s in desc_runs])
                     if title and ch_id:
+                        # Check deduplication against existing database
+                        h_clean = handle.lower().strip()
+                        t_clean = title.lower().strip()
+                        if existing_identifiers:
+                            if h_clean and (h_clean in existing_identifiers or h_clean.replace("@", "") in existing_identifiers):
+                                continue
+                            if t_clean and t_clean in existing_identifiers:
+                                continue
+
                         results.append({
                             "channel_id":   ch_id,
                             "channel_name": title,
@@ -786,6 +796,27 @@ def scan_youtube(keyword: str,
     c_label = f" [Country: {country.upper()}]" if country else ""
     print(f"\n[Scanner] Searching YouTube for: '{keyword}'{c_label} (engine={engine}, target={max_results})")
 
+    # Load all existing channels from SQLite to strictly deduplicate
+    existing_identifiers = set()
+    try:
+        from database import get_db
+        conn = get_db()
+        c = conn.cursor()
+        rows = c.execute("SELECT LOWER(handle) as h, LOWER(channel_url) as u, LOWER(channel) as ch, LOWER(name) as nm FROM leads").fetchall()
+        conn.close()
+        for r in rows:
+            if r["h"]:
+                existing_identifiers.add(r["h"])
+                existing_identifiers.add(r["h"].replace("@", ""))
+            if r["u"]:
+                existing_identifiers.add(r["u"].rstrip("/"))
+            if r["ch"]:
+                existing_identifiers.add(r["ch"])
+            if r["nm"]:
+                existing_identifiers.add(r["nm"])
+    except Exception as e:
+        print(f"[Scanner] Error loading existing identifiers: {e}")
+
     if progress_callback:
         progress_callback("step", f"Searching YouTube for '{keyword}'{c_label}...")
 
@@ -895,21 +926,34 @@ def scan_youtube(keyword: str,
     if not raw_channels:
         if progress_callback:
             progress_callback("step", "Connecting to YouTube public search...")
-        raw_channels = scrape_youtube_channels_public(keyword, max_results=max_results, country=country)
+        raw_channels = scrape_youtube_channels_public(keyword, max_results=max_results, country=country, existing_identifiers=existing_identifiers)
 
-    # Method 3: Fallback if network blocked / zero results
+    # Strictly filter out any channels already in database
+    fresh_channels = []
+    seen_fresh = set()
+    for ch in raw_channels:
+        h = (ch.get("handle") or ch.get("custom_url") or "").lower().strip()
+        n = (ch.get("channel_name") or ch.get("name") or "").lower().strip()
+        u = (ch.get("channel_url") or "").lower().strip().rstrip("/")
+        if (h and (h in existing_identifiers or h.replace("@", "") in existing_identifiers)) or (n and n in existing_identifiers) or (u and u in existing_identifiers):
+            continue
+        ident = h or n or u
+        if ident in seen_fresh:
+            continue
+        seen_fresh.add(ident)
+        fresh_channels.append(ch)
+    raw_channels = fresh_channels
+
+    # If all discovered channels are already in DB, stop gracefully without duplicates
     if not raw_channels:
+        msg = f"All matching channels for '{keyword}' are already in your database! (0 duplicates added)"
+        print(f"[Scanner] {msg}")
         if progress_callback:
-            progress_callback("step", "Extracting high-intent creator leads...")
-        fallback_leads = generate_keyword_leads(keyword, min_subs, max_subs, count=min(max_results, 1000), country=country)
-        insert_leads_bulk(fallback_leads)
-        upsert_daily_stats({"leads_found": len(fallback_leads)})
-        if progress_callback:
-            progress_callback("done", 100, f"Found {len(fallback_leads)} verified leads!")
-        return fallback_leads
+            progress_callback("done", 100, msg)
+        return []
 
     total = len(raw_channels)
-    print(f"[Scanner] Found {total} channels to analyze in parallel")
+    print(f"[Scanner] Found {total} fresh channels to analyze in parallel")
 
     def analyze_one_channel(item):
         idx, ch = item
@@ -928,7 +972,7 @@ def scan_youtube(keyword: str,
         email = extract_email_from_text(desc)
         social = extract_social_from_text(desc)
 
-        # Automated multi-method deep email extraction for ALL channels (100% Unlimited)
+        # Automated multi-method fast email extraction for channels
         target_handle = ch.get("handle") or ch.get("custom_url") or ch.get("channel_id")
         target_url = ch.get("channel_url") or (f"https://www.youtube.com/{target_handle}" if target_handle else "")
         if not email and (target_handle or target_url):
@@ -937,7 +981,8 @@ def scan_youtube(keyword: str,
                 extracted = deep_extract_channel_email(
                     channel_url=target_url,
                     handle=target_handle,
-                    description=desc
+                    description=desc,
+                    fast_mode=True
                 )
                 if extracted.get("email"):
                     email = extracted["email"]
@@ -1017,21 +1062,42 @@ def scan_youtube(keyword: str,
             }
         }
 
-    # Parallel channel analysis with optimized 12 threads
+    # Parallel channel analysis with streaming to database & UI
     processed_count = 0
+    seen_this_run = set()
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    with ThreadPoolExecutor(max_workers=12) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         futures = {executor.submit(analyze_one_channel, (idx, ch)): idx for idx, ch in enumerate(raw_channels)}
         for future in as_completed(futures):
             processed_count += 1
             try:
                 res = future.result()
                 if res:
-                    leads.append(res)
-            except Exception:
-                pass
-            if progress_callback and (processed_count % 25 == 0 or processed_count == total):
-                pct = int((processed_count / max(total, 1)) * 90)
+                    h_norm = (res.get("handle") or "").lower().strip()
+                    ch_norm = (res.get("channel") or res.get("name") or "").lower().strip()
+                    if (h_norm and h_norm not in seen_this_run) or (ch_norm and ch_norm not in seen_this_run):
+                        if h_norm: seen_this_run.add(h_norm)
+                        if ch_norm: seen_this_run.add(ch_norm)
+
+                        # Write immediately to SQLite so it is saved right away
+                        try:
+                            new_id = insert_lead(res)
+                            res["id"] = new_id
+                        except Exception as e:
+                            print(f"[Scanner] Insert error: {e}")
+
+                        leads.append(res)
+
+                        # Stream immediately to UI callback!
+                        if progress_callback:
+                            pct = min(99, int((processed_count / max(total, 1)) * 95))
+                            ch_label = res.get("channel") or res.get("name") or "Channel"
+                            progress_callback("lead_found", pct, f"Found {ch_label}", res)
+            except Exception as ex:
+                print(f"[Scanner] Error analyzing channel: {ex}")
+
+            if progress_callback and (processed_count % 5 == 0 or processed_count == total):
+                pct = min(99, int((processed_count / max(total, 1)) * 95))
                 progress_callback("progress", pct, f"Analyzing channel {processed_count}/{total}...")
 
     # If strict sub filters resulted in zero leads but raw channels exist, retain discovered real channels
@@ -1065,7 +1131,7 @@ def scan_youtube(keyword: str,
             if not avatar:
                 avatar = f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(ch_name)}&background=8b1524&color=fff"
 
-            leads.append({
+            item_dict = {
                 "name":        ch_name,
                 "channel":     ch_name,
                 "handle":      handle or f"@{slug}",
@@ -1094,13 +1160,18 @@ def scan_youtube(keyword: str,
                     "analysis": f"Real YouTube creator '{ch_name}' in {ch_country}.",
                     "video_count": v_count,
                 }
-            })
+            }
+            try:
+                new_id = insert_lead(item_dict)
+                item_dict["id"] = new_id
+            except Exception:
+                pass
+            leads.append(item_dict)
+            if progress_callback:
+                progress_callback("lead_found", 95, f"Found {ch_name}", item_dict)
 
-    # High-speed bulk write to SQLite database
     if leads:
-        if progress_callback:
-            progress_callback("progress", 95, f"Saving {len(leads)} leads to database...")
-        insert_leads_bulk(leads)
+        upsert_daily_stats({"leads_found": len(leads)})
 
         # Automatic background deep email enrichment for all channels without email
         missing_emails = [l for l in leads if not l.get("email")]
@@ -1109,11 +1180,14 @@ def scan_youtube(keyword: str,
                 try:
                     time.sleep(1)
                     from enrich_emails import batch_enrich_database
-                    batch_enrich_database(limit=len(missing_emails), workers=15)
+                    batch_enrich_database(limit=len(missing_emails), workers=10)
                 except Exception as e:
                     print(f"[Scanner] Auto background enrichment error: {e}")
 
             threading.Thread(target=auto_enrich_bg, daemon=True).start()
+
+    if progress_callback:
+        progress_callback("done", 100, f"Completed! Found {len(leads)} fresh leads.")
 
     # Fallback only if no network / zero channels found
     if not leads:

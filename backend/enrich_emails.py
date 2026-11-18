@@ -116,7 +116,7 @@ def extract_website_from_channel_page(html_text: str) -> list:
 
     return urls
 
-def scrape_email_from_external_site(url: str, timeout=(2.0, 3.0)) -> str:
+def scrape_email_from_external_site(url: str, timeout=(1.5, 2.0), deep: bool = False) -> str:
     if not url:
         return ""
     try:
@@ -135,23 +135,21 @@ def scrape_email_from_external_site(url: str, timeout=(2.0, 3.0)) -> str:
             
             if "linktr.ee" not in url and "beacons.ai" not in url:
                 base_site = "/".join(url.split("/")[:3])
-                subpages = [f"{base_site}{sub}" for sub in ["/contact", "/about", "/contact-us", "/privacy-policy"]]
-                with ThreadPoolExecutor(max_workers=4) as sub_ex:
-                    sub_futs = [sub_ex.submit(requests.get, sub_url, headers=HEADERS, timeout=timeout) for sub_url in subpages]
-                    for sf in as_completed(sub_futs):
-                        try:
-                            rc = sf.result()
-                            if rc.status_code == 200:
-                                sub_emails = extract_all_emails_from_text(rc.text)
-                                if sub_emails:
-                                    return sub_emails[0]
-                        except Exception:
-                            pass
+                subpages = [f"{base_site}/contact"] if not deep else [f"{base_site}{sub}" for sub in ["/contact", "/about", "/contact-us", "/privacy-policy"]]
+                for sub_url in subpages:
+                    try:
+                        rc = requests.get(sub_url, headers=HEADERS, timeout=timeout)
+                        if rc.status_code == 200:
+                            sub_emails = extract_all_emails_from_text(rc.text)
+                            if sub_emails:
+                                return sub_emails[0]
+                    except Exception:
+                        pass
     except Exception:
         pass
     return ""
 
-def deep_extract_channel_email(channel_url: str, handle: str = "", description: str = "") -> dict:
+def deep_extract_channel_email(channel_url: str, handle: str = "", description: str = "", fast_mode: bool = True) -> dict:
     res = {"email": "", "source": "", "website": ""}
 
     # 1. Check existing description
@@ -175,10 +173,13 @@ def deep_extract_channel_email(channel_url: str, handle: str = "", description: 
     if not target_url:
         return res
 
+    t_yt = (1.5, 2.0) if fast_mode else (2.0, 3.5)
+    t_site = (1.5, 2.0) if fast_mode else (2.0, 3.0)
+
     # 2. Fetch Channel Page / About tab
     try:
         about_url = target_url.rstrip("/") + "/about"
-        r = requests.get(about_url, headers=HEADERS, timeout=(2.0, 3.5))
+        r = requests.get(about_url, headers=HEADERS, timeout=t_yt)
         if r.status_code == 200:
             emails = extract_all_emails_from_text(r.text)
             if emails:
@@ -187,13 +188,14 @@ def deep_extract_channel_email(channel_url: str, handle: str = "", description: 
                 return res
 
             ext_sites = extract_website_from_channel_page(r.text)
-            for site in ext_sites[:4]:
+            sites_to_check = ext_sites[:2] if fast_mode else ext_sites[:4]
+            for site in sites_to_check:
                 dom = site.split("/")[2].lower() if "/" in site else site.lower()
                 if any(s in dom for s in SKIP_WEBSITE_DOMAINS):
                     continue
                 if not res["website"]:
                     res["website"] = site
-                site_email = scrape_email_from_external_site(site)
+                site_email = scrape_email_from_external_site(site, timeout=t_site, deep=not fast_mode)
                 if site_email:
                     res["email"] = site_email
                     res["source"] = f"website:{dom}"
@@ -204,12 +206,12 @@ def deep_extract_channel_email(channel_url: str, handle: str = "", description: 
     # 3. Check Recent Videos (top 1 upload only)
     try:
         v_url = target_url.rstrip("/") + "/videos"
-        rv = requests.get(v_url, headers=HEADERS, timeout=(1.5, 2.0))
+        rv = requests.get(v_url, headers=HEADERS, timeout=(1.2, 1.8))
         if rv.status_code == 200:
             video_ids = list(dict.fromkeys(re.findall(r'/watch\?v=([a-zA-Z0-9_-]{11})', rv.text)))[:1]
             for vid in video_ids:
                 try:
-                    vp = requests.get(f"https://www.youtube.com/watch?v={vid}", headers=HEADERS, timeout=(1.5, 2.0))
+                    vp = requests.get(f"https://www.youtube.com/watch?v={vid}", headers=HEADERS, timeout=(1.2, 1.8))
                     if vp.status_code == 200:
                         v_emails = extract_all_emails_from_text(vp.text)
                         if v_emails:

@@ -540,6 +540,29 @@ def init_db():
 def insert_lead(lead: dict) -> int:
     conn = get_db()
     c = conn.cursor()
+
+    # ── Deduplication Check ──
+    h = (lead.get("handle") or "").strip().lower()
+    u = (lead.get("channel_url") or lead.get("website") or "").strip().lower().rstrip("/")
+    ch = (lead.get("channel") or lead.get("name") or "").strip().lower()
+
+    existing = None
+    if h and h != "@":
+        existing = c.execute("SELECT id, email FROM leads WHERE LOWER(handle) = ? LIMIT 1", (h,)).fetchone()
+    if not existing and u and "youtube.com" in u:
+        existing = c.execute("SELECT id, email FROM leads WHERE LOWER(channel_url) = ? LIMIT 1", (u,)).fetchone()
+    if not existing and ch:
+        existing = c.execute("SELECT id, email FROM leads WHERE LOWER(channel) = ? OR LOWER(name) = ? LIMIT 1", (ch, ch)).fetchone()
+
+    if existing:
+        lead_id = existing["id"]
+        # If new email found and existing had none, enrich existing row
+        if lead.get("email") and not existing["email"]:
+            c.execute("UPDATE leads SET email = ? WHERE id = ?", (lead["email"], lead_id))
+            conn.commit()
+        conn.close()
+        return lead_id
+
     c.execute("""
         INSERT INTO leads (name, channel, platform, subscribers, email, website, country,
                            social_json, ai_score, lead_type, status, ai_analysis,
@@ -582,14 +605,47 @@ def insert_lead(lead: dict) -> int:
 def insert_leads_bulk(leads: list) -> list:
     """
     High-speed batch insertion for 100-1000+ leads in a single SQLite transaction.
-    Reduces 1000 writes from ~10 seconds down to ~0.05 seconds.
+    Deduplicates against existing database leads by handle, channel_url, and name.
     """
     if not leads:
         return []
     conn = get_db()
     c = conn.cursor()
+
+    # Load all existing identifiers to avoid duplicates
+    rows = c.execute("SELECT id, LOWER(handle) as h, LOWER(channel_url) as u, LOWER(channel) as ch, LOWER(name) as nm, email FROM leads").fetchall()
+    existing_handles = {r["h"]: r for r in rows if r["h"]}
+    existing_urls = {r["u"].rstrip("/"): r for r in rows if r["u"]}
+    existing_names = {r["ch"]: r for r in rows if r["ch"]}
+    for r in rows:
+        if r["nm"]:
+            existing_names[r["nm"]] = r
+
     params = []
+    inserted_ids = []
+
     for lead in leads:
+        h = (lead.get("handle") or "").strip().lower()
+        u = (lead.get("channel_url") or lead.get("website") or "").strip().lower().rstrip("/")
+        ch = (lead.get("channel") or lead.get("name") or "").strip().lower()
+
+        exist = existing_handles.get(h) or (existing_urls.get(u) if "youtube.com" in u else None) or existing_names.get(ch)
+        if exist:
+            exist_id = exist["id"]
+            if lead.get("email") and not exist["email"]:
+                c.execute("UPDATE leads SET email = ? WHERE id = ?", (lead["email"], exist_id))
+            inserted_ids.append(exist_id)
+            continue
+
+        # Register in memory so duplicates inside same batch are skipped
+        dummy_row = {"id": -1, "email": lead.get("email", "")}
+        if h and h != "@":
+            existing_handles[h] = dummy_row
+        if u:
+            existing_urls[u] = dummy_row
+        if ch:
+            existing_names[ch] = dummy_row
+
         params.append({
             "name":        lead.get("name", ""),
             "channel":     lead.get("channel", ""),
@@ -614,19 +670,19 @@ def insert_leads_bulk(leads: list) -> list:
             "created":     lead.get("created", "Oct 2022"),
             "description": lead.get("description", "")
         })
-    c.executemany("""
-        INSERT INTO leads (name, channel, platform, subscribers, email, website, country,
-                           social_json, ai_score, lead_type, status, ai_analysis,
-                           avatar, handle, channel_url, total_views, videos, avg_views,
-                           last_upload, upload_freq, created, description)
-        VALUES (:name, :channel, :platform, :subscribers, :email, :website, :country,
-                :social_json, :ai_score, :lead_type, :status, :ai_analysis,
-                :avatar, :handle, :channel_url, :total_views, :videos, :avg_views,
-                :last_upload, :upload_freq, :created, :description)
-    """, params)
+
+    if params:
+        c.executemany("""
+            INSERT INTO leads (name, channel, platform, subscribers, email, website, country,
+                               social_json, ai_score, lead_type, status, ai_analysis,
+                               avatar, handle, channel_url, total_views, videos, avg_views,
+                               last_upload, upload_freq, created, description)
+            VALUES (:name, :channel, :platform, :subscribers, :email, :website, :country,
+                    :social_json, :ai_score, :lead_type, :status, :ai_analysis,
+                    :avatar, :handle, :channel_url, :total_views, :videos, :avg_views,
+                    :last_upload, :upload_freq, :created, :description)
+        """, params)
     conn.commit()
-    # Assign generated row IDs if needed
-    first_id = c.lastrowid
     conn.close()
     return leads
 

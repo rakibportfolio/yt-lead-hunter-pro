@@ -597,6 +597,20 @@
         </div>
       </div>
 
+      <!-- Real-Time Live Discovery Progress Box (Appears when scanning) -->
+      <div id="resultsScanProgressBox" style="display:none;margin-bottom:16px;background:var(--bg-subtle);border:1px solid var(--border-color);border-radius:8px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;margin-bottom:8px;">
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;"></span>
+            <span id="resultsScanStatusMsg">Scanning YouTube & streaming channels live...</span>
+          </span>
+          <span id="resultsScanProgressPct" style="color:var(--primary-red);font-weight:800;">0%</span>
+        </div>
+        <div style="height:8px;background:var(--border-color);border-radius:4px;overflow:hidden;">
+          <div id="resultsScanProgressBarFill" style="height:100%;background:linear-gradient(90deg,#dc2626,#ef4444);width:0%;transition:width 0.3s ease;"></div>
+        </div>
+      </div>
+
       <!-- Results Tabs: Latest Scan vs All Leads -->
       <div class="results-tabs">
         <button class="results-tab-btn active" id="tabLatestLeads" onclick="switchResultsTab('latest')" style="display:flex;align-items:center;gap:8px;cursor:pointer;background:none;border:none;">

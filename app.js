@@ -543,11 +543,33 @@ async function startDiscoveryScan() {
     btn.innerHTML = '⏳ Scanning YouTube...';
   }
 
+  // Reset and prepare latest scan state for real-time streaming
+  APP_STATE.latestScanLeads = [];
+  APP_STATE.latestScanKeyword = keyword || '';
+  APP_STATE.selectedLeadIds.clear();
+  const bLatest = document.getElementById('badgeLatestLeads');
+  if (bLatest) bLatest.textContent = '0';
+
   const pBox = document.getElementById('liveScanProgressBox');
   const pMsg = document.getElementById('scanStatusMsg');
   const pPct = document.getElementById('scanProgressPct');
   const pBar = document.getElementById('scanProgressBarFill');
   if (pBox) pBox.style.display = 'block';
+
+  // Also activate Results real-time progress box and switch to Results tab immediately
+  const resPBox = document.getElementById('resultsScanProgressBox');
+  if (resPBox) resPBox.style.display = 'block';
+  const resPMsg = document.getElementById('resultsScanStatusMsg');
+  if (resPMsg) resPMsg.textContent = `Connecting to YouTube for '${keyword}'...`;
+  const resPPct = document.getElementById('resultsScanProgressPct');
+  if (resPPct) resPPct.textContent = '0%';
+  const resPBar = document.getElementById('resultsScanProgressBarFill');
+  if (resPBar) resPBar.style.width = '0%';
+
+  // Transition to results page right away so user sees channels streaming in one-by-one!
+  switchResultsTab('latest');
+  navigatePage('results');
+  renderResultsTable();
 
   // API Call to FastAPI Backend
   try {
@@ -580,6 +602,8 @@ async function startDiscoveryScan() {
     }
     const pBox = document.getElementById('liveScanProgressBox');
     if (pBox) pBox.style.display = 'none';
+    const resPBox = document.getElementById('resultsScanProgressBox');
+    if (resPBox) resPBox.style.display = 'none';
     showToast('Failed to connect to backend scanner. Please verify server is online.', 'error');
   }
 }
@@ -596,17 +620,61 @@ function pollScanProgress(scanId, keyword, country = '') {
       const data = await res.json();
       errCount = 0;
 
-      if (pMsg && data.step) pMsg.textContent = data.step;
-      if (pPct) pPct.textContent = `${data.progress || 0}%`;
-      if (pBar) pBar.style.width = `${data.progress || 0}%`;
+      // Update both progress boxes
+      const stepText = data.step || 'Analyzing channels...';
+      const pctText = `${data.progress || 0}%`;
+      const pctWidth = `${data.progress || 0}%`;
+
+      if (pMsg) pMsg.textContent = stepText;
+      if (pPct) pPct.textContent = pctText;
+      if (pBar) pBar.style.width = pctWidth;
+
+      const resPMsg = document.getElementById('resultsScanStatusMsg');
+      const resPPct = document.getElementById('resultsScanProgressPct');
+      const resPBar = document.getElementById('resultsScanProgressBarFill');
+      if (resPMsg) resPMsg.textContent = stepText;
+      if (resPPct) resPPct.textContent = pctText;
+      if (resPBar) resPBar.style.width = pctWidth;
+
+      // Real-time streaming ingestion: append newly discovered channels one-by-one!
+      if (Array.isArray(data.leads) && data.leads.length > APP_STATE.latestScanLeads.length) {
+        const existingKeys = new Set(APP_STATE.latestScanLeads.map(l => (l.handle || l.channel || l.id || '').toLowerCase()));
+        const newItems = data.leads.filter(l => !existingKeys.has((l.handle || l.channel || l.id || '').toLowerCase()));
+
+        if (newItems.length > 0) {
+          APP_STATE.latestScanLeads.push(...newItems);
+          APP_STATE.latestScanKeyword = keyword || '';
+
+          // Merge into global leads history
+          newItems.forEach(l => {
+            const lKey = (l.handle || l.channel || l.id || '').toLowerCase();
+            if (!APP_STATE.leads.some(ex => (ex.handle || ex.channel || ex.id || '').toLowerCase() === lKey)) {
+              APP_STATE.leads.unshift(l);
+            }
+          });
+
+          // Update navigation and tab badges dynamically
+          const bLatest = document.getElementById('badgeLatestLeads');
+          if (bLatest) bLatest.textContent = APP_STATE.latestScanLeads.length;
+          const bAll = document.getElementById('badgeAllLeads');
+          if (bAll) bAll.textContent = APP_STATE.leads.length;
+
+          // Dynamically re-render the results table as each channel arrives!
+          if (APP_STATE.currentPage === 'results') {
+            renderResultsTable();
+          }
+        }
+      }
 
       if (data.status === 'done' || data.progress >= 100) {
         clearInterval(timer);
-        finishScan(data.leads || [], keyword);
+        const resPBox = document.getElementById('resultsScanProgressBox');
+        if (resPBox) resPBox.style.display = 'none';
+        finishScan(data.leads || APP_STATE.latestScanLeads || [], keyword);
       }
     } catch (e) {
       errCount++;
-      if (errCount >= 6) {
+      if (errCount >= 8) {
         clearInterval(timer);
         APP_STATE.isScanning = false;
         const btn = document.getElementById('btnStartDiscovery');
@@ -616,10 +684,12 @@ function pollScanProgress(scanId, keyword, country = '') {
         }
         const pBox = document.getElementById('liveScanProgressBox');
         if (pBox) pBox.style.display = 'none';
+        const resPBox = document.getElementById('resultsScanProgressBox');
+        if (resPBox) resPBox.style.display = 'none';
         showToast('Lost connection to backend scan progress.', 'error');
       }
     }
-  }, 1000);
+  }, 600);
 }
 
 function runSimulatedDiscovery(keyword, count, country = '') {
@@ -662,8 +732,10 @@ function finishScan(newLeads, keyword) {
   }
   const pBox = document.getElementById('liveScanProgressBox');
   if (pBox) pBox.style.display = 'none';
+  const resPBox = document.getElementById('resultsScanProgressBox');
+  if (resPBox) resPBox.style.display = 'none';
 
-  const validNewLeads = Array.isArray(newLeads) ? newLeads : [];
+  const validNewLeads = Array.isArray(newLeads) && newLeads.length > 0 ? newLeads : APP_STATE.latestScanLeads;
 
   // 1. Save ONLY the new leads into latestScanLeads (separated from old leads!)
   APP_STATE.latestScanLeads = [...validNewLeads];
@@ -694,11 +766,16 @@ function finishScan(newLeads, keyword) {
   APP_STATE.quotaUsed += Math.min(validNewLeads.length * 35, 1200);
 
   updateDashboardMetrics();
-  showToast(`⚡ Discovered ${validNewLeads.length} new leads! Showing Just Discovered tab.`, 'success');
+  if (validNewLeads.length === 0) {
+    showToast(`All matching channels for '${keyword}' are already saved in your database! (0 duplicates added)`, 'info');
+  } else {
+    showToast(`⚡ Discovered ${validNewLeads.length} new leads! Showing Just Discovered tab.`, 'success');
+  }
 
   // Immediately activate the 'latest' tab so user sees ONLY what was just discovered!
   switchResultsTab('latest');
   navigatePage('results');
+  renderResultsTable();
 }
 
 // ------------------------------------------------------------
