@@ -109,7 +109,7 @@ def extract_website_from_channel_page(html_text: str) -> list:
 
     return urls
 
-def scrape_email_from_external_site(url: str, timeout=(2.5, 3.5)) -> str:
+def scrape_email_from_external_site(url: str, timeout=(2.0, 3.0)) -> str:
     try:
         r = requests.get(url, headers=HEADERS, timeout=timeout)
         if r.status_code == 200:
@@ -119,15 +119,18 @@ def scrape_email_from_external_site(url: str, timeout=(2.5, 3.5)) -> str:
             
             if "linktr.ee" not in url and "beacons.ai" not in url:
                 base_site = "/".join(url.split("/")[:3])
-                for sub in ["/contact", "/about", "/contact-us", "/privacy-policy"]:
-                    try:
-                        rc = requests.get(f"{base_site}{sub}", headers=HEADERS, timeout=timeout)
-                        if rc.status_code == 200:
-                            sub_emails = extract_all_emails_from_text(rc.text)
-                            if sub_emails:
-                                return sub_emails[0]
-                    except Exception:
-                        pass
+                subpages = [f"{base_site}{sub}" for sub in ["/contact", "/about", "/contact-us"]]
+                with ThreadPoolExecutor(max_workers=3) as sub_ex:
+                    sub_futs = [sub_ex.submit(requests.get, sub_url, headers=HEADERS, timeout=timeout) for sub_url in subpages]
+                    for sf in as_completed(sub_futs):
+                        try:
+                            rc = sf.result()
+                            if rc.status_code == 200:
+                                sub_emails = extract_all_emails_from_text(rc.text)
+                                if sub_emails:
+                                    return sub_emails[0]
+                        except Exception:
+                            pass
     except Exception:
         pass
     return ""

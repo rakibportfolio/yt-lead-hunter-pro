@@ -928,15 +928,22 @@ def scan_youtube(keyword: str,
         email = extract_email_from_text(desc)
         social = extract_social_from_text(desc)
 
-        # For small targeted runs (max_results <= 30), quick check top 5 handles if missing email
+        # Automated multi-method deep email extraction during scan (About, Bio, Websites, Videos)
         target_handle = ch.get("handle") or ch.get("custom_url") or ch.get("channel_id")
-        if not email and target_handle and max_results <= 30 and idx < 5:
+        target_url = ch.get("channel_url") or (f"https://www.youtube.com/{target_handle}" if target_handle else "")
+        deep_limit = 100 if max_results <= 100 else 50
+        if not email and (target_handle or target_url) and idx < deep_limit:
             try:
-                about_data = scrape_channel_about(target_handle)
-                if about_data.get("email"):
-                    email = about_data["email"]
-                if about_data.get("social"):
-                    social.update(about_data["social"])
+                from enrich_emails import deep_extract_channel_email
+                extracted = deep_extract_channel_email(
+                    channel_url=target_url,
+                    handle=target_handle,
+                    description=desc
+                )
+                if extracted.get("email"):
+                    email = extracted["email"]
+                if extracted.get("website") and not ch.get("website"):
+                    ch["website"] = extracted["website"]
             except Exception:
                 pass
 
@@ -1095,6 +1102,19 @@ def scan_youtube(keyword: str,
         if progress_callback:
             progress_callback("progress", 95, f"Saving {len(leads)} leads to database...")
         insert_leads_bulk(leads)
+
+        # Automatic background deep email enrichment for all channels without email
+        missing_emails = [l for l in leads if not l.get("email")]
+        if missing_emails:
+            def auto_enrich_bg():
+                try:
+                    time.sleep(1)
+                    from enrich_emails import batch_enrich_database
+                    batch_enrich_database(limit=len(missing_emails), workers=15)
+                except Exception as e:
+                    print(f"[Scanner] Auto background enrichment error: {e}")
+
+            threading.Thread(target=auto_enrich_bg, daemon=True).start()
 
     # Fallback only if no network / zero channels found
     if not leads:
