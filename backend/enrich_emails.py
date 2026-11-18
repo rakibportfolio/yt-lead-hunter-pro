@@ -109,9 +109,9 @@ def extract_website_from_channel_page(html_text: str) -> list:
 
     return urls
 
-def scrape_email_from_external_site(url: str) -> str:
+def scrape_email_from_external_site(url: str, timeout=(2.5, 3.5)) -> str:
     try:
-        r = requests.get(url, headers=HEADERS, timeout=(1.5, 2.0))
+        r = requests.get(url, headers=HEADERS, timeout=timeout)
         if r.status_code == 200:
             emails = extract_all_emails_from_text(r.text)
             if emails:
@@ -119,9 +119,9 @@ def scrape_email_from_external_site(url: str) -> str:
             
             if "linktr.ee" not in url and "beacons.ai" not in url:
                 base_site = "/".join(url.split("/")[:3])
-                for sub in ["/contact", "/about"]:
+                for sub in ["/contact", "/about", "/contact-us", "/privacy-policy"]:
                     try:
-                        rc = requests.get(f"{base_site}{sub}", headers=HEADERS, timeout=(1.5, 2.0))
+                        rc = requests.get(f"{base_site}{sub}", headers=HEADERS, timeout=timeout)
                         if rc.status_code == 200:
                             sub_emails = extract_all_emails_from_text(rc.text)
                             if sub_emails:
@@ -143,10 +143,15 @@ def deep_extract_channel_email(channel_url: str, handle: str = "", description: 
             res["source"] = "channel_description"
             return res
 
-    target_url = channel_url
-    if not target_url and handle:
-        h = handle if handle.startswith("@") else f"@{handle}"
-        target_url = f"https://www.youtube.com/{h}"
+    target_url = (channel_url or "").strip()
+    if not target_url.startswith("http"):
+        h = handle or target_url
+        if h:
+            if not h.startswith("@"):
+                h = f"@{h}"
+            target_url = f"https://www.youtube.com/{h}"
+        else:
+            target_url = ""
 
     if not target_url:
         return res

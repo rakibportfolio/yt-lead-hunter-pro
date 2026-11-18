@@ -304,6 +304,38 @@
                 <div class="toggle-switch-pills">
                   <button class="switch-pill-btn active" id="btnModeSingle" onclick="setDiscoveryMode('single')">Single Keyword</button>
                   <button class="switch-pill-btn" id="btnModeBulk" onclick="setDiscoveryMode('bulk')">Bulk Keywords</button>
+                  <button class="switch-pill-btn" id="btnModeExtractor" onclick="setDiscoveryMode('extractor')" style="display:flex;align-items:center;gap:4px;font-weight:700;"><span>⚡</span> Email Extractor</button>
+                </div>
+              </div>
+
+              <!-- Instant Single Email Extractor Section -->
+              <div id="extractorSection" style="display:none;margin-bottom:20px;padding:18px;background:var(--bg-subtle);border:1.5px solid var(--primary-red);border-radius:10px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                  <span style="font-size:20px;">⚡</span>
+                  <h4 style="font-size:15px;font-weight:800;color:var(--text-main);">Instant YouTube & Website Email Extractor</h4>
+                </div>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Paste any YouTube Channel handle, URL, or creator website to extract verified business emails in seconds.</p>
+                
+                <div style="margin-bottom:12px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:5px;display:block;">Channel URL / @Handle / Website Domain</label>
+                  <input type="text" class="search-input-field" id="extractorTargetInput" placeholder="e.g. @thegymbusinesscoach or https://www.youtube.com/@thegymbusinesscoach or gymbusinesscoach.com" style="padding:11px 14px;font-size:13.5px;" />
+                </div>
+
+                <div style="margin-bottom:16px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:5px;display:block;">Creator Websites / External Links (Optional, comma-separated)</label>
+                  <input type="text" class="search-input-field" id="extractorLinksInput" placeholder="e.g. https://gymbusinesscoach.com, https://timlyonsjr.com" style="padding:10px 14px;font-size:13px;" />
+                </div>
+
+                <button class="btn-primary-red" id="btnRunEmailExtractor" onclick="runInstantEmailExtractor()" style="width:100%;justify-content:center;padding:12px;font-size:14px;font-weight:700;">
+                  🔍 Extract Real Business Emails
+                </button>
+
+                <!-- Extractor Output Card -->
+                <div id="extractorResultBox" style="display:none;margin-top:16px;padding:14px;background:var(--bg-card);border:1px solid #059669;border-radius:8px;">
+                  <div style="font-size:13px;font-weight:700;color:#10b981;margin-bottom:10px;" id="extractorResultTitle">
+                    ✅ Verified Emails Found:
+                  </div>
+                  <div id="extractorResultList" style="display:flex;flex-direction:column;gap:8px;"></div>
                 </div>
               </div>
 

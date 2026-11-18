@@ -250,11 +250,90 @@ function toggleDarkMode() {
 // ------------------------------------------------------------
 function setDiscoveryMode(mode) {
   APP_STATE.discoveryMode = mode;
-  document.getElementById('btnModeSingle').classList.toggle('active', mode === 'single');
-  document.getElementById('btnModeBulk').classList.toggle('active', mode === 'bulk');
+  document.getElementById('btnModeSingle')?.classList.toggle('active', mode === 'single');
+  document.getElementById('btnModeBulk')?.classList.toggle('active', mode === 'bulk');
+  document.getElementById('btnModeExtractor')?.classList.toggle('active', mode === 'extractor');
+
   document.getElementById('singleKeywordSection').style.display = mode === 'single' ? 'block' : 'none';
   document.getElementById('bulkKeywordSection').style.display = mode === 'bulk' ? 'block' : 'none';
-  calculatePreSearchEstimate();
+  const extSec = document.getElementById('extractorSection');
+  if (extSec) extSec.style.display = mode === 'extractor' ? 'block' : 'none';
+
+  // Toggle standard search filter visibility when in extractor mode
+  const estCard = document.querySelector('.estimate-bar-card');
+  const btnStart = document.getElementById('btnStartDiscovery');
+  if (estCard) estCard.style.display = mode === 'extractor' ? 'none' : 'block';
+  if (btnStart) btnStart.style.display = mode === 'extractor' ? 'none' : 'flex';
+
+  if (mode !== 'extractor') {
+    calculatePreSearchEstimate();
+  }
+}
+
+async function runInstantEmailExtractor() {
+  const target = (document.getElementById('extractorTargetInput')?.value || '').trim();
+  const rawLinks = (document.getElementById('extractorLinksInput')?.value || '').trim();
+  const links = rawLinks ? rawLinks.split(/[,;\n]+/).map(l => l.trim()).filter(Boolean) : [];
+
+  if (!target && links.length === 0) {
+    showToast('Please enter a YouTube handle, URL, or website link!', 'warning');
+    return;
+  }
+
+  const btn = document.getElementById('btnRunEmailExtractor');
+  const resBox = document.getElementById('extractorResultBox');
+  const resTitle = document.getElementById('extractorResultTitle');
+  const resList = document.getElementById('extractorResultList');
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Crawling Websites & Bio...';
+  }
+  if (resBox) resBox.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/extract-single-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target, links })
+    });
+    const data = await res.json();
+
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '🔍 Extract Real Business Emails';
+    }
+
+    if (data.success && data.all_emails && data.all_emails.length > 0) {
+      if (resBox) resBox.style.display = 'block';
+      if (resTitle) resTitle.innerHTML = `✅ Found ${data.all_emails.length} Verified Email${data.all_emails.length > 1 ? 's' : ''}:`;
+      if (resList) {
+        resList.innerHTML = data.all_emails.map((em, idx) => `
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-subtle);padding:8px 12px;border-radius:6px;gap:10px;border:1px solid var(--border-color);flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-family:monospace;font-size:13.5px;color:#10b981;font-weight:700;">✉️ ${em}</span>
+              ${data.sources && data.sources[idx] ? `<span style="font-size:11px;color:var(--text-light);background:var(--bg-card);padding:2px 6px;border-radius:4px;">${data.sources[idx]}</span>` : ''}
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn-secondary" style="padding:4px 10px;font-size:11.5px;" onclick="copyText('${em}')">Copy</button>
+            </div>
+          </div>
+        `).join('');
+      }
+      showToast(`🎉 Found ${data.all_emails.length} verified emails!`, 'success');
+    } else {
+      if (resBox) resBox.style.display = 'block';
+      if (resTitle) resTitle.innerHTML = `<span style="color:#ef4444;">⚠️ No verified email found for this channel.</span>`;
+      if (resList) resList.innerHTML = `<p style="font-size:12px;color:var(--text-muted);margin:0;">Checked bio, official websites, and recent uploads. The creator has not made a public email available.</p>`;
+      showToast('No public email found for this channel.', 'info');
+    }
+  } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '🔍 Extract Real Business Emails';
+    }
+    showToast('Failed to connect to email extractor API.', 'error');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

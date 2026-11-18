@@ -270,6 +270,77 @@ def api_enrich_emails(body: dict = None):
     return {"success": True, "total_processed": len(leads), "enriched_count": len(enriched), "enriched": enriched}
 
 
+@app.post("/api/extract-single-email")
+def api_extract_single_email(body: dict):
+    """
+    Extract verified business emails from:
+    1. A YouTube channel URL or @handle (e.g. @thegymbusinesscoach)
+    2. Directly passed website links (e.g. gymbusinesscoach.com, timlyonsjr.com)
+    3. Associated recent YouTube video descriptions
+    """
+    target = (body.get("target") or "").strip()
+    links = body.get("links") or []
+    description = body.get("description") or ""
+
+    from enrich_emails import (
+        deep_extract_channel_email,
+        scrape_email_from_external_site,
+        extract_all_emails_from_text
+    )
+
+    found_emails = []
+    sources = []
+
+    # 1. Check description text
+    if description:
+        desc_emails = extract_all_emails_from_text(description)
+        for e in desc_emails:
+            if e not in found_emails:
+                found_emails.append(e)
+                sources.append("description")
+
+    # 2. Check explicitly provided links (e.g. from YouTube modal)
+    for link in links:
+        if not link:
+            continue
+        if not link.startswith("http"):
+            link = "https://" + link
+        em = scrape_email_from_external_site(link)
+        if em and em not in found_emails:
+            found_emails.append(em)
+            sources.append(f"link:{link}")
+
+    # 3. If target is a YouTube handle or URL
+    if target:
+        if "youtube.com" in target or target.startswith("@"):
+            handle = target if target.startswith("@") else ""
+            res = deep_extract_channel_email(channel_url=target, handle=handle, description=description)
+            if res.get("email") and res["email"] not in found_emails:
+                found_emails.append(res["email"])
+                sources.append(res.get("source", "youtube"))
+            if res.get("website"):
+                site_em = scrape_email_from_external_site(res["website"])
+                if site_em and site_em not in found_emails:
+                    found_emails.append(site_em)
+                    sources.append(f"website:{res['website']}")
+        elif "." in target and not target.startswith("@"):
+            # Target is a direct website domain
+            url = target if target.startswith("http") else f"https://{target}"
+            em = scrape_email_from_external_site(url)
+            if em and em not in found_emails:
+                found_emails.append(em)
+                sources.append(f"website:{url}")
+
+    primary_email = found_emails[0] if found_emails else ""
+    return {
+        "success": bool(primary_email),
+        "email": primary_email,
+        "all_emails": found_emails,
+        "sources": sources,
+        "target": target
+    }
+
+
 # ═══════════════════════════════════════════════════════════════
 # YOUTUBE SCANNER API
 # ═══════════════════════════════════════════════════════════════
