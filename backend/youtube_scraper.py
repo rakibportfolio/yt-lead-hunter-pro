@@ -911,14 +911,17 @@ def scan_youtube(keyword: str,
         email = extract_email_from_text(desc)
         social = extract_social_from_text(desc)
 
-        # If email not found in search snippet, try checking channel about page (deep fetch for top 30)
+        # If email not found in search snippet, try checking channel about page (fast fetch for top 15)
         target_handle = ch.get("handle") or ch.get("custom_url") or ch.get("channel_id")
-        if not email and target_handle and idx < 30:
-            about_data = scrape_channel_about(target_handle)
-            if about_data.get("email"):
-                email = about_data["email"]
-            if about_data.get("social"):
-                social.update(about_data["social"])
+        if not email and target_handle and idx < 15:
+            try:
+                about_data = scrape_channel_about(target_handle)
+                if about_data.get("email"):
+                    email = about_data["email"]
+                if about_data.get("social"):
+                    social.update(about_data["social"])
+            except Exception:
+                pass
 
         # Only use real extracted email — never guess non-existent domains to prevent bounces
         if not email:
