@@ -135,8 +135,8 @@ def scrape_email_from_external_site(url: str, timeout=(2.0, 3.0)) -> str:
             
             if "linktr.ee" not in url and "beacons.ai" not in url:
                 base_site = "/".join(url.split("/")[:3])
-                subpages = [f"{base_site}{sub}" for sub in ["/contact", "/about", "/contact-us"]]
-                with ThreadPoolExecutor(max_workers=3) as sub_ex:
+                subpages = [f"{base_site}{sub}" for sub in ["/contact", "/about", "/contact-us", "/privacy-policy"]]
+                with ThreadPoolExecutor(max_workers=4) as sub_ex:
                     sub_futs = [sub_ex.submit(requests.get, sub_url, headers=HEADERS, timeout=timeout) for sub_url in subpages]
                     for sf in as_completed(sub_futs):
                         try:
@@ -178,7 +178,7 @@ def deep_extract_channel_email(channel_url: str, handle: str = "", description: 
     # 2. Fetch Channel Page / About tab
     try:
         about_url = target_url.rstrip("/") + "/about"
-        r = requests.get(about_url, headers=HEADERS, timeout=(1.5, 2.0))
+        r = requests.get(about_url, headers=HEADERS, timeout=(2.0, 3.5))
         if r.status_code == 200:
             emails = extract_all_emails_from_text(r.text)
             if emails:
@@ -187,12 +187,16 @@ def deep_extract_channel_email(channel_url: str, handle: str = "", description: 
                 return res
 
             ext_sites = extract_website_from_channel_page(r.text)
-            if ext_sites:
-                res["website"] = ext_sites[0]
-                site_email = scrape_email_from_external_site(ext_sites[0])
+            for site in ext_sites[:4]:
+                dom = site.split("/")[2].lower() if "/" in site else site.lower()
+                if any(s in dom for s in SKIP_WEBSITE_DOMAINS):
+                    continue
+                if not res["website"]:
+                    res["website"] = site
+                site_email = scrape_email_from_external_site(site)
                 if site_email:
                     res["email"] = site_email
-                    res["source"] = f"website:{ext_sites[0]}"
+                    res["source"] = f"website:{dom}"
                     return res
     except Exception:
         pass

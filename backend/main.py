@@ -257,20 +257,21 @@ def api_enrich_emails(body: dict = None):
             handle=ld.get("handle", ""),
             description=ld.get("description", "")
         )
-        return ld["id"], ld["name"], r.get("email", ""), r.get("source", "")
+        return ld["id"], ld["name"], ld.get("handle", ""), r.get("email", ""), r.get("source", "")
 
     enriched = []
     with ThreadPoolExecutor(max_workers=12) as ex:
         futs = [ex.submit(process_lead, l) for l in leads]
         for f in as_completed(futs):
             try:
-                lid, name, email, source = f.result()
+                lid, name, handle, email, source = f.result()
                 if email:
                     conn.execute("UPDATE leads SET email = ? WHERE id = ?", (email, lid))
                     conn.commit()
                     enriched.append({
                         "id": lid,
                         "name": name,
+                        "handle": handle,
                         "email": email,
                         "source": source
                     })

@@ -3170,11 +3170,22 @@ async function triggerEmailEnrichment() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         lead_ids: selectedIds.length > 0 ? selectedIds : [],
-        limit: 30
+        limit: 60
       })
     });
     const data = await res.json();
     if (data.success) {
+      if (data.enriched && Array.isArray(data.enriched)) {
+        data.enriched.forEach(e => {
+          const l1 = (APP_STATE.latestScanLeads || []).find(x => String(x.id) === String(e.id) || x.channel === e.name || (e.handle && x.handle === e.handle));
+          if (l1) l1.email = e.email;
+          const l2 = (APP_STATE.leads || []).find(x => String(x.id) === String(e.id) || x.channel === e.name || (e.handle && x.handle === e.handle));
+          if (l2) l2.email = e.email;
+        });
+        try {
+          localStorage.setItem('yt_lead_hunter_latest_leads', JSON.stringify(APP_STATE.latestScanLeads));
+        } catch (err) {}
+      }
       if (data.enriched_count > 0) {
         showToast(`🎉 Found and verified ${data.enriched_count} real emails!`, 'success');
       } else {
