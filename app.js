@@ -982,96 +982,87 @@ function updateSelectedCount() {
 
 const BULK_EMAIL_TEMPLATES = {
   var1: {
-    name: 'Variation 1: High-Retention 30s Demo Pitch (Default & Recommended)',
+    name: 'Variation 1: High-Retention Hook Demo (Default & Recommended)',
     subject: 'The first 30 seconds of your next video, on us?',
     body: `Hey {name},
 
-I was watching your content on {channel} today — genuinely impressed by the consistency. Building to {subscribers} subs and over {total_views} views takes serious dedication that 95% of creators quit before reaching.
+Been watching {channel} recently, really like the content you're putting out.
 
-Looking at current retention trends, the biggest bottleneck creators face isn't their content quality, but viewer drop-off in the first 30 seconds before the algorithm kicks in.
+I run a video post-production studio called Zentic Media (https://zenticmedia.com/portfolio). I noticed a couple of spots in your intros where tighter cuts and subtle sound cues could help keep viewers hooked past the 30-second mark.
 
-We run Zentic Media (https://zenticmedia.com/portfolio), where we specialize in retention editing that keeps viewers hooked through dynamic pacing, sound design, and pattern interrupts.
+Would you be open to me editing a free 20-second intro hook for your next video? If it boosts your watch time you can use it in your upload, zero strings attached.
 
-Talk is cheap, so here's a risk-free idea:
-I'd love to take 20–30 seconds of raw footage from your upcoming video and edit a high-retention demo hook for you — completely free. If you like the retention boost, you can use it in your video 100% on the house; if not, no hard feelings at all.
-
-Dropping an upload this week? Mind if I send a quick 20-second sample over?
+Got a video coming out this week?
 
 Best,
 Rakibul Hasan (Rakib)
-Founder & Lead Editor | Zentic Media`
+Lead Video Editor, Zentic Media`
   },
   var2: {
-    name: 'Variation 2: Retention Metric & Algorithm',
+    name: 'Variation 2: Short & Direct Retention Note',
     subject: 'Quick retention thought on your content ({channel})',
     body: `Hey {name},
 
-Congrats on over {total_views} views on {channel}!
+Loved your recent video on {channel}.
 
-I noticed views fluctuate across your uploads. On YouTube, if viewer retention drops below 60% in the first 45 seconds, the algorithm immediately slows Browse impressions—usually caused by slow hooks and missing sound cues.
+I'm an editor specializing in YouTube retention (portfolio: https://zenticmedia.com/portfolio). I noticed a few quick pacing tweaks in the first 30 seconds that could help keep more viewers watching before they drop off.
 
-At Zentic Media, we specialize in high-retention editing (https://zenticmedia.com/portfolio).
+Happy to edit a free 20-second sample hook for your next video so you can see the difference yourself.
 
-I'd love to edit a free 20-second retention hook for your upcoming video. No commitment—just to prove the watch-time jump.
-
-Dropping a video this week?
+Dropping an upload this week?
 
 Best,
-Rakibul Hasan (Rakib) | Zentic Media`
+Rakib
+Zentic Media`
   },
   var3: {
     name: 'Variation 3: A/B Test Challenge',
     subject: "A/B test for {channel}'s next video?",
     body: `Hey {name},
 
-Big fan of your content—you've built an incredible audience of {subscribers} creators!
+Quick question about {channel}.
 
-Talk is cheap, so here's a risk-free test: Send me 20-30 seconds of raw intro footage from your next video. I'll edit a high-retention hook completely free.
+I run Zentic Media (https://zenticmedia.com/portfolio), where we specialize in high-retention pacing and motion design for YouTube creators.
 
-Test it against your normal edit. If your retention graph doesn't spike, you lose nothing.
+I'd love to take 20 seconds of raw footage from your next video and edit a hook for you to test against your normal edit. Completely free.
 
-You can check out our recent creator edits here: https://zenticmedia.com/portfolio
+If your watch time doesn't jump, no hard feelings at all.
 
-Open to giving it a shot?
+Would you be down to test it on your next upload?
 
-Best regards,
-Rakibul Hasan (Rakib)
-Lead Video Editor, Zentic Media`
+Best,
+Rakib
+Lead Editor, Zentic Media`
   },
   var4: {
     name: 'Variation 4: Direct Zero-BS (Ultra-Short)',
     subject: 'Free 20s hook for {channel}?',
     body: `Hey {name},
 
-Great work on your latest upload!
+Great work on your latest upload on {channel}.
 
-I run Zentic Media (https://zenticmedia.com/portfolio), where we specialize in retention editing that keeps viewers watching past the 60-second mark.
+I run a video editing studio (https://zenticmedia.com/portfolio) where we help creators boost retention past the first 60 seconds.
 
-To prove our quality, I'd love to edit a 20-second demo hook for your next video 100% free with zero strings attached.
+I'd love to edit a 20-second intro hook for your next video 100% free. If you like the retention jump, you can keep it in the final video.
 
-If you like the retention boost, great. If not, it's yours to keep free.
-
-Dropping a video this week? Just reply "yes" and I'll send over the details.
+Got an upload lined up this week?
 
 Best,
 Rakibul Hasan (Rakib) | Zentic Media`
   },
   var5: {
-    name: 'Variation 5: Specific Weakness Fix',
+    name: 'Variation 5: Casual Intro Pacing Fix',
     subject: 'quick question regarding {channel}',
     body: `Hey {name},
 
-Huge congrats on building {channel} to {subscribers} subscribers!
+Came across {channel} today while browsing YouTube, really solid videos.
 
-While checking out your uploads, I noticed the intro pacing takes 20-30 seconds to get to the core point, which usually causes early drop-off before YouTube pushes the video to Suggested feeds.
+I'm an editor with Zentic Media (https://zenticmedia.com/portfolio). While watching, I noticed the intro takes about 20-30 seconds to get right into the core hook, which usually causes early drop-off.
 
-We fix this through micro-resets and tight hooks (portfolio: https://zenticmedia.com/portfolio).
-
-Can I gift you a free 20-second hook edit for your next video so you can see the difference on your retention graph?
+Could I cut a quick 20-second intro for your upcoming video for free? No catch at all, just wanted to show you what it looks like with tighter pacing.
 
 Best,
-Rakibul Hasan (Rakib)
-Founder, Zentic Media`
+Rakib`
   }
 };
 
@@ -1144,10 +1135,12 @@ function cleanCreatorDisplayName(rawTitle) {
     'vancouver', 'housing', 'market', 'investing', 'daily', 'guide', 'solutions'
   ]);
 
-  let greeting = `${t} team`;
-  if (words.length >= 3 && !nonPerson.has(words[0].toLowerCase()) && !nonPerson.has(words[1].toLowerCase()) && words.slice(2).some(w => ['real', 'estate', 'realtor', 'homes'].includes(w.toLowerCase()))) {
+  let greeting = 'there';
+  if (words.length > 0 && (words[0].includes("'s") || words[0].includes("’s"))) {
+    greeting = words[0].replace(/['’]s/gi, '');
+  } else if (words.length >= 2 && !nonPerson.has(words[0].toLowerCase())) {
     greeting = words[0];
-  } else if (words.length === 2 && !words.some(w => nonPerson.has(w.toLowerCase()))) {
+  } else if (words.length === 1 && !nonPerson.has(words[0].toLowerCase()) && words[0].length >= 3) {
     greeting = words[0];
   } else if (words.some(w => w.toLowerCase() === 'team')) {
     greeting = t;

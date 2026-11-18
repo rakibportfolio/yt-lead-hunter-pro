@@ -124,69 +124,63 @@ Zentic Media
         "subject": "The first 30 seconds of your next video, on us?",
         "body": """Hey {name},
 
-I was watching your content on {channel} today — genuinely impressed by the consistency. Building to {subscribers} subs and over {total_views} views takes serious dedication that 95% of creators quit before reaching.
+Been watching {channel} recently, really like the content you're putting out.
 
-Looking at current retention trends, the biggest bottleneck creators face isn't their content quality, but viewer drop-off in the first 30 seconds before the algorithm kicks in.
+I run a video post-production studio called Zentic Media (https://zenticmedia.com/portfolio). I noticed a couple of spots in your intros where tighter cuts and subtle sound cues could help keep viewers hooked past the 30-second mark.
 
-We run Zentic Media (https://zenticmedia.com/portfolio), where we specialize in retention editing that keeps viewers hooked through dynamic pacing, sound design, and pattern interrupts.
+Would you be open to me editing a free 20-second intro hook for your next video? If it boosts your watch time you can use it in your upload, zero strings attached.
 
-Talk is cheap, so here's a risk-free idea:
-I'd love to take 20–30 seconds of raw footage from your upcoming video and edit a high-retention demo hook for you — completely free. If you like the retention boost, you can use it in your video 100% on the house; if not, no hard feelings at all.
-
-Dropping an upload this week? Mind if I send a quick 20-second sample over?
+Got a video coming out this week?
 
 Best,
 Rakibul Hasan (Rakib)
-Founder & Lead Editor | Zentic Media"""
+Lead Video Editor, Zentic Media"""
     },
     "var2": {
         "subject": "Quick retention thought on your content ({channel})",
         "body": """Hey {name},
 
-Congrats on over {total_views} views on {channel}!
+Loved your recent video on {channel}.
 
-I noticed views fluctuate across your uploads. On YouTube, if viewer retention drops below 60% in the first 45 seconds, the algorithm immediately slows Browse impressions—usually caused by slow hooks and missing sound cues.
+I'm an editor specializing in YouTube retention (portfolio: https://zenticmedia.com/portfolio). I noticed a few quick pacing tweaks in the first 30 seconds that could help keep more viewers watching before they drop off.
 
-At Zentic Media, we specialize in high-retention editing (https://zenticmedia.com/portfolio).
+Happy to edit a free 20-second sample hook for your next video so you can see the difference yourself.
 
-I'd love to edit a free 20-second retention hook for your upcoming video. No commitment—just to prove the watch-time jump.
-
-Dropping a video this week?
+Dropping an upload this week?
 
 Best,
-Rakibul Hasan (Rakib) | Zentic Media"""
+Rakib
+Zentic Media"""
     },
     "var3": {
         "subject": "A/B test for {channel}'s next video?",
         "body": """Hey {name},
 
-Big fan of your content—you've built an incredible audience of {subscribers} creators!
+Quick question about {channel}.
 
-Talk is cheap, so here's a risk-free test: Send me 20-30 seconds of raw intro footage from your next video. I'll edit a high-retention hook completely free.
+I run Zentic Media (https://zenticmedia.com/portfolio), where we specialize in high-retention pacing and motion design for YouTube creators.
 
-Test it against your normal edit. If your retention graph doesn't spike, you lose nothing.
+I'd love to take 20 seconds of raw footage from your next video and edit a hook for you to test against your normal edit. Completely free.
 
-You can check out our recent creator edits here: https://zenticmedia.com/portfolio
+If your watch time doesn't jump, no hard feelings at all.
 
-Open to giving it a shot?
+Would you be down to test it on your next upload?
 
-Best regards,
-Rakibul Hasan (Rakib)
-Lead Video Editor, Zentic Media"""
+Best,
+Rakib
+Lead Editor, Zentic Media"""
     },
     "var4": {
         "subject": "Free 20s hook for {channel}?",
         "body": """Hey {name},
 
-Great work on your latest upload!
+Great work on your latest upload on {channel}.
 
-I run Zentic Media (https://zenticmedia.com/portfolio), where we specialize in retention editing that keeps viewers watching past the 60-second mark.
+I run a video editing studio (https://zenticmedia.com/portfolio) where we help creators boost retention past the first 60 seconds.
 
-To prove our quality, I'd love to edit a 20-second demo hook for your next video 100% free with zero strings attached.
+I'd love to edit a 20-second intro hook for your next video 100% free. If you like the retention jump, you can keep it in the final video.
 
-If you like the retention boost, great. If not, it's yours to keep free.
-
-Dropping a video this week? Just reply "yes" and I'll send over the details.
+Got an upload lined up this week?
 
 Best,
 Rakibul Hasan (Rakib) | Zentic Media"""
@@ -195,17 +189,14 @@ Rakibul Hasan (Rakib) | Zentic Media"""
         "subject": "quick question regarding {channel}",
         "body": """Hey {name},
 
-Huge congrats on building {channel} to {subscribers} subscribers!
+Came across {channel} today while browsing YouTube, really solid videos.
 
-While checking out your uploads, I noticed the intro pacing takes 20-30 seconds to get to the core point, which usually causes early drop-off before YouTube pushes the video to Suggested feeds.
+I'm an editor with Zentic Media (https://zenticmedia.com/portfolio). While watching, I noticed the intro takes about 20-30 seconds to get right into the core hook, which usually causes early drop-off.
 
-We fix this through micro-resets and tight hooks (portfolio: https://zenticmedia.com/portfolio).
-
-Can I gift you a free 20-second hook edit for your next video so you can see the difference on your retention graph?
+Could I cut a quick 20-second intro for your upcoming video for free? No catch at all, just wanted to show you what it looks like with tighter pacing.
 
 Best,
-Rakibul Hasan (Rakib)
-Founder, Zentic Media"""
+Rakib"""
     }
 }
 
@@ -273,17 +264,20 @@ def clean_creator_display_name(raw_title: str) -> tuple:
     }
 
     # Pattern: Person Name + Brand (e.g. 'Wendy Berke Real Estate' -> 'Wendy')
-    if len(words) >= 3 and words[0].lower() not in non_person and words[1].lower() not in non_person and any(w.lower() in {"real", "estate", "realtor", "homes"} for w in words[2:]):
+    if words and (words[0].endswith("'s") or words[0].endswith("’s")):
+        greeting = re.sub(r"['’]s$", "", words[0])
+        channel_name = t
+    elif len(words) >= 3 and words[0].lower() not in non_person and words[1].lower() not in non_person and any(w.lower() in {"real", "estate", "realtor", "homes"} for w in words[2:]):
         greeting = words[0]
         channel_name = t
     elif len(words) == 2 and not any(w.lower() in non_person for w in words):
         greeting = words[0]
         channel_name = t
-    elif any(w.lower() == "team" for w in words):
-        greeting = t
+    elif len(words) >= 1 and words[0].lower() not in non_person and len(words[0]) >= 3:
+        greeting = words[0]
         channel_name = t
     else:
-        greeting = f"{t} team"
+        greeting = "there"
         channel_name = t
 
     return greeting, channel_name
@@ -311,31 +305,25 @@ def build_unsubscribe_link(tracking_id: str) -> str:
 def text_to_html(text: str, tracking_id: str) -> str:
     """
     Convert plain text email to authentic, personal 1-to-1 HTML email.
-    Includes a hidden preheader to ensure the Gmail subtitle/preview is 100% natural,
-    with NO bot-like '⚡ ZENTIC MEDIA' prefixes.
+    Uses natural human paragraph spacing matching native Gmail (no giant gaps).
     """
-    lines = text.strip().split("\n")
-    html_lines = []
+    paragraphs = [p.strip() for p in re.split(r'\n\s*\n', text.strip()) if p.strip()]
+    html_blocks = []
     preview_snippet = ""
 
-    for line in lines:
-        stripped = line.strip()
-        if not stripped:
-            html_lines.append("<br/>")
-        else:
-            if not preview_snippet and not stripped.lower().startswith("hey") and not stripped.lower().startswith("hi"):
-                preview_snippet = stripped
-            elif not preview_snippet:
-                preview_snippet = stripped
+    for p in paragraphs:
+        if not preview_snippet and not p.lower().startswith("hey") and not p.lower().startswith("hi"):
+            preview_snippet = p
+        elif not preview_snippet:
+            preview_snippet = p
 
-            if stripped.startswith("•") or stripped.startswith("✅") or stripped.startswith("📊"):
-                html_lines.append(f'<div style="margin: 4px 0; padding-left: 8px;">{stripped}</div>')
-            else:
-                html_lines.append(f'<p style="margin: 8px 0; line-height: 1.6;">{stripped}</p>')
+        lines = [l.strip() for l in p.split("\n") if l.strip()]
+        line_html = "<br/>".join(lines)
+        html_blocks.append(f'<p style="margin: 0 0 12px 0; line-height: 1.5; color: #1e293b;">{line_html}</p>')
 
     pixel = build_tracking_pixel(tracking_id)
-    html_body = "\n".join(html_lines)
-    clean_preview = preview_snippet[:130] if preview_snippet else "Quick thought on your recent video"
+    html_body = "\n".join(html_blocks)
+    clean_preview = preview_snippet[:130] if preview_snippet else "Quick note"
 
     return f"""<!DOCTYPE html>
 <html>
@@ -344,18 +332,12 @@ def text_to_html(text: str, tracking_id: str) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title></title>
 </head>
-<body style="margin: 0; padding: 18px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #1e293b; background-color: #ffffff; line-height: 1.6;">
-  <!-- Clean Hidden Preheader (Sets the exact subtitle/preview text in Gmail & Outlook) -->
+<body style="margin: 0; padding: 12px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #1e293b; background-color: #ffffff; line-height: 1.5;">
   <div style="display:none!important;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;">
     {clean_preview} &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847;
   </div>
   <div style="max-width: 580px; margin: 0; color: #1e293b;">
     {html_body}
-    <div style="margin-top: 26px; padding-top: 14px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; line-height: 1.5;">
-      <p style="margin: 2px 0; font-weight: 700; color: #0f172a;">Rakibul Hasan (Rakib)</p>
-      <p style="margin: 2px 0;">Founder & Lead Video Editor, <b>Zentic Media</b></p>
-      <p style="margin: 2px 0;">🌐 <a href="https://zenticmedia.com/portfolio" style="color: #6366f1; text-decoration: none;">zenticmedia.com/portfolio</a> | 📧 {cfg.GMAIL_ADDRESS}</p>
-    </div>
   </div>
   {pixel}
 </body>
