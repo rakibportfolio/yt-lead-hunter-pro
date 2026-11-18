@@ -1018,15 +1018,19 @@ function renderResultsTable() {
     return;
   }
 
-  tbody.innerHTML = filtered.map(l => {
-    const isChecked = APP_STATE.selectedLeadIds.has(l.id);
+  tbody.innerHTML = filtered.map((l, idx) => {
+    const leadId = (l.id !== undefined && l.id !== null && l.id !== '')
+      ? String(l.id)
+      : (l.handle ? l.handle.replace(/[^a-zA-Z0-9_]/g, '') : `lead_${idx}`);
+    l.id = leadId;
+    const isChecked = APP_STATE.selectedLeadIds.has(leadId) || (!isNaN(leadId) && APP_STATE.selectedLeadIds.has(Number(leadId)));
     const scoreClass = (l.ai_score || 0) >= 70 ? 'high' : ((l.ai_score || 0) >= 40 ? 'med' : 'low');
 
     return `
       <tr>
-        <td><input type="checkbox" class="lead-row-check" data-id="${l.id}" ${isChecked ? 'checked' : ''} onchange="toggleSelectLead(${l.id}, this.checked)" /></td>
+        <td><input type="checkbox" class="lead-row-check" data-id="${leadId}" ${isChecked ? 'checked' : ''} onchange="toggleSelectLead('${leadId}', this.checked)" /></td>
         <td>
-          <div class="channel-cell" style="cursor:pointer;" onclick="openLeadModal(${l.id})">
+          <div class="channel-cell" style="cursor:pointer;" onclick="openLeadModal('${leadId}')">
             <div style="width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#8b1524;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,0.15);">
               ${l.avatar ? `<img src="${l.avatar}" alt="${l.channel || l.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.parentElement.innerHTML='<span style=\\'color:#fff;font-weight:700;font-size:13px;\\'>${(l.channel||'C').charAt(0)}</span>';" />` : `<span style="color:#fff;font-weight:700;font-size:13px;">${(l.channel||'C').charAt(0)}</span>`}
             </div>
@@ -1058,14 +1062,23 @@ function renderResultsTable() {
         </td>
         <td>
           <div style="display:flex;gap:5px;align-items:center;">
-            <button class="btn-secondary" style="padding:4px 8px;font-size:11px;" onclick="openLeadModal(${l.id})">View</button>
-            <button class="btn-secondary" style="padding:4px 8px;font-size:11px;background:#7c3aed;color:#fff;border-color:#7c3aed;" onclick="openSingleEmailModal(${l.id})" title="Send email to this creator">✉ Email</button>
+            <button class="btn-secondary" style="padding:4px 8px;font-size:11px;" onclick="openLeadModal('${leadId}')">View</button>
+            <button class="btn-secondary" style="padding:4px 8px;font-size:11px;background:#7c3aed;color:#fff;border-color:#7c3aed;" onclick="openSingleEmailModal('${leadId}')" title="Send email to this creator">✉ Email</button>
             <button class="score-badge ${scoreClass}">${l.ai_score || 50}</button>
           </div>
         </td>
       </tr>
     `;
   }).join('');
+
+  // Sync selectAll checkbox and count
+  const allRowCbs = document.querySelectorAll('.lead-row-check');
+  const checkedRowCbs = document.querySelectorAll('.lead-row-check:checked');
+  const selectAll = document.getElementById('selectAllCheckbox');
+  if (selectAll) {
+    selectAll.checked = (allRowCbs.length > 0 && allRowCbs.length === checkedRowCbs.length);
+  }
+  updateSelectedCount();
 }
 
 function filterResultsTable() {
@@ -1091,22 +1104,43 @@ function switchResultsTab(tab) {
 // ------------------------------------------------------------
 function toggleSelectAll(checkbox) {
   const isChecked = checkbox.checked;
-  const isLatestMode = (APP_STATE.activeResultsTab === 'latest' && APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0);
-  const source = isLatestMode ? APP_STATE.latestScanLeads : APP_STATE.leads;
+  const rowCheckboxes = document.querySelectorAll('.lead-row-check');
 
-  source.forEach(l => {
-    if (l && l.id) {
-      if (isChecked) APP_STATE.selectedLeadIds.add(l.id);
-      else APP_STATE.selectedLeadIds.delete(l.id);
+  rowCheckboxes.forEach(cb => {
+    cb.checked = isChecked;
+    const leadId = cb.getAttribute('data-id');
+    if (leadId) {
+      if (isChecked) {
+        APP_STATE.selectedLeadIds.add(leadId);
+        if (!isNaN(leadId)) APP_STATE.selectedLeadIds.add(Number(leadId));
+      } else {
+        APP_STATE.selectedLeadIds.delete(leadId);
+        if (!isNaN(leadId)) APP_STATE.selectedLeadIds.delete(Number(leadId));
+      }
     }
   });
-  document.querySelectorAll('.lead-row-check').forEach(cb => cb.checked = isChecked);
   updateSelectedCount();
 }
 
 function toggleSelectLead(id, isChecked) {
-  if (isChecked) APP_STATE.selectedLeadIds.add(id);
-  else APP_STATE.selectedLeadIds.delete(id);
+  if (!id) return;
+  const strId = String(id);
+  if (isChecked) {
+    APP_STATE.selectedLeadIds.add(strId);
+    if (!isNaN(strId)) APP_STATE.selectedLeadIds.add(Number(strId));
+  } else {
+    APP_STATE.selectedLeadIds.delete(strId);
+    if (!isNaN(strId)) APP_STATE.selectedLeadIds.delete(Number(strId));
+  }
+
+  // Update header checkbox state
+  const allRowCbs = document.querySelectorAll('.lead-row-check');
+  const checkedRowCbs = document.querySelectorAll('.lead-row-check:checked');
+  const selectAll = document.getElementById('selectAllCheckbox');
+  if (selectAll) {
+    selectAll.checked = (allRowCbs.length > 0 && allRowCbs.length === checkedRowCbs.length);
+  }
+
   updateSelectedCount();
 }
 
@@ -1119,7 +1153,9 @@ function clearTableSelection() {
 }
 
 function updateSelectedCount() {
-  const count = APP_STATE.selectedLeadIds.size;
+  const checkedBoxes = document.querySelectorAll('.lead-row-check:checked');
+  const count = checkedBoxes.length;
+
   const btn = document.getElementById('btnExportSelected');
   if (btn) btn.textContent = `Export Selected (${count})`;
   const badge = document.getElementById('bulkEmailCountBadge');
@@ -1213,13 +1249,24 @@ Rakib`
 };
 
 function openBulkEmailModal() {
-  if (!APP_STATE.selectedLeadIds || APP_STATE.selectedLeadIds.size === 0) {
+  const checkedBoxes = document.querySelectorAll('.lead-row-check:checked');
+  const checkedIds = new Set(Array.from(checkedBoxes).map(cb => cb.getAttribute('data-id')).filter(Boolean));
+
+  if (checkedIds.size === 0 && (!APP_STATE.selectedLeadIds || APP_STATE.selectedLeadIds.size === 0)) {
     showToast('Please select at least 1 channel from the table first!', 'warning');
     return;
   }
 
-  const allAvailable = [...APP_STATE.leads, ...(APP_STATE.latestScanLeads || [])];
-  const selected = allAvailable.filter((l, idx, self) => APP_STATE.selectedLeadIds.has(l.id) && self.findIndex(x => x.id === l.id) === idx);
+  const isLatestMode = (APP_STATE.activeResultsTab === 'latest' && APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0);
+  const source = isLatestMode ? APP_STATE.latestScanLeads : APP_STATE.leads;
+  const allAvailable = [...source, ...APP_STATE.leads];
+
+  const selected = allAvailable.filter((l, idx, self) => {
+    const lid = String(l.id !== undefined && l.id !== null ? l.id : (l.handle ? l.handle.replace(/[^a-zA-Z0-9_]/g, '') : ''));
+    const isSel = checkedIds.has(lid) || APP_STATE.selectedLeadIds.has(lid) || (!isNaN(lid) && APP_STATE.selectedLeadIds.has(Number(lid)));
+    return isSel && self.findIndex(x => (x.id && x.id === l.id) || (x.handle && x.handle === l.handle)) === idx;
+  });
+
   const valid = selected.filter(l => l.email && l.email.includes('@'));
 
   const selTotalEl = document.getElementById('bulkSelectedTotal');
@@ -1238,14 +1285,22 @@ function openBulkEmailModal() {
 }
 
 function openSingleEmailModal(leadId) {
-  const lead = APP_STATE.leads.find(l => l.id === leadId);
+  const allAvailable = [...(APP_STATE.latestScanLeads || []), ...APP_STATE.leads];
+  const lead = allAvailable.find(l => String(l.id) === String(leadId) || l.handle === leadId || (l.handle && l.handle.replace(/[^a-zA-Z0-9_]/g, '') === String(leadId)));
   if (!lead) return;
   if (!lead.email || !lead.email.includes('@')) {
     showToast('This creator does not have a public email address.', 'warning');
     return;
   }
   APP_STATE.selectedLeadIds.clear();
-  APP_STATE.selectedLeadIds.add(lead.id);
+  const lid = String(lead.id !== undefined && lead.id !== null ? lead.id : lead.handle);
+  APP_STATE.selectedLeadIds.add(lid);
+  if (!isNaN(lid)) APP_STATE.selectedLeadIds.add(Number(lid));
+
+  // Check the single row on table if visible
+  document.querySelectorAll('.lead-row-check').forEach(cb => {
+    cb.checked = (cb.getAttribute('data-id') === lid);
+  });
   updateSelectedCount();
   openBulkEmailModal();
 }
@@ -1666,12 +1721,29 @@ function exportFilteredLeads() {
 }
 
 function exportSelectedLeads() {
-  if (APP_STATE.selectedLeadIds.size === 0) {
+  const checkedBoxes = document.querySelectorAll('.lead-row-check:checked');
+  const checkedIds = new Set(Array.from(checkedBoxes).map(cb => cb.getAttribute('data-id')).filter(Boolean));
+
+  if (checkedIds.size === 0 && (!APP_STATE.selectedLeadIds || APP_STATE.selectedLeadIds.size === 0)) {
     showToast('No leads selected! Check rows in table first.', 'warning');
     return;
   }
-  const allAvailable = [...APP_STATE.leads, ...(APP_STATE.latestScanLeads || [])];
-  const selected = allAvailable.filter((l, idx, self) => APP_STATE.selectedLeadIds.has(l.id) && self.findIndex(x => x.id === l.id) === idx);
+
+  const isLatestMode = (APP_STATE.activeResultsTab === 'latest' && APP_STATE.latestScanLeads && APP_STATE.latestScanLeads.length > 0);
+  const source = isLatestMode ? APP_STATE.latestScanLeads : APP_STATE.leads;
+  const allAvailable = [...source, ...APP_STATE.leads];
+
+  const selected = allAvailable.filter((l, idx, self) => {
+    const lid = String(l.id !== undefined && l.id !== null ? l.id : (l.handle ? l.handle.replace(/[^a-zA-Z0-9_]/g, '') : ''));
+    const isSel = checkedIds.has(lid) || APP_STATE.selectedLeadIds.has(lid) || (!isNaN(lid) && APP_STATE.selectedLeadIds.has(Number(lid)));
+    return isSel && self.findIndex(x => (x.id && x.id === l.id) || (x.handle && x.handle === l.handle)) === idx;
+  });
+
+  if (selected.length === 0) {
+    showToast('No leads selected! Check rows in table first.', 'warning');
+    return;
+  }
+
   let csv = 'channel_name,email,subscribers,url,score\n';
   selected.forEach(l => {
     csv += `"${l.channel}","${l.email || ''}","${l.subscribers}","${l.channel_url}","${l.ai_score || 50}"\n`;
