@@ -26,6 +26,13 @@ BLOCKED_DOMAINS = {
 }
 BLOCKED_EXTS = (".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".css", ".js")
 
+SKIP_WEBSITE_DOMAINS = {
+    "instagram.com", "facebook.com", "fb.com", "tiktok.com", "twitter.com", "x.com",
+    "linkedin.com", "pinterest.com", "spotify.com", "apple.com", "threads.net",
+    "snapchat.com", "patreon.com", "discord.gg", "discord.com", "twitch.tv",
+    "reddit.com", "t.me", "telegram.org", "whatsapp.com", "wa.me", "youtube.com"
+}
+
 _dns_cache = {}
 
 def is_domain_valid(domain: str) -> bool:
@@ -110,6 +117,15 @@ def extract_website_from_channel_page(html_text: str) -> list:
     return urls
 
 def scrape_email_from_external_site(url: str, timeout=(2.0, 3.0)) -> str:
+    if not url:
+        return ""
+    try:
+        dom = url.split("/")[2].lower() if "/" in url else url.lower()
+        if any(s in dom for s in SKIP_WEBSITE_DOMAINS) or any(b in dom for b in BLOCKED_DOMAINS):
+            return ""
+    except Exception:
+        return ""
+
     try:
         r = requests.get(url, headers=HEADERS, timeout=timeout)
         if r.status_code == 200:

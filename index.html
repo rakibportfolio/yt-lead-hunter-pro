@@ -625,6 +625,7 @@
           <input type="text" id="tableSearchInput" placeholder="Search channels..." class="search-input-field" style="width:260px;padding:8px 12px;font-size:13px;" oninput="filterResultsTable()" />
           <div class="pills-select-group">
             <button class="select-pill active" data-filter="all" onclick="setScoreFilter('all', this)">All</button>
+            <button class="select-pill" data-filter="email" onclick="setScoreFilter('email', this)" style="background:#059669;color:#fff;font-weight:700;">✉️ Has Email</button>
             <button class="select-pill" data-filter="high" onclick="setScoreFilter('high', this)">High</button>
             <button class="select-pill" data-filter="med" onclick="setScoreFilter('med', this)">Med</button>
             <button class="select-pill" data-filter="low" onclick="setScoreFilter('low', this)">Low</button>

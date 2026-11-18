@@ -248,23 +248,34 @@ def api_enrich_emails(body: dict = None):
             f"LIMIT {limit}"
         ).fetchall()
 
-    enriched = []
-    for l in leads:
-        lead_dict = dict(l)
-        res = deep_extract_channel_email(
-            channel_url=lead_dict.get("channel_url", ""),
-            handle=lead_dict.get("handle", ""),
-            description=lead_dict.get("description", "")
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    def process_lead(lead_row):
+        ld = dict(lead_row)
+        r = deep_extract_channel_email(
+            channel_url=ld.get("channel_url", ""),
+            handle=ld.get("handle", ""),
+            description=ld.get("description", "")
         )
-        if res.get("email"):
-            conn.execute("UPDATE leads SET email = ? WHERE id = ?", (res["email"], lead_dict["id"]))
-            conn.commit()
-            enriched.append({
-                "id": lead_dict["id"],
-                "name": lead_dict["name"],
-                "email": res["email"],
-                "source": res.get("source", "")
-            })
+        return ld["id"], ld["name"], r.get("email", ""), r.get("source", "")
+
+    enriched = []
+    with ThreadPoolExecutor(max_workers=12) as ex:
+        futs = [ex.submit(process_lead, l) for l in leads]
+        for f in as_completed(futs):
+            try:
+                lid, name, email, source = f.result()
+                if email:
+                    conn.execute("UPDATE leads SET email = ? WHERE id = ?", (email, lid))
+                    conn.commit()
+                    enriched.append({
+                        "id": lid,
+                        "name": name,
+                        "email": email,
+                        "source": source
+                    })
+            except Exception:
+                pass
 
     conn.close()
     return {"success": True, "total_processed": len(leads), "enriched_count": len(enriched), "enriched": enriched}

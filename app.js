@@ -982,6 +982,7 @@ function renderResultsTable() {
   let filtered = [...source];
 
   // Score chip filter
+  if (APP_STATE.activeScoreFilter === 'email') filtered = filtered.filter(l => l.email && l.email.trim().length > 0);
   if (APP_STATE.activeScoreFilter === 'high') filtered = filtered.filter(l => (l.ai_score || 0) >= 70);
   if (APP_STATE.activeScoreFilter === 'med') filtered = filtered.filter(l => (l.ai_score || 0) >= 40 && (l.ai_score || 0) < 70);
   if (APP_STATE.activeScoreFilter === 'low') filtered = filtered.filter(l => (l.ai_score || 0) < 40);

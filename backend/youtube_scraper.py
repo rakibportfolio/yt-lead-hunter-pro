@@ -931,7 +931,7 @@ def scan_youtube(keyword: str,
         # Automated multi-method deep email extraction during scan (About, Bio, Websites, Videos)
         target_handle = ch.get("handle") or ch.get("custom_url") or ch.get("channel_id")
         target_url = ch.get("channel_url") or (f"https://www.youtube.com/{target_handle}" if target_handle else "")
-        deep_limit = 100 if max_results <= 100 else 50
+        deep_limit = 150 if max_results <= 250 else 100
         if not email and (target_handle or target_url) and idx < deep_limit:
             try:
                 from enrich_emails import deep_extract_channel_email
